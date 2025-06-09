@@ -2,8 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
 
 const instance = axios.create({
-  withCredentials: true,
-  baseURL: (process.env.NEXT_PUBLIC_DOMAIN || '') + (process.env.NEXT_PUBLIC_BASE_PATH || ''),
+  baseURL: process.env.NEXT_PUBLIC_BASE_URL,
 });
 
 instance.interceptors.request.use(
@@ -13,7 +12,8 @@ instance.interceptors.request.use(
       ...config,
       headers: {
         ...config.headers,
-        Accept: "application/json",
+        // 'Access-Control-Allow-Credentials': 'true',
+        "Access-Control-Allow-Origin": "*",
       },
     };
   },
@@ -33,7 +33,8 @@ instance.interceptors.response.use(
       Cookies.remove("expiresIn");
       Cookies.remove("isAuthenticated");
       Cookies.remove("roleActive");
-      window.location.href = (process.env.NEXT_PUBLIC_BASE_PATH || '') + "/login";
+      window.location.href =
+        (process.env.NEXT_PUBLIC_BASE_PATH || "") + "/login";
     }
     return Promise.reject(error);
   }
