@@ -8,12 +8,18 @@ const instance = axios.create({
 instance.interceptors.request.use(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async (config: any) => {
+    let token: string | undefined = "";
+    if (Cookies.get("token")) {
+      token = Cookies.get("token");
+    }
+
     return {
       ...config,
       headers: {
         ...config.headers,
         // 'Access-Control-Allow-Credentials': 'true',
         "Access-Control-Allow-Origin": "*",
+        ...(token && { Authorization: `Bearer ${token}` }),
       },
     };
   },

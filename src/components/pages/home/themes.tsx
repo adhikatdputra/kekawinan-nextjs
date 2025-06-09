@@ -19,7 +19,7 @@ interface Theme {
 }
 
 export default function Themes() {
-  const { data: themes } = useQuery({
+  const { data: themes, isLoading } = useQuery({
     queryKey: ["themes"],
     queryFn: () => themeApi.getTheme(),
     select: (data) => data.data.data?.rows,
@@ -85,35 +85,39 @@ export default function Themes() {
           viewport={{ once: true }}
           className="pt-10 md:hidden"
         >
-          <Swiper
-            loop={true}
-            modules={[Autoplay, Navigation]}
-            spaceBetween={24}
-            slidesPerView={1}
-            centeredSlides={true}
-            autoplay={{ delay: 2500, disableOnInteraction: false }}
-            navigation={true}
-            className="mySwiper"
-          >
-            {themes?.map((theme: Theme, index: number) => (
-              <SwiperSlide key={index}>
-                <div className="relative group">
-                  <Image
-                    src={theme?.thumbnail}
-                    alt=""
-                    className="w-full rounded-2xl"
-                    width={100}
-                    height={100}
-                  />
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-center">
-                    <Link href={`/${theme?.component_name.toLowerCase()}/demo`}>
-                      <Button>Lihat Undangan</Button>
-                    </Link>
+          {!isLoading && themes?.length > 0 && (
+            <Swiper
+              loop={true}
+              modules={[Autoplay, Navigation]}
+              spaceBetween={24}
+              slidesPerView={1}
+              centeredSlides={true}
+              autoplay={{ delay: 2500, disableOnInteraction: false }}
+              navigation={true}
+              className="mySwiper"
+            >
+              {themes?.map((theme: Theme, index: number) => (
+                <SwiperSlide key={index}>
+                  <div className="relative group">
+                    <Image
+                      src={theme?.thumbnail}
+                      alt=""
+                      className="w-full rounded-2xl"
+                      width={100}
+                      height={100}
+                    />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-center">
+                      <Link
+                        href={`/${theme?.component_name.toLowerCase()}/demo`}
+                      >
+                        <Button>Lihat Undangan</Button>
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          )}
         </motion.div>
       </div>
     </div>

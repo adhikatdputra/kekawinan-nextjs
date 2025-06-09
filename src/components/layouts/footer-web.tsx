@@ -8,9 +8,10 @@ export default function FooterWeb() {
           <Image
             src="/images/kekawinan-logo.png"
             alt="Kekawinan"
-            width={200}
-            height={200}
-            className="w-[150px] md:w-[200px] mx-auto"
+            width={500}
+            height={500}
+            className="w-[150px] md:w-[200px] mx-auto h-auto"
+            // style={{ width: 'auto', height: 'auto' }}
             priority
           />
           <hr />

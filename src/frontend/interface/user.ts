@@ -1,16 +1,10 @@
 export interface User {
-  id: number;
-  name: string;
-  image: string;
+  id: string;
   email: string;
-  nrk: string;
-  roles: Array<string>;
-  activeRole: string;
-  skpd: PDUK;
-  uke: PDUK;
-}
-
-export interface PDUK {
-  id: number;
-  name: string;
+  fullname: string;
+  level: string;
+  token: string;
+  exp_token: number;
+  refresh_token: string;
+  exp_refresh_token: number;
 }

@@ -1,14 +1,15 @@
 import axios from "@/lib/axios";
+import { LoginBody, RegisterBody } from "../interface/auth";
 
 const authApi = {
-  login: async (formData: { username: string; password: string }) => {
-    return axios.post(`/api/auth-rest/signin`, formData);
+  login: async (body: LoginBody) => {
+    return axios.post(`/auth/signin`, body);
   },
-  logout: async () => {
-    return axios.post(`/api/auth-rest/signout`);
+  register: async (body: RegisterBody) => {
+    return axios.post(`/users`, body);
   },
-  getUser: async () => {
-    return axios.get(`/api/auth-rest/me`);
+  getMe: async () => {
+    return axios.get(`/users/profile`);
   },
 };
 
