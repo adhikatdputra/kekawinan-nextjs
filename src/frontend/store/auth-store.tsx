@@ -14,7 +14,6 @@ export default function AuthStore() {
     mutationFn: (data: LoginBody) => authApi.login(data),
     onSuccess: (data) => {
       const user: User = data.data.data;
-      console.log(user);
       if (data.data.success) {
         toast.success("Login berhasil");
         const expiresIn = new Date(user.exp_token * 1000).toISOString();

@@ -43,9 +43,9 @@ export default function LoginPage() {
             </div>
           </div>
         </div>
-        <div className="w-full md:w-1/2">
-          <div className="p-6 md:p-16 flex flex-col gap-6 max-w-[600px] mx-auto">
-            <div className="text-center">
+        <div className="w-full md:w-1/2 flex items-center justify-center h-screen bg-green-soft-kwn md:bg-transparent">
+          <div className="p-6 md:p-16 flex flex-col gap-6 max-w-[500px] mx-auto w-full">
+            <div className="text-center mb-6">
               <Image
                 src="/images/kekawinan-logo.png"
                 alt=""
@@ -61,7 +61,7 @@ export default function LoginPage() {
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="border-green-kwn h-12 rounded-full px-4"
+                className="border-green-kwn h-12 rounded-full px-4 bg-white"
               />
               <div className="relative">
                 <Input
@@ -69,7 +69,7 @@ export default function LoginPage() {
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="border-green-kwn h-12 rounded-full px-4"
+                  className="border-green-kwn h-12 rounded-full px-4 bg-white"
                 />
                 <div className="absolute top-1/2 -translate-y-1/2 right-4">
                   {showPassword ? (

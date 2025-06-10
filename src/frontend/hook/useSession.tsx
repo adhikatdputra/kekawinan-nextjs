@@ -8,11 +8,11 @@ export default function useSession() {
   useEffect(() => {
     if (!isAuthenticated()) {
       removeAuth();
-      router.push("/login");
+      router.push("/auth/login");
     }
     if (Number(getExpiresIn()) < new Date().getTime()) {
       removeAuth();
-      router.push("/login");
+      router.push("/auth/login");
     }
   }, [isAuthenticated, getExpiresIn]);
 }

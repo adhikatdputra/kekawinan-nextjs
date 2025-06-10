@@ -9,6 +9,6 @@ export interface RegisterBody {
   fullname: string;
   level: string;
   phone: string;
-  dob: string;
-  gender: string;
+  dob?: string;
+  gender?: string;
 }

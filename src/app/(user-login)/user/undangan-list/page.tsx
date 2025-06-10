@@ -64,6 +64,7 @@ import "swiper/css/pagination";
 
 export default function UndanganListPage() {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isOpenTrakteer, setIsOpenTrakteer] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Undangan | null>(null);
@@ -112,6 +113,7 @@ export default function UndanganListPage() {
         setIsOpen(false);
         setSelectedItem(null);
         toast.success("Undangan berhasil dibuat");
+        setIsOpenTrakteer(true);
         refetchUndangan();
       } else {
         toast.error(response.message);
@@ -506,6 +508,47 @@ export default function UndanganListPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Dialog Trakteer */}
+      <Dialog
+        open={isOpenTrakteer}
+        onOpenChange={() => {
+          setIsOpenTrakteer(false);
+          window.open("https://trakteer.id/partnerinaja/tip", "_blank");
+        }}
+      >
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle></DialogTitle>
+            <DialogDescription></DialogDescription>
+          </DialogHeader>
+          <div className="md:px-8">
+            <div className="text-center pb-5">
+              <div className="text-3xl font-bold text-black">
+                Selamat kamu berhasil membuat undangan!
+              </div>
+              <p className="pt-2">
+                Yuk terus support kami agar dapat terus mengembangkan sistem ini
+              </p>
+            </div>
+            <Link
+              href="https://trakteer.id/partnerinaja/tip"
+              target="_blank"
+              className="flex items-center justify-center gap-2 bg-red-700 text-white px-4 py-2 rounded-full"
+              onClick={() => setIsOpenTrakteer(false)}
+            >
+              <Image
+                src="https://cdn.trakteer.id/images/embed/trbtn-icon.png"
+                alt=""
+                width={100}
+                height={100}
+                className="w-[16px]"
+              />
+              <span>Dukung kami di Trakteer</span>
+            </Link>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

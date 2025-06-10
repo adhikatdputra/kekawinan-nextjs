@@ -40,7 +40,7 @@ instance.interceptors.response.use(
       Cookies.remove("isAuthenticated");
       Cookies.remove("roleActive");
       window.location.href =
-        (process.env.NEXT_PUBLIC_BASE_PATH || "") + "/login";
+        (process.env.NEXT_PUBLIC_BASE_PATH || "") + "/auth/login";
     }
     return Promise.reject(error);
   }
