@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Upload } from "lucide-react";
+import ImageUpload from "@/components/ui/custom/image-uploader";
 
 export default function InformasiMempelaiPage() {
   const params = useParams();
@@ -25,6 +26,8 @@ export default function InformasiMempelaiPage() {
   const [img_female, setImgFemale] = useState<string>("");
   const [male_no, setMaleNo] = useState<string>("");
   const [female_no, setFemaleNo] = useState<string>("");
+  const [male_upload, setMaleUpload] = useState<File | null>(null);
+  const [female_upload, setFemaleUpload] = useState<File | null>(null);
 
   const { data: undanganContent, refetch } = useQuery({
     queryKey: ["undangan-content", id],
@@ -60,8 +63,8 @@ export default function InformasiMempelaiPage() {
     formData.append("mother_male", mother_male);
     formData.append("father_female", father_female);
     formData.append("mother_female", mother_female);
-    formData.append("img_male", img_male);
-    formData.append("img_female", img_female);
+    formData.append("img_male", male_upload as File);
+    formData.append("img_female", female_upload as File);
     formData.append("male_no", male_no);
     formData.append("female_no", female_no);
     updateUndanganContent(formData);
@@ -93,6 +96,22 @@ export default function InformasiMempelaiPage() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="flex flex-col gap-6">
+          <div className="grid gap-2">
+            <Label htmlFor="img_female">Foto Mempelai Wanita</Label>
+            <ImageUpload
+              placeholder="w-40 h-40 bg-gray-200 rounded-full"
+              icon={Upload}
+              iconSize={32}
+              defaultValue={img_female}
+              onChange={(file, imageUrl) => {
+                if (file) {
+                  setImgFemale(imageUrl as string);
+                  setFemaleUpload(file);
+                }
+              }}
+            />
+          </div>
+
           <div className="grid gap-2">
             <Label htmlFor="name_male">Nama Mempelai Wanita</Label>
             <Input
@@ -138,12 +157,28 @@ export default function InformasiMempelaiPage() {
           </div>
           <div className="grid gap-2">
             <div className="bg-muted rounded-md p-4 text-sm">
-              Putri {female_no || "..."} dari keluarga Bpk {father_female || "..."}
+              Putri {female_no || "..."} dari keluarga Bpk{" "}
+              {father_female || "..."}
               dan Ibu {mother_female || "..."}
             </div>
           </div>
         </div>
         <div className="flex flex-col gap-6">
+          <div className="grid gap-2">
+            <Label htmlFor="img_male">Foto Mempelai Pria</Label>
+            <ImageUpload
+              placeholder="w-40 h-40 bg-gray-200 rounded-full"
+              icon={Upload}
+              iconSize={32}
+              defaultValue={img_male}
+              onChange={(file, imageUrl) => {
+                if (file) {
+                  setImgMale(imageUrl as string);
+                  setMaleUpload(file);
+                }
+              }}
+            />
+          </div>
           <div className="grid gap-2">
             <Label htmlFor="name_male">Nama Mempelai Pria</Label>
             <Input
