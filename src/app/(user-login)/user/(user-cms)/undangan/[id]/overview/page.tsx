@@ -236,7 +236,7 @@ export default function OverviewPage() {
                 {isLoading ? (
                   <IconLoader2 size={40} className="animate-spin pb-1" />
                 ) : (
-                  undanganUcapan?.count
+                  undanganUcapan?.count || 0
                 )}
               </h6>
               <p className="text-muted-foreground pb-1">Ucapan</p>
@@ -251,7 +251,7 @@ export default function OverviewPage() {
                 {isLoadingTotalHadir ? (
                   <IconLoader2 size={40} className="animate-spin pb-1" />
                 ) : (
-                  totalHadir
+                  totalHadir || 0
                 )}
               </h6>
               <p className="text-muted-foreground pb-1">Tamu</p>
@@ -266,7 +266,7 @@ export default function OverviewPage() {
                 {isLoadingTotalTidakHadir ? (
                   <IconLoader2 size={40} className="animate-spin pb-1" />
                 ) : (
-                  totalTidakHadir
+                  totalTidakHadir || 0
                 )}
               </h6>
               <p className="text-muted-foreground pb-1">Tamu</p>
@@ -300,8 +300,10 @@ export default function OverviewPage() {
               tableData.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell className="w-[20%]">{item.name}</TableCell>
-                  <TableCell className="w-[55%] whitespace-normal">
-                    <p>{item.message}</p>
+                  <TableCell className="w-[55%] whitespace-break-spaces">
+                    <div
+                      dangerouslySetInnerHTML={{ __html: item.message }}
+                    ></div>
                   </TableCell>
                   <TableCell className="w-[15%]">
                     <p>

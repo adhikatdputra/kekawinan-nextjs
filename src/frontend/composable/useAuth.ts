@@ -46,6 +46,10 @@ export const useAuth = () => {
       expires: expiredCookies,
       secure: COOKIE_SECURE,
     });
+    Cookies.set("fullname", user.fullname, {
+      expires: expiredCookies,
+      secure: COOKIE_SECURE,
+    });
   };
 
   const getUser = () => {
@@ -63,6 +67,17 @@ export const useAuth = () => {
       }
     }
     return null;
+  };
+
+  const getUserName = () => {
+    return Cookies.get("fullname");
+  };
+
+  const setUserName = (name: string) => {
+    Cookies.set("fullname", name, {
+      expires: expiredCookies,
+      secure: COOKIE_SECURE,
+    });
   };
 
   const getExpiresIn = () => {
@@ -100,6 +115,7 @@ export const useAuth = () => {
     Cookies.remove("expiresIn");
     Cookies.remove("isAuthenticated");
     Cookies.remove("token");
+    Cookies.remove("fullname");
     setUser(null);
     setExpiresIn(null);
     setIsAuthenticated(false);
@@ -114,5 +130,7 @@ export const useAuth = () => {
     removeAuth,
     isAuthenticated,
     getToken,
+    getUserName,
+    setUserName,
   };
 };

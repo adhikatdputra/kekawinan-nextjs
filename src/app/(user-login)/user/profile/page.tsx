@@ -8,11 +8,13 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-hot-toast";
 import { Loader2 } from "lucide-react";
+import { useAuth } from "@/frontend/composable/useAuth";
 
 export default function ProfilePage() {
   const [fullname, setFullname] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const { setUserName } = useAuth();
 
   const {
     data: user,
@@ -44,6 +46,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (user) {
+      setUserName(user.fullname);
       setFullname(user.fullname);
       setPhone(user.phone);
       setEmail(user.email);

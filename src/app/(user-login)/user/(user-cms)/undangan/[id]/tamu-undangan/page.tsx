@@ -289,7 +289,7 @@ export default function TamuPage() {
                 {isLoading ? (
                   <IconLoader2 size={40} className="animate-spin pb-1" />
                 ) : (
-                  undanganTamu?.count
+                  undanganTamu?.count || 0
                 )}
               </h6>
               <p className="text-muted-foreground pb-1">Tamu</p>
@@ -304,7 +304,7 @@ export default function TamuPage() {
                 {isLoadingTotalKirimWA ? (
                   <IconLoader2 size={40} className="animate-spin pb-1" />
                 ) : (
-                  totalKirimWA?.total_send
+                  totalKirimWA?.total_send || 0
                 )}
               </h6>
               <p className="text-muted-foreground pb-1">Tamu</p>
@@ -319,7 +319,7 @@ export default function TamuPage() {
                 {isLoadingTotalKirimWA ? (
                   <IconLoader2 size={40} className="animate-spin pb-1" />
                 ) : (
-                  totalKirimWA?.total_confirm
+                  totalKirimWA?.total_confirm || 0
                 )}
               </h6>
               <p className="text-muted-foreground pb-1">Tamu</p>
@@ -334,7 +334,7 @@ export default function TamuPage() {
                 {isLoadingTotalKirimWA ? (
                   <IconLoader2 size={40} className="animate-spin pb-1" />
                 ) : (
-                  totalKirimWA?.total_read
+                  totalKirimWA?.total_read || 0
                 )}
               </h6>
               <p className="text-muted-foreground pb-1">Tamu</p>

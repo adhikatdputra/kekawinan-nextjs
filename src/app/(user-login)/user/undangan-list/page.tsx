@@ -71,7 +71,7 @@ export default function UndanganListPage() {
   const [selectedTheme, setSelectedTheme] = useState<string | undefined>("");
   const [name, setName] = useState("");
   const [permalink, setPermalink] = useState("");
-  const { getUser } = useAuth();
+  const { getUser, getUserName } = useAuth();
 
   const {
     data: undangan,
@@ -183,7 +183,7 @@ export default function UndanganListPage() {
           {isLoaded && (
             <>
               <h1 className="text-black text-3xl md:text-5xl font-bold">
-                Halo... <br /> {getUser()?.fullname}
+                Halo... <br /> {getUserName()}
               </h1>
               {(getUser()?.level === "admin" ||
                 (getUser()?.level !== "admin" && undangan?.length < 2)) && (
@@ -258,7 +258,7 @@ export default function UndanganListPage() {
                           </Tooltip>
                           <Tooltip>
                             <TooltipTrigger className="bg-blue-600 text-white p-1 rounded-sm">
-                              <Link href={`/user/undangan/${item.id}/tamu`}>
+                              <Link href={`/user/undangan/${item.id}/tamu-undangan`}>
                                 <IconUsers size={18} />
                               </Link>
                             </TooltipTrigger>
