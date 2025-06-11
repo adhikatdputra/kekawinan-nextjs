@@ -41,7 +41,7 @@ export default function MenuAction({
           {items.includes("Edit") && (
             <Button
               variant="ghost"
-              className="justify-start rounded-none hover:bg-green-soft-kwn hover:text-white"
+              className="justify-start rounded-none hover:bg-green-soft-kwn"
               onClick={handleEdit}
             >
               <IconEdit size={24} />

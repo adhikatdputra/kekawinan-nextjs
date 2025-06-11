@@ -3,7 +3,7 @@ import { IconMoodSad } from "@tabler/icons-react";
 
 export default function TableNoData({ colSpan }: { colSpan: number }) {
   return (
-    <TableRow>
+    <TableRow className="h-[100px]">
       <TableCell colSpan={colSpan} className="text-center">
         <div className="flex gap-2 items-center justify-center">
           <IconMoodSad size={24} /> Data Tidak Ditemukan

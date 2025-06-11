@@ -81,3 +81,51 @@ export interface UndanganGaleri {
   undangan_id: string;
   updatedAt: string;
 }
+
+export interface Params {
+  search?: string;
+  limit?: number;
+  page?: number;
+  sortBy?: string;
+  order?: string;
+}
+
+export interface UndanganUcapanResponse {
+  rows: UndanganUcapan[];
+  count: number;
+  current_page: number;
+  page_size: number;
+}
+
+export interface UndanganUcapan {
+  undangan_id: string;
+  id: string;
+  name: string;
+  message: string;
+  attend: string;
+  attend_total: number;
+  is_show: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UndanganTamuResponse {
+  rows: UndanganTamu[];
+  count: number;
+  current_page: number;
+  page_size: number;
+}
+
+export interface UndanganTamu {
+  id: string;
+  undangan_id: string;
+  name: string;
+  phone: string;
+  send_status: number;
+  is_read: number;
+  is_confirm: number;
+  max_invite: number;
+  createdAt: string;
+  updatedAt: string;
+}
+

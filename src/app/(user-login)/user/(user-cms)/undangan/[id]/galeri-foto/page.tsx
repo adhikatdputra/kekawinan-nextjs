@@ -93,7 +93,7 @@ export default function GaleriFotoPage() {
     deleteUndanganGaleri(selectedItem?.id as string);
   };
 
-  const handleUpdateUndanganGaleri = () => {
+  const handleCreateUndanganGaleri = () => {
     const formData = new FormData();
     formData.append("undangan_id", id);
     formData.append("image", image as unknown as File);
@@ -138,7 +138,7 @@ export default function GaleriFotoPage() {
           </div>
           <div className="flex gap-2">
             <Button
-              onClick={handleUpdateUndanganGaleri}
+              onClick={handleCreateUndanganGaleri}
               disabled={isCreating || !image}
             >
               {isCreating ? (
