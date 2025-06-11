@@ -29,6 +29,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Image from "next/image";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { useQuery } from "@tanstack/react-query";
 import undanganApi from "@/frontend/api/undangan";
@@ -41,13 +42,21 @@ export function AppSidebar() {
   const pathname = usePathname();
   const id = params.id as string;
 
-  // Menu items.
-  const items = [
+  const menuItems = [
     {
       title: "Dashboard",
       url: `/user/undangan/${id}/overview`,
       icon: LayoutDashboard,
     },
+    {
+      title: "Tamu Undangan",
+      url: `/user/undangan/${id}/tamu-undangan`,
+      icon: UserRoundPlus,
+    },
+  ];
+
+  // Menu items.
+  const items = [
     {
       title: "Cover Pembuka",
       url: `/user/undangan/${id}/cover-pembuka`,
@@ -78,11 +87,7 @@ export function AppSidebar() {
       url: `/user/undangan/${id}/setting`,
       icon: Settings,
     },
-    {
-      title: "Tamu Undangan",
-      url: `/user/undangan/${id}/tamu-undangan`,
-      icon: UserRoundPlus,
-    },
+
     {
       title: "Kambali",
       url: `/user/undangan-list`,
@@ -90,7 +95,7 @@ export function AppSidebar() {
     },
   ];
 
-  const { data: undangan } = useQuery({
+  const { data: undangan, isLoading } = useQuery({
     queryKey: ["undangan-detail", id],
     queryFn: () => undanganApi.getUndanganDetail(id),
     select: (data) => data.data.data,
@@ -109,14 +114,47 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup className="border-y border-gray-200 py-6 px-4 mt-4">
           <div className="flex flex-col gap-3">
-            <div>
-              <h3 className="font-medium">{undangan?.name}</h3>
-              <p className="text-sm">{formatDate(undangan?.expired)}</p>
-            </div>
-            <Link href={`/${undangan?.permalink}/demo`} target="_blank">
-              <Button className="w-full rounded-full">Preview Undangan</Button>
-            </Link>
+            {isLoading ? (
+              <>
+                <Skeleton className="w-full h-10 rounded-md" />
+                <Skeleton className="w-full h-10 rounded-md" />
+              </>
+            ) : (
+              <>
+                <div>
+                  <h3 className="font-medium">{undangan?.name}</h3>
+                  <p className="text-sm">{formatDate(undangan?.expired)}</p>
+                </div>
+                <Link href={`/${undangan?.permalink}/demo`} target="_blank">
+                  <Button className="w-full rounded-full">
+                    Preview Undangan
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Tamu Management</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {menuItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    className={cn(
+                      pathname === item.url && "bg-gray-200 hover:bg-gray-200"
+                    )}
+                  >
+                    <Link href={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel>Content Management</SidebarGroupLabel>
@@ -127,8 +165,7 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     asChild
                     className={cn(
-                      pathname === item.url &&
-                        "bg-gray-200 hover:bg-gray-200"
+                      pathname === item.url && "bg-gray-200 hover:bg-gray-200"
                     )}
                   >
                     <Link href={item.url}>

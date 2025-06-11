@@ -280,3 +280,14 @@ button {
   backdrop-filter: blur(32px);
   box-shadow: 0px 5px 15px 0px #dcedff1a;
 }
+
+.react-datetime-picker__wrapper {
+  border-color: var(--border) !important;
+  border-radius: var(--radius) !important;
+  padding: 0.5rem !important;
+  background-color: var(--green-soft-kwn) !important;
+}
+
+.react-datetime-picker__calendar-button.react-datetime-picker__button {
+  margin-top: -5px !important;
+}

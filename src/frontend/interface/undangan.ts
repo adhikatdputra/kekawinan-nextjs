@@ -53,3 +53,31 @@ export interface UndanganContent {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface Gift {
+  id: string;
+  undangan_id: string;
+  bank_name: string;
+  name: string;
+  bank_number: string;
+  name_address: string;
+  phone: string;
+  address: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UndanganGaleriResponse {
+  rows: UndanganGaleri[];
+  count: number;
+  current_page: number;
+  page_size: number;
+}
+
+export interface UndanganGaleri {
+  createdAt: string;
+  id: string;
+  image: string;
+  undangan_id: string;
+  updatedAt: string;
+}

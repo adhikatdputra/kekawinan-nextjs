@@ -70,7 +70,7 @@ export default function InformasiAcaraPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 border-b pb-4">
         <h1 className="text-2xl font-bold">Informasi Acara Pernikahan</h1>
         <p>
           Masukkan informasi acara pernikahanmu agar memudahkan para tamu untuk

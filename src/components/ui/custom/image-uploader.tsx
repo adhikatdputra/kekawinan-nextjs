@@ -9,7 +9,7 @@ export default function ImageUpload({
   defaultValue = "",
   onChange = (file: File | null, imageUrl: string | null) => { void file; void imageUrl; },
   accept = "image/*",
-  maxSize = 5 * 1024 * 1024, // 5MB default
+  maxSize = 1 * 1024 * 1024, // 1MB default
   showDeleteButton = true,
   uploadText = "Click to upload image",
   className = ""

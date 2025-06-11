@@ -44,14 +44,14 @@ export default function InformasiMempelaiPage() {
     onSuccess: (data) => {
       const response = data.data;
       if (response.success) {
-        toast.success("Informasi acara berhasil diubah");
+        toast.success("Informasi mempelai berhasil diubah");
         refetch();
       } else {
         toast.error(response.message);
       }
     },
     onError: () => {
-      toast.error("Informasi acara gagal diubah");
+      toast.error("Informasi mempelai gagal diubah");
     },
   });
 
@@ -87,7 +87,7 @@ export default function InformasiMempelaiPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 border-b pb-4">
         <h1 className="text-2xl font-bold">Informasi Mempelai</h1>
         <p>
           Masukkan data pengantin beserta nama kedua orang tua dari pengantin.
@@ -99,7 +99,7 @@ export default function InformasiMempelaiPage() {
           <div className="grid gap-2">
             <Label htmlFor="img_female">Foto Mempelai Wanita</Label>
             <ImageUpload
-              placeholder="w-40 h-40 bg-gray-200 rounded-full"
+              placeholder="w-32 h-32 bg-gray-200 rounded-full"
               icon={Upload}
               iconSize={32}
               defaultValue={img_female}
@@ -167,7 +167,7 @@ export default function InformasiMempelaiPage() {
           <div className="grid gap-2">
             <Label htmlFor="img_male">Foto Mempelai Pria</Label>
             <ImageUpload
-              placeholder="w-40 h-40 bg-gray-200 rounded-full"
+              placeholder="w-32 h-32 bg-gray-200 rounded-full"
               icon={Upload}
               iconSize={32}
               defaultValue={img_male}
