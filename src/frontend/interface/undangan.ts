@@ -24,6 +24,23 @@ export interface Theme {
   component_name: string;
 }
 
+export interface UndanganDetail {
+  id: string;
+  user_id: string;
+  permalink: string;
+  name: string;
+  status: string;
+  expired: string;
+  theme_id: string;
+  createdAt: string;
+  updatedAt: string;
+  undangan_content: UndanganContent;
+  undangan_gift: Gift;
+  undangan_gallery: UndanganGaleri[];
+  ucapan: UndanganUcapan[];
+  theme: Theme;
+}
+
 export interface UndanganContent {
   id: string;
   undangan_id: string;
@@ -98,15 +115,15 @@ export interface UndanganUcapanResponse {
 }
 
 export interface UndanganUcapan {
-  undangan_id: string;
-  id: string;
+  undangan_id?: string;
+  id?: string;
   name: string;
   message: string;
   attend: string;
   attend_total: number;
-  is_show: number;
-  createdAt: string;
-  updatedAt: string;
+  is_show?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface UndanganTamuResponse {

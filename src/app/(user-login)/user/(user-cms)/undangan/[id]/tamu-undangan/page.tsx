@@ -63,6 +63,7 @@ import TamuStore from "@/frontend/store/tamu-store";
 import { debounce } from "lodash";
 import undanganTamuApi from "@/frontend/api/undangan-tamu";
 import undanganApi from "@/frontend/api/undangan";
+import { toast } from "react-hot-toast";
 
 export default function TamuPage() {
   const params = useParams();
@@ -72,8 +73,7 @@ export default function TamuPage() {
   const { mutate: updateTamu, isPending: isPendingUpdate } = update;
   const { mutate: createTamu, isPending: isPendingCreate } = create;
   const { mutate: deleteTamu, isPending: isPendingDelete } = remove;
-  const { mutate: sendWhatsappTamu } =
-    sendWhatsapp;
+  const { mutate: sendWhatsappTamu } = sendWhatsapp;
 
   // Form Data
   const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -124,9 +124,15 @@ export default function TamuPage() {
 
   const handleDeleteTamu = () => {
     deleteTamu(selectedItem?.id as string, {
-      onSuccess: () => {
-        refetch();
-        refetchTotalKirimWA();
+      onSuccess: (data) => {
+        const res = data.data;
+        if (res.success) {
+          refetch();
+          refetchTotalKirimWA();
+          toast.success("Tamu berhasil dihapus");
+        } else {
+          toast.error(res.message);
+        }
       },
     });
   };
@@ -151,14 +157,20 @@ export default function TamuPage() {
     formData.append("max_invite", max_invite);
     formData.append("undangan_id", id);
     createTamu(formData, {
-      onSuccess: () => {
-        setIsOpen(false);
-        setName("");
-        setPhone("");
-        setMaxInvite("");
-        setSelectedItem(null);
-        refetch();
-        refetchTotalKirimWA();
+      onSuccess: (data) => {
+        const res = data.data;
+        if (res.success) {
+          setIsOpen(false);
+          setName("");
+          setPhone("");
+          setMaxInvite("");
+          setSelectedItem(null);
+          refetch();
+          refetchTotalKirimWA();
+          toast.success("Tamu berhasil dibuat");
+        } else {
+          toast.error(res.message);
+        }
       },
     });
   };
@@ -176,14 +188,20 @@ export default function TamuPage() {
         data: formData,
       },
       {
-        onSuccess: () => {
-          setIsOpen(false);
-          setName("");
-          setPhone("");
-          setMaxInvite("");
-          setSelectedItem(null);
-          refetch();
-          refetchTotalKirimWA();
+        onSuccess: (data) => {
+          const res = data.data;
+          if (res.success) {
+            setIsOpen(false);
+            setName("");
+            setPhone("");
+            setMaxInvite("");
+            setSelectedItem(null);
+            refetch();
+            refetchTotalKirimWA();
+            toast.success("Tamu berhasil diubah");
+          } else {
+            toast.error(res.message);
+          }
         },
       }
     );
@@ -462,7 +480,9 @@ export default function TamuPage() {
                 <Input
                   id="name"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) =>
+                    setName(e.target.value.replace(/[^\w\s]/gi, ""))
+                  }
                   placeholder="Nama Tamu"
                   className="w-full"
                 />
