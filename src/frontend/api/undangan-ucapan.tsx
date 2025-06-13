@@ -17,6 +17,9 @@ const undanganUcapanApi = {
   getNoAttend: (id: string) => {
     return axios.get(`/users/ucapan/no-attend/${id}`);
   },
+  getAttendanceSummary: (id: string) => {
+    return axios.get(`/users/ucapan/attendance-summary/${id}`);
+  },
   changeShow: (id: string, data: { is_show: string }) => {
     return axios.put(`/users/ucapan/show/${id}`, data);
   },

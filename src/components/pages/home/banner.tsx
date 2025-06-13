@@ -16,7 +16,7 @@ const desc = `Bikin undangan digital gak perlu ribet!Pilih desain sesuai selera,
 
 export default function Banner() {
   return (
-    <div className="bg-[url('/images/background-banner.png')] bg-cover bg-center h-screen flex items-center justify-center">
+    <div className="bg-[url('/images/background-banner.png')] bg-cover bg-center min-h-screen flex items-center justify-center py-16 md:py-0">
       <div className="container mx-auto">
         <div className="flex flex-wrap items-center">
           <div className="w-full md:w-2/5 md:order-last">
@@ -33,7 +33,7 @@ export default function Banner() {
               <Image
                 src="/images/image-banner.png"
                 alt=""
-                className="w-[80%] mx-auto"
+                className="w-[70%] md:w-[80%] mx-auto"
                 width={1000}
                 height={1000}
               />

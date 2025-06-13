@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import {
   Dialog,
@@ -7,8 +9,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Gift } from "@/frontend/interface/undangan";
-import { IconClipboard } from "@tabler/icons-react";
+import { IconClipboard, IconCheck } from "@tabler/icons-react";
 import { toast } from "react-hot-toast";
+import { useState } from "react";
 
 export default function DialogGift({
   gift,
@@ -19,10 +22,14 @@ export default function DialogGift({
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) {
-
+  const [isCopied, setIsCopied] = useState(false);
   const handleCopy = () => {
     navigator.clipboard.writeText(gift.bank_number);
     toast.success("Nomor rekening berhasil disalin");
+    setIsCopied(true);
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 2000);
   };
 
   return (
@@ -58,10 +65,14 @@ export default function DialogGift({
                     onClick={handleCopy}
                   >
                     <p className="text-2xl font-bold">{gift.bank_number}</p>
-                    <IconClipboard
-                      size={20}
-                      className="-mt-1 text-blue-600 cursor-pointer"
-                    />
+                    {isCopied ? (
+                      <IconCheck size={20} className="-mt-1 text-green-kwn" />
+                    ) : (
+                      <IconClipboard
+                        size={20}
+                        className="-mt-1 text-blue-600 cursor-pointer"
+                      />
+                    )}
                   </button>
                 </div>
                 <div className="flex flex-col gap-1 items-start">
@@ -74,8 +85,8 @@ export default function DialogGift({
               <h3 className="text-xl font-bold">Kirim Hadiah</h3>
               <div className="flex flex-col gap-1 items-start bg-gray-100 p-4 rounded-lg w-full border border-dashed border-gray-300">
                 <p className="text-sm font-semibold">{gift.name_address}</p>
-                <p className="text-sm">{gift.phone}</p>
-                <p className="text-sm">{gift.address}</p>
+                <p className="text-sm text-left">{gift.phone}</p>
+                <p className="text-sm text-left">{gift.address}</p>
               </div>
             </div>
           </div>

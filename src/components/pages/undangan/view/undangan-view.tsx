@@ -1,20 +1,29 @@
 "use client";
 
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import undanganUserApi from "@/frontend/api/undangan-user";
-import { UndanganTamu, UndanganDetail } from "@/frontend/interface/undangan";
-
-import CountdownTimer from "@/components/card/counting-down";
-import UcapanConfirm from "@/components/card/ucapan-confirm";
+import {
+  UndanganTamu,
+  UndanganDetail,
+  UndanganUcapan,
+} from "@/frontend/interface/undangan";
 import { toast } from "react-hot-toast";
 
 interface ThemeComponentProps {
-  onPlayMusic: () => void;
-  onOpenGift: () => void;
-  isPlayMusic: boolean;
   undanganData: UndanganDetail;
   tamuData: UndanganTamu;
+  ucapan: UndanganUcapan[];
+  isPlayMusic: boolean;
+  isSubmitting: boolean;
+  onPlayMusic: () => void;
+  onSubmitUcapan: (data: {
+    name: string;
+    attend: string;
+    attend_total: string;
+    message: string;
+  }) => void;
 }
 
 export default function UndanganView({
@@ -24,16 +33,23 @@ export default function UndanganView({
   slug: string;
   id_tamu: string;
 }) {
+  const router = useRouter();
+
   const [music, setMusic] = useState<string | null>(null);
   const [isPlayMusic, setIsPlayMusic] = useState(false);
+  const [ucapan, setUcapan] = useState<UndanganUcapan[]>([]);
 
-  const { data: undanganData } = useQuery({
+  const {
+    data: undanganData,
+    isError,
+    refetch,
+  } = useQuery({
     queryKey: ["undangan-user-page", slug],
     queryFn: () => undanganUserApi.getUndangan(slug),
     select: (data) => data.data as UndanganDetail,
   });
 
-  const { data: tamu } = useQuery({
+  const { data: tamu, refetch: refetchTamu } = useQuery({
     queryKey: ["undangan-user-tamu", id_tamu],
     queryFn: () => undanganUserApi.getTamu(id_tamu),
     select: (data) => data.data,
@@ -45,6 +61,9 @@ export default function UndanganView({
 
   const { mutate: changeStatusUcapan } = useMutation({
     mutationFn: undanganUserApi.changeStatusUcapan,
+    onSuccess: () => {
+      refetchTamu();
+    },
   });
 
   const onSubmitUcapan = (data: {
@@ -57,8 +76,9 @@ export default function UndanganView({
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("attend", data.attend);
-      formData.append("attend_total", data.attend_total);
+      formData.append("attend_total", data.attend_total || tamu?.max_invite);
       formData.append("message", data.message);
+      formData.append("undangan_id", undanganData?.id ?? "");
 
       submitUcapan(formData, {
         onSuccess: (data) => {
@@ -66,6 +86,7 @@ export default function UndanganView({
           if (res.success) {
             changeStatusUcapan(id_tamu);
             toast.success("Ucapan berhasil dikirim");
+            refetch();
           } else {
             toast.error(res.message);
           }
@@ -74,13 +95,17 @@ export default function UndanganView({
       return;
     }
 
+    toast.success("Ucapan berhasil dikirim");
     // Jika id_tamu adalah demo, maka tambahkan ucapan ke dalam array ucapan
-    undanganData?.ucapan.unshift({
-      name: data.name,
-      attend: data.attend,
-      attend_total: parseInt(data.attend_total),
-      message: data.message,
-    });
+    setUcapan([
+      {
+        name: data.name,
+        attend: data.attend,
+        attend_total: parseInt(data.attend_total),
+        message: data.message,
+      },
+      ...ucapan,
+    ]);
   };
 
   const handlePlayMusic = () => {
@@ -99,7 +124,6 @@ export default function UndanganView({
     useState<React.ComponentType<ThemeComponentProps> | null>(null);
 
   useEffect(() => {
-    console.log("undanganData", undanganData);
     const loadTheme = async () => {
       const name = undanganData?.theme?.component_name;
       if (!name) {
@@ -120,37 +144,40 @@ export default function UndanganView({
     };
 
     setMusic(undanganData?.undangan_content?.music ?? null);
+    setUcapan(undanganData?.ucapan ?? []);
 
     loadTheme();
   }, [undanganData]);
 
+  useEffect(() => {
+    if (isError) {
+      router.push("/");
+    }
+  }, [isError]);
+
   return (
-    <div className="max-w-[400px] mx-auto">
-      UndanganView: {slug} {id_tamu}
+    <div className="max-w-[400px] mx-auto overflow-x-hidden">
       {ThemeComponent && undanganData ? (
         <ThemeComponent
-          onPlayMusic={handlePlayMusic}
-          isPlayMusic={isPlayMusic}
           undanganData={undanganData}
           tamuData={tamu}
-          onOpenGift={() => {
-            console.log("open gift");
-          }}
+          ucapan={ucapan}
+          isPlayMusic={isPlayMusic}
+          isSubmitting={isSubmitting}
+          onSubmitUcapan={onSubmitUcapan}
+          onPlayMusic={handlePlayMusic}
         />
       ) : (
-        <div>Memuat tema...</div>
+        <div className="flex flex-col justify-center items-center h-screen">
+          <img
+            src="/images/kekawinan-icon.svg"
+            alt=""
+            className="w-[50px] animate-bounce"
+          />
+          <div className="text-lg font-semibold">Please wait...</div>
+        </div>
       )}
-      <CountdownTimer
-        targetDate={undanganData?.undangan_content?.date_wedding ?? ""}
-      />
-      <UcapanConfirm
-        tamu={tamu}
-        isLoading={isSubmitting}
-        onSubmit={({ data }) => {
-          onSubmitUcapan(data);
-        }}
-      />
-      
+
       {music && <audio id="music" src={music} autoPlay={isPlayMusic} />}
     </div>
   );

@@ -63,7 +63,6 @@ import TamuStore from "@/frontend/store/tamu-store";
 import { debounce } from "lodash";
 import undanganTamuApi from "@/frontend/api/undangan-tamu";
 import undanganApi from "@/frontend/api/undangan";
-import { toast } from "react-hot-toast";
 
 export default function TamuPage() {
   const params = useParams();
@@ -129,9 +128,6 @@ export default function TamuPage() {
         if (res.success) {
           refetch();
           refetchTotalKirimWA();
-          toast.success("Tamu berhasil dihapus");
-        } else {
-          toast.error(res.message);
         }
       },
     });
@@ -167,9 +163,6 @@ export default function TamuPage() {
           setSelectedItem(null);
           refetch();
           refetchTotalKirimWA();
-          toast.success("Tamu berhasil dibuat");
-        } else {
-          toast.error(res.message);
         }
       },
     });
@@ -198,9 +191,6 @@ export default function TamuPage() {
             setSelectedItem(null);
             refetch();
             refetchTotalKirimWA();
-            toast.success("Tamu berhasil diubah");
-          } else {
-            toast.error(res.message);
           }
         },
       }
@@ -362,7 +352,12 @@ export default function TamuPage() {
       </div>
       <div className="border border-border p-6 rounded-2xl grid gap-4">
         <div className="flex gap-2 justify-end items-center">
-          <Button onClick={() => setIsOpen(true)}>
+          <Button
+            onClick={() => {
+              setIsOpen(true);
+              setSelectedItem(null);
+            }}
+          >
             <IconPlus size={16} />
             Tambah Tamu
           </Button>

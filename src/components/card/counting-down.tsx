@@ -98,12 +98,12 @@ export default function CountdownTimer({
     <div className="flex flex-col items-center justify-center">
       <div className="mb-6 text-center">
         <h1
-          className="text-3xl font-medium mb-1 font-glitten"
+          className="text-4xl font-medium mb-1 font-glitten"
           style={{ color: textHeadingColor }}
         >
           Save the Date
         </h1>
-        <p className="text-sm font-glitten">
+        <p className="text-base font-glitten" style={{ color: textHeadingColor }}>
           {formatDateId(targetDate.toISOString())}
         </p>
       </div>
@@ -162,13 +162,16 @@ export const BoxTime = ({
   return (
     <div
       className="rounded-2xl p-2 text-center flex flex-col justify-center items-center aspect-square"
-      style={{ boxShadow: "4px 3pt 0pt #FFFFFF", backgroundColor: bgColor }}
+      style={{
+        boxShadow: `4px 3pt 0pt ${textColor}`,
+        backgroundColor: bgColor,
+      }}
     >
-      <div className="text-3xl font-bold mb-1" style={{ color: textColor }}>
+      <div className="text-3xl font-bold" style={{ color: textColor }}>
         {formatNumber(timeLeft)}
       </div>
       <div
-        className="text-sm font-medium tracking-wider"
+        className="text-xs font-medium tracking-wider"
         style={{ color: textColor }}
       >
         {title}
