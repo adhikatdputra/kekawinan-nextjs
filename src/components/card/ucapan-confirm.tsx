@@ -19,6 +19,7 @@ export default function UcapanConfirm({
   tamu,
   bgColor,
   color,
+  colorHeading,
   fontHeading = "font-glitten",
   isLoading,
   onSubmit,
@@ -26,6 +27,7 @@ export default function UcapanConfirm({
   tamu: UndanganTamu;
   bgColor?: string;
   color?: string;
+  colorHeading?: string;
   fontHeading?: string;
   isLoading?: boolean;
   onSubmit: ({
@@ -71,7 +73,7 @@ export default function UcapanConfirm({
     <div className="px-6 py-16" style={{ backgroundColor: bgColor }}>
       <h1
         className={`text-2xl font-medium text-center mb-8 ${fontHeading}`}
-        style={{ color: color }}
+        style={{ color: colorHeading }}
       >
         RSVP dan Ucapan Doa
       </h1>

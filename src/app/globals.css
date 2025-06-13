@@ -177,6 +177,8 @@
   --color-green-soft-kwn: var(--green-soft-kwn);
   --color-theme4-primary: var(--theme4-primary);
   --color-theme4-secondary: var(--theme4-secondary);
+  --color-theme6-primary: var(--theme6-primary);
+  --color-theme6-secondary: var(--theme6-secondary);
 }
 
 @utility container {
@@ -224,6 +226,8 @@
   --green-soft-kwn: oklch(0.9272 0.0226 141.23);
   --theme4-primary: oklch(0.7394 0.0534 130.88);
   --theme4-secondary: oklch(0.9411 0.0102 131.36);
+  --theme6-primary: oklch(0.5684 0.1696 295.47);
+  --theme6-secondary: oklch(0.1956 0.1135 286.07);
 }
 
 .dark {
@@ -266,6 +270,8 @@
   --green-soft-kwn: oklch(0.9272 0.0226 141.23);
   --theme4-primary: oklch(0.7394 0.0534 130.88);
   --theme4-secondary: oklch(0.9411 0.0102 131.36);
+  --theme6-primary: oklch(0.5684 0.1696 295.47);
+  --theme6-secondary: oklch(0.1956 0.1135 286.07);
 }
 
 @layer base {

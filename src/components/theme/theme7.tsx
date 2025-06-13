@@ -70,7 +70,7 @@ export default function Theme7({
               <IconLeaf size={20} className="text-green-soft-kwn" />
             </div>
           ))}
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black to-theme4-primary opacity-80"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black to-theme6-primary opacity-80"></div>
         <div className="relative z-10 text-center">
           <motion.div
             initial={{ opacity: 0, y: 100 }}
@@ -112,10 +112,12 @@ export default function Theme7({
           viewport={{ once: false }}
           className="flex flex-col gap-6 relative z-10 w-full mb-12"
         >
-          <div className="bg-white p-4 rounded-2xl text-center w-[80%] mx-auto border border-dashed border-theme4-primary">
+          <div className="bg-white p-4 rounded-2xl text-center w-[80%] mx-auto border border-dashed border-theme6-primary">
             <p>Kepada Yth.</p>
             <p className="text-xs">Bapak/Ibu/Saudara/i</p>
-            <p className="font-semibold text-lg mt-2">{tamuData?.name || "Tamu Spesial"}</p>
+            <p className="font-semibold text-lg mt-2">
+              {tamuData?.name || "Tamu Spesial"}
+            </p>
           </div>
           <div className="text-center">
             <Button
@@ -143,33 +145,7 @@ export default function Theme7({
         }}
       >
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black to-transparent opacity-80"></div>
-        <motion.div
-          initial={{ opacity: 0, x: 100 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{
-            duration: 1,
-            ease: "easeInOut",
-            delay: 0.4,
-          }}
-          viewport={{ once: false }}
-          className="absolute top-0 right-0 w-[200px]"
-        >
-          <img src="/images/theme4/flower1.png" alt="" className="w-[200px]" />
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, x: -100 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{
-            duration: 1,
-            ease: "easeInOut",
-            delay: 0.4,
-          }}
-          viewport={{ once: false }}
-          className="absolute -bottom-4 left-0 w-[200px]"
-        >
-          <img src="/images/theme4/flower2.png" alt="" className="w-[200px]" />
-        </motion.div>
-        <div className="flex flex-col gap-3 items-center mt-24 relative">
+        <div className="flex flex-col gap-3 items-center mt-6 relative">
           <motion.div
             initial={{ opacity: 0, y: 100 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -219,7 +195,7 @@ export default function Theme7({
         </div>
       </div>
       {/* Informasi Mempelai */}
-      <div className="py-16 px-6 bg-[url('/images/theme4/bg1.png')] bg-cover bg-center">
+      <div className="py-16 px-6 bg-[url('/images/theme6/bg1.png')] bg-cover bg-center text-theme6-secondary rounded-t-3xl -mt-8 relative z-10">
         <div className="flex flex-col gap-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 100 }}
@@ -231,7 +207,7 @@ export default function Theme7({
             }}
             viewport={{ once: false }}
           >
-            <Badge className="text-xs rounded-full bg-theme4-primary text-white px-4">
+            <Badge className="text-xs rounded-full bg-theme6-primary text-white px-4">
               Undangan Pernikahan
             </Badge>
           </motion.div>
@@ -283,7 +259,7 @@ export default function Theme7({
               <img
                 src={undangan?.undangan_content?.img_female}
                 alt=""
-                className="w-[140px] h-[175px] object-cover rounded-t-full mx-auto"
+                className="w-[150px] h-[150px] object-cover rounded-full mx-auto"
               />
             </motion.div>
             <motion.div
@@ -331,7 +307,7 @@ export default function Theme7({
               <img
                 src={undangan?.undangan_content?.img_male}
                 alt=""
-                className="w-[140px] h-[175px] object-cover rounded-t-full mx-auto"
+                className="w-[150px] h-[150px] object-cover rounded-full mx-auto"
               />
             </motion.div>
             <motion.div
@@ -365,16 +341,16 @@ export default function Theme7({
               viewport={{ once: false }}
             >
               <img
-                src="/images/theme4/flower3.png"
+                src="/images/theme6/bunga.png"
                 alt=""
-                className="w-[90px] mx-auto py-5"
+                className="w-[250px] mx-auto py-5"
               />
             </motion.div>
           </div>
         </div>
       </div>
       {/* Informasi Resepsi */}
-      <div className="py-16 px-6 bg-[url('/images/theme4/bg2.png')] bg-cover bg-center">
+      <div className="py-16 px-6 bg-[url('/images/theme6/bg2.png')] bg-cover bg-center">
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -388,77 +364,76 @@ export default function Theme7({
           <CountdownTimer
             targetDate={undangan?.undangan_content?.date_wedding ?? ""}
             textHeadingColor="#FFFFFF"
-            bgColor="#9FB28F"
+            bgColor="#815CCE"
           />
         </motion.div>
-        <div className="pt-18 pb-12">
-          <div className="bg-[#EEEEEE] px-4 py-8 rounded-bl-[70px]">
-            <motion.div
-              initial={{ opacity: 0, y: 100 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 1,
-                ease: "easeInOut",
-                delay: 0.4,
-              }}
-              viewport={{ once: false }}
-              className="-mt-20"
-            >
+        <div className="py-10 flex flex-col gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 100 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 1,
+              ease: "easeInOut",
+              delay: 0.6,
+            }}
+            viewport={{ once: false }}
+            className="p-3 bg-white rounded-2xl relative overflow-hidden"
+          >
+            <div className="absolute -top-4 -right-6">
               <img
-                src="/images/theme4/flower4.png"
+                src="/images/theme6/bunga2.png"
                 alt=""
-                className="w-[140px] mx-auto"
+                className="w-[100px] h-[100px]"
               />
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 100 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 1,
-                ease: "easeInOut",
-                delay: 0.6,
-              }}
-              viewport={{ once: false }}
-              className="py-6"
-            >
-              <p className="text-center text-lg font-semibold font-recoleta">
+            </div>
+            <div className="p-4 border-2 border-theme6-primary rounded-2xl">
+              <p className="text-xl font-semibold font-recoleta uppercase">
                 Akad Nikah
               </p>
-              <p className="text-center text-sm font-medium font-recoleta text-[#6C6A39]">
+              <p className="text-sm font-medium text-theme6-primary">
                 {undangan?.undangan_content?.akad_time}
               </p>
               <div
-                className="text-center text-sm mt-2"
+                className="text-sm mt-2"
                 dangerouslySetInnerHTML={{
                   __html: undangan?.undangan_content?.akad_place ?? "",
                 }}
               />
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 100 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 1,
-                ease: "easeInOut",
-                delay: 0.7,
-              }}
-              viewport={{ once: false }}
-              className="py-6"
-            >
-              <p className="text-center text-lg font-semibold font-recoleta">
-                Resepsi Nikah
+            </div>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 100 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 1,
+              ease: "easeInOut",
+              delay: 0.8,
+            }}
+            viewport={{ once: false }}
+            className="p-3 bg-white rounded-2xl relative overflow-hidden"
+          >
+            <div className="absolute -top-4 -right-6">
+              <img
+                src="/images/theme6/bunga2.png"
+                alt=""
+                className="w-[100px] h-[100px]"
+              />
+            </div>
+            <div className="p-4 border-2 border-theme6-primary rounded-2xl">
+              <p className="text-xl font-semibold font-recoleta uppercase">
+                Resepsi Pernikahan
               </p>
-              <p className="text-center text-sm font-medium font-recoleta text-[#6C6A39]">
+              <p className="text-sm font-medium text-theme6-primary">
                 {undangan?.undangan_content?.resepsi_time}
               </p>
               <div
-                className="text-center text-sm mt-2"
+                className="text-sm mt-2"
                 dangerouslySetInnerHTML={{
                   __html: undangan?.undangan_content?.resepsi_place ?? "",
                 }}
               />
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
         </div>
         <div className="flex flex-col gap-6 items-center">
           <motion.div
@@ -475,7 +450,7 @@ export default function Theme7({
               href={undangan?.undangan_content?.gmaps ?? ""}
               target="_blank"
             >
-              <Button className="bg-theme4-primary text-white font-semibold">
+              <Button className="bg-theme6-primary hover:bg-theme6-primary text-white hover:text-white font-semibold">
                 <IconMapPin size={16} />
                 <span>Lihat di Google Maps</span>
               </Button>
@@ -499,7 +474,7 @@ export default function Theme7({
                 href={undangan?.undangan_content?.stream_link ?? ""}
                 target="_blank"
               >
-                <Button className="bg-theme4-primary text-white font-semibold">
+                <Button className="bg-theme6-primary hover:bg-theme6-primary text-white hover:text-white font-semibold">
                   <IconDeviceTvOld size={16} />
                   <span>Live Streaming</span>
                 </Button>
@@ -536,7 +511,7 @@ export default function Theme7({
           viewport={{ once: false }}
           className="pb-8"
         >
-          <h2 className="text-3xl font-medium text-center font-glitten">
+          <h2 className="text-3xl font-medium text-center font-recoleta-alt text-theme6-secondary">
             Galeri Kami
           </h2>
         </motion.div>
@@ -549,11 +524,14 @@ export default function Theme7({
         onSubmit={({ data }) => {
           onSubmitUcapan(data);
         }}
-        bgColor="#E9EDE6"
+        bgColor="#FFFFFF"
+        fontHeading="font-recoleta-alt"
+        color="#815CCE"
+        colorHeading="#24006E"
       />
       {/* Ucapan Doa List */}
-      <div className="py-16 px-6 bg-gray-100">
-        <div className="flex flex-col mb-8 items-center justify-center">
+      <div className="py-16 px-6 bg-[#FAFAFA]">
+        <div className="flex flex-col mb-8 items-center justify-center text-theme6-secondary">
           <h3 className="font-recoleta text-3xl font-semibold">Doa Terbaik</h3>
           <p className="text-sm">untuk {undangan?.undangan_content?.title}</p>
         </div>
@@ -567,16 +545,20 @@ export default function Theme7({
           )}
           {ucapan?.map((item, index) => (
             <div
-              className="bg-white border-l-3 border-theme4-primary rounded-r-3xl p-4 flex gap-4"
+              className="bg-white border-l-3 border-theme6-primary rounded-2xl p-4 flex flex-col gap-3 bg-gradient-to-br from-white to-theme6-primary/15"
               key={index}
             >
-              <div className="w-8 h-8 bg-theme4-primary rounded-full flex items-center justify-center font-semibold text-white">
-                {item.name.charAt(0)}
+              <div className="flex gap-3">
+                <div className="w-8 h-8 bg-theme6-primary rounded-full flex items-center justify-center font-semibold text-white">
+                  {item.name.charAt(0)}
+                </div>
+                <div className="flex-wrap">
+                  <h6 className="font-semibold font-recoleta-alt mb-2 mt-1">
+                    {item.name}
+                  </h6>
+                </div>
               </div>
-              <div className="flex-1">
-                <h6 className="font-semibold font-recoleta-alt mb-2 mt-1">
-                  {item.name}
-                </h6>
+              <div>
                 <div
                   className="text-sm"
                   dangerouslySetInnerHTML={{
@@ -604,6 +586,7 @@ export default function Theme7({
         onPlayMusic={onPlayMusic}
         isPlayMusic={isPlayMusic}
         onOpenGift={() => setIsOpenGift(true)}
+        bgColor="bg-theme6-primary"
       />
 
       {/* Open Dialog Gift */}

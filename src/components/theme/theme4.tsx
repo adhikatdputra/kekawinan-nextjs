@@ -115,7 +115,9 @@ export default function Theme7({
           <div className="bg-white p-4 rounded-2xl text-center w-[80%] mx-auto border border-dashed border-theme4-primary">
             <p>Kepada Yth.</p>
             <p className="text-xs">Bapak/Ibu/Saudara/i</p>
-            <p className="font-semibold text-lg mt-2">{tamuData?.name}</p>
+            <p className="font-semibold text-lg mt-2">
+              {tamuData?.name || "Tamu Spesial"}
+            </p>
           </div>
           <div className="text-center">
             <Button
