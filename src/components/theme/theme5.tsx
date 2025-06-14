@@ -244,7 +244,7 @@ export default function Theme5({
             <img
               src={undangan?.undangan_content?.img_bg}
               alt=""
-              className="w-full h-[600px] object-cover rounded-t-full"
+              className="w-full h-[65%] object-cover rounded-t-full"
             />
           </div>
         </motion.div>

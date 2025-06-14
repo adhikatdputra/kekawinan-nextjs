@@ -140,9 +140,9 @@ export default function Theme7({
   }
 
   return (
-    <div className="relative">
+    <div className="relative bg-black">
       {/* Cover Undangan */}
-      <div className="relative h-screen flex flex-col items-center justify-between">
+      <div className="relative h-screen flex flex-col items-center justify-between text-white">
         <div className="flex flex-col gap-3 items-center mt-6 relative p-6 py-8">
           <motion.div
             initial={{ opacity: 0 }}
@@ -154,7 +154,7 @@ export default function Theme7({
             }}
             viewport={{ once: false }}
           >
-            <Badge className="text-xs rounded-full bg-black text-white px-4">
+            <Badge className="text-xs rounded-full bg-white text-black px-4">
               Undangan Pernikahan
             </Badge>
           </motion.div>
@@ -168,7 +168,7 @@ export default function Theme7({
             }}
             viewport={{ once: false }}
           >
-            <h2 className="text-4xl text-black font-recoleta-alt font-bold">
+            <h2 className="text-4xl  font-recoleta-alt font-bold">
               {undangan?.undangan_content?.title}
             </h2>
           </motion.div>
@@ -182,7 +182,7 @@ export default function Theme7({
             }}
             viewport={{ once: false }}
           >
-            <p className="text-black text-center">
+            <p className="text-center">
               {formatDateId(undangan?.undangan_content?.date_wedding ?? "")}
             </p>
           </motion.div>
@@ -250,7 +250,7 @@ export default function Theme7({
         </motion.div>
       </div>
       {/* Informasi Mempelai */}
-      <div className="py-16 px-6 text-black relative z-10">
+      <div className="py-16 px-6 text-white relative z-10">
         <div className="flex flex-col gap-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 100 }}
@@ -279,7 +279,7 @@ export default function Theme7({
             <img
               src="/images/theme1/bismillah.png"
               alt=""
-              className="h-12 mx-auto"
+              className="h-12 mx-auto contrast-0"
             />
             <p className="font-semibold mt-4 text-sm">
               Assalamu&apos;alaikum Warahmatullahi Wabarakatuh
@@ -569,7 +569,7 @@ export default function Theme7({
         </div>
       </div>
       {/* Galeri */}
-      <div className="py-16 bg-[url('/images/theme2/bg1.png')] bg-cover bg-center">
+      <div className="py-16 bg-gray-900">
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -581,11 +581,11 @@ export default function Theme7({
           viewport={{ once: false }}
           className="pb-8"
         >
-          <h2 className="text-3xl font-medium text-center font-glitten text-theme5-secondary">
+          <h2 className="text-3xl font-medium text-center font-glitten text-white">
             Galeri Kami
           </h2>
         </motion.div>
-        <Galeri galeri={undanganData.undangan_gallery} view={2} />
+        <Galeri galeri={undanganData.undangan_gallery} view={2} color="#FFFFFF" />
       </div>
       {/* Reservasi Ucapan Doa */}
       <UcapanConfirm
@@ -594,15 +594,15 @@ export default function Theme7({
         onSubmit={({ data }) => {
           onSubmitUcapan(data);
         }}
-        bgColor="bg-white"
+        bgColor="bg-black"
         fontHeading="font-glitten"
         bgButton="bg-theme5-primary"
         colorButton="text-white"
-        colorHeading="text-theme5-secondary"
+        colorHeading="text-white"
       />
       {/* Ucapan Doa List */}
-      <div className="py-16 px-6 bg-[#FAFAFA]">
-        <div className="flex flex-col mb-8 items-center justify-center text-theme5-secondary">
+      <div className="py-16 px-6 bg-gradient-to-b from-black to-theme5-primary">
+        <div className="flex flex-col mb-8 items-center justify-center text-white">
           <h3 className="font-glitten text-3xl">Doa Terbaik</h3>
           <p className="text-sm">untuk {undangan?.undangan_content?.title}</p>
         </div>
@@ -640,7 +640,7 @@ export default function Theme7({
             </div>
           ))}
         </div>
-        <div className="flex flex-col items-center justify-center mt-8 gap-1">
+        <div className="flex flex-col items-center justify-center mt-8 gap-1 bg-white py-2 rounded-2xl">
           <img
             src="/images/kekawinan-logo.png"
             alt=""
