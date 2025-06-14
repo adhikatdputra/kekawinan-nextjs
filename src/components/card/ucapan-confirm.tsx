@@ -131,7 +131,7 @@ export default function UcapanConfirm({
           </div>
           <div className="flex justify-center mt-2">
             <Button
-              className={`${bgButton} ${colorButton}`}
+              className={`${bgButton} ${colorButton} px-8`}
               onClick={submitUcapan}
               disabled={
                 !name ||

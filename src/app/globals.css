@@ -175,6 +175,8 @@
   --font-recoleta-alt: "Recoleta Alt", sans-serif;
   --color-green-kwn: var(--green-kwn);
   --color-green-soft-kwn: var(--green-soft-kwn);
+  --color-theme1-primary: var(--theme1-primary);
+  --color-theme1-secondary: var(--theme1-secondary);
   --color-theme2-primary: var(--theme2-primary);
   --color-theme2-secondary: var(--theme2-secondary);
   --color-theme4-primary: var(--theme4-primary);
@@ -230,6 +232,8 @@
   --font-recoleta-alt: "Recoleta Alt", sans-serif;
   --green-kwn: oklch(0.5192 0.0971 139.19);
   --green-soft-kwn: oklch(0.9272 0.0226 141.23);
+  --theme1-primary: oklch(0.7248 0.043 51.26);
+  --theme1-secondary: oklch(0.9201 0.0138 46.22);
   --theme2-primary: oklch(0.5142 0.0693 106.54);
   --theme2-secondary: oklch(0 0 0);
   --theme4-primary: oklch(0.7394 0.0534 130.88);
@@ -280,6 +284,8 @@
   --font-recoleta-alt: "Recoleta Alt", sans-serif;
   --green-kwn: oklch(0.5192 0.0971 139.19);
   --green-soft-kwn: oklch(0.9272 0.0226 141.23);
+  --theme1-primary: oklch(0.7248 0.043 51.26);
+  --theme1-secondary: oklch(0.9201 0.0138 46.22);
   --theme2-primary: oklch(0.5142 0.0693 106.54);
   --theme2-secondary: oklch(0 0 0);
   --theme4-primary: oklch(0.7394 0.0534 130.88);
