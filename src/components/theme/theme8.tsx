@@ -601,7 +601,7 @@ export default function Theme8({
         colorHeading="text-white"
       />
       {/* Ucapan Doa List */}
-      <div className="py-16 px-6 bg-gradient-to-b from-black to-theme5-primary">
+      <div className="py-16 px-6 bg-gradient-to-b from-black to-theme5-primary border-t border-white/20">
         <div className="flex flex-col mb-8 items-center justify-center text-white">
           <h3 className="font-glitten text-3xl">Doa Terbaik</h3>
           <p className="text-sm">untuk {undangan?.undangan_content?.title}</p>
@@ -658,6 +658,7 @@ export default function Theme8({
         isPlayMusic={isPlayMusic}
         onOpenGift={() => setIsOpenGift(true)}
         bgColor="bg-theme5-primary"
+        darkMode={true}
       />
 
       {/* Open Dialog Gift */}
