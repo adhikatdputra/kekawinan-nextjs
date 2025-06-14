@@ -8,7 +8,11 @@ import {
 } from "@/frontend/interface/undangan";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import { IconDeviceTvOld, IconLeaf, IconMapPin } from "@tabler/icons-react";
+import {
+  IconDeviceTvOld,
+  IconBrandSnowflake,
+  IconMapPin,
+} from "@tabler/icons-react";
 
 import DialogGift from "@/components/card/dialog-gift";
 import Galeri from "@/components/card/galeri";
@@ -67,7 +71,7 @@ export default function Theme6({
           .fill(null)
           .map((_, i) => (
             <div className="snowflake z-9" key={i}>
-              <IconLeaf size={20} className="text-green-soft-kwn" />
+              <IconBrandSnowflake size={20} className="text-green-soft-kwn" />
             </div>
           ))}
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black to-theme6-primary opacity-80"></div>
@@ -250,7 +254,7 @@ export default function Theme6({
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{
-                duration: 1,
+                duration: 2,
                 ease: "easeInOut",
                 delay: 0.8,
               }}
@@ -298,7 +302,7 @@ export default function Theme6({
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{
-                duration: 1,
+                duration: 2,
                 ease: "easeInOut",
                 delay: 0.8,
               }}
@@ -363,8 +367,8 @@ export default function Theme6({
         >
           <CountdownTimer
             targetDate={undangan?.undangan_content?.date_wedding ?? ""}
-            textHeadingColor="#FFFFFF"
-            bgColor="#815CCE"
+            textHeadingColor="text-white"
+            bgColor="bg-theme6-primary"
           />
         </motion.div>
         <div className="py-10 flex flex-col gap-6">
@@ -524,10 +528,11 @@ export default function Theme6({
         onSubmit={({ data }) => {
           onSubmitUcapan(data);
         }}
-        bgColor="#FFFFFF"
+        bgColor="bg-white"
         fontHeading="font-recoleta-alt"
-        color="#815CCE"
-        colorHeading="#24006E"
+        bgButton="bg-theme6-primary"
+        colorButton="text-white"
+        colorHeading="text-theme6-secondary"
       />
       {/* Ucapan Doa List */}
       <div className="py-16 px-6 bg-[#FAFAFA]">

@@ -13,13 +13,15 @@ interface CountdownTimerProps {
   bgColor?: string;
   textColor?: string;
   textHeadingColor?: string;
+  shadowColor?: string;
 }
 
 export default function CountdownTimer({
   targetDate: targetDateString,
-  bgColor = "#000000",
-  textColor = "#FFFFFF",
-  textHeadingColor = "#000000",
+  bgColor = "bg-black",
+  textColor = "text-white",
+  textHeadingColor = "text-black",
+  shadowColor = "bg-white",
 }: CountdownTimerProps) {
   const targetDate = new Date(targetDateString);
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({
@@ -98,12 +100,11 @@ export default function CountdownTimer({
     <div className="flex flex-col items-center justify-center">
       <div className="mb-6 text-center">
         <h1
-          className="text-4xl font-medium mb-1 font-glitten"
-          style={{ color: textHeadingColor }}
+          className={`text-4xl font-medium mb-1 font-glitten ${textHeadingColor}`}
         >
           Save the Date
         </h1>
-        <p className="text-base font-glitten" style={{ color: textHeadingColor }}>
+        <p className={`text-base font-glitten ${textHeadingColor}`}>
           {formatDateId(targetDate.toISOString())}
         </p>
       </div>
@@ -115,6 +116,7 @@ export default function CountdownTimer({
           title="Hari"
           bgColor={bgColor}
           textColor={textColor}
+          shadowColor={shadowColor}
         />
 
         {/* Hours */}
@@ -123,6 +125,7 @@ export default function CountdownTimer({
           title="Jam"
           bgColor={bgColor}
           textColor={textColor}
+          shadowColor={shadowColor}
         />
 
         {/* Minutes */}
@@ -131,6 +134,7 @@ export default function CountdownTimer({
           title="Menit"
           bgColor={bgColor}
           textColor={textColor}
+          shadowColor={shadowColor}
         />
 
         {/* Seconds */}
@@ -139,6 +143,7 @@ export default function CountdownTimer({
           title="Detik"
           bgColor={bgColor}
           textColor={textColor}
+          shadowColor={shadowColor}
         />
       </div>
     </div>
@@ -150,31 +155,31 @@ export const BoxTime = ({
   title,
   bgColor,
   textColor,
+  shadowColor = "bg-white",
 }: {
   timeLeft: number;
   title: string;
   bgColor: string;
   textColor: string;
+  shadowColor?: string;
 }) => {
   const formatNumber = (num: number): string => {
     return num.toString().padStart(2, "0");
   };
   return (
-    <div
-      className="rounded-2xl p-2 text-center flex flex-col justify-center items-center aspect-square"
-      style={{
-        boxShadow: `4px 3pt 0pt ${textColor}`,
-        backgroundColor: bgColor,
-      }}
-    >
-      <div className="text-3xl font-bold" style={{ color: textColor }}>
-        {formatNumber(timeLeft)}
-      </div>
+    <div className="relative">
       <div
-        className="text-xs font-medium tracking-wider"
-        style={{ color: textColor }}
+        className={`absolute top-1 -right-1 w-full h-full rounded-2xl ${shadowColor}`}
+      ></div>
+      <div
+        className={` ${bgColor} rounded-2xl p-2 text-center flex flex-col justify-center items-center aspect-square relative`}
       >
-        {title}
+        <div className={`text-3xl font-bold ${textColor}`}>
+          {formatNumber(timeLeft)}
+        </div>
+        <div className={`text-xs font-medium tracking-wider ${textColor}`}>
+          {title}
+        </div>
       </div>
     </div>
   );

@@ -276,7 +276,7 @@ export default function Theme7({
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{
-                duration: 1,
+                duration: 2,
                 ease: "easeInOut",
                 delay: 0.8,
               }}
@@ -324,7 +324,7 @@ export default function Theme7({
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{
-                duration: 1,
+                duration: 2,
                 ease: "easeInOut",
                 delay: 0.8,
               }}
@@ -389,8 +389,8 @@ export default function Theme7({
         >
           <CountdownTimer
             targetDate={undangan?.undangan_content?.date_wedding ?? ""}
-            textHeadingColor="#FFFFFF"
-            bgColor="#9FB28F"
+            textHeadingColor="text-white"
+            bgColor="bg-theme4-primary"
           />
         </motion.div>
         <div className="pt-18 pb-12">
@@ -551,7 +551,7 @@ export default function Theme7({
         onSubmit={({ data }) => {
           onSubmitUcapan(data);
         }}
-        bgColor="#E9EDE6"
+        bgColor="bg-theme4-secondary"
       />
       {/* Ucapan Doa List */}
       <div className="py-16 px-6 bg-gray-100">

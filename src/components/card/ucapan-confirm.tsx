@@ -18,7 +18,8 @@ import { UndanganTamu } from "@/frontend/interface/undangan";
 export default function UcapanConfirm({
   tamu,
   bgColor,
-  color,
+  bgButton,
+  colorButton,
   colorHeading,
   fontHeading = "font-glitten",
   isLoading,
@@ -26,7 +27,8 @@ export default function UcapanConfirm({
 }: {
   tamu: UndanganTamu;
   bgColor?: string;
-  color?: string;
+  bgButton?: string;
+  colorButton?: string;
   colorHeading?: string;
   fontHeading?: string;
   isLoading?: boolean;
@@ -70,10 +72,9 @@ export default function UcapanConfirm({
   }, [tamu]);
 
   return (
-    <div className="px-6 py-16" style={{ backgroundColor: bgColor }}>
+    <div className={`px-6 py-16 ${bgColor}`}>
       <h1
-        className={`text-2xl font-medium text-center mb-8 ${fontHeading}`}
-        style={{ color: colorHeading }}
+        className={`text-2xl font-medium text-center mb-8 ${fontHeading} ${colorHeading}`}
       >
         RSVP dan Ucapan Doa
       </h1>
@@ -130,7 +131,7 @@ export default function UcapanConfirm({
           </div>
           <div className="flex justify-center mt-2">
             <Button
-              style={{ backgroundColor: color }}
+              className={`${bgButton} ${colorButton}`}
               onClick={submitUcapan}
               disabled={
                 !name ||
