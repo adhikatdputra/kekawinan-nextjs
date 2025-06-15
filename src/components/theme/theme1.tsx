@@ -216,9 +216,9 @@ export default function Theme1({
             className="absolute -bottom-3 -right-4 w-[200px] z-10 flex items-center justify-end"
           >
             <img
-              src="/images/theme1/flower2.png"
+              src="/images/theme1/bunga2.png"
               alt=""
-              className="w-[100px] animate-pulse"
+              className="w-[180px]"
             />
           </motion.div>
           <motion.div
@@ -233,9 +233,9 @@ export default function Theme1({
             className="absolute -bottom-3 -left-4 w-[200px] z-10"
           >
             <img
-              src="/images/theme1/flower1.png"
+              src="/images/theme1/bunga1.png"
               alt=""
-              className="w-[100px] animate-pulse"
+              className="w-[180px]"
             />
           </motion.div>
           <div className="absolute top-8 left-0 w-full p-6 py-6">
@@ -423,7 +423,7 @@ export default function Theme1({
         <div className="relative z-10 -mt-[380px] px-6">
           <div className="py-10 flex flex-col gap-6">
             <div className="py-6">
-              <div className="bg-[#EEEEEE] px-4 py-8 rounded-bl-[70px] rounded-tr-[70px]">
+              <div className="bg-[#EEEEEE] px-4 py-8 rounded-tl-[70px] rounded-br-[70px]">
                 <motion.div
                   initial={{ opacity: 0, y: 100 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -452,7 +452,7 @@ export default function Theme1({
                   className="py-6"
                 >
                   <p className="text-center text-xl font-recoleta-alt uppercase font-semibold mb-1">Akad Nikah</p>
-                  <p className="text-center text-sm font-medium font-recoleta text-theme1-secondary">
+                  <p className="text-center text-sm font-medium font-recoleta text-theme1-primary">
                     {undangan?.undangan_content?.akad_time}
                   </p>
                   <div
@@ -492,7 +492,7 @@ export default function Theme1({
                   <p className="text-center text-xl font-recoleta-alt uppercase font-semibold mb-1">
                     Resepsi Nikah
                   </p>
-                  <p className="text-center text-sm font-medium font-recoleta-alt text-theme1-secondary">
+                  <p className="text-center text-sm font-medium font-recoleta-alt text-theme1-primary">
                     {undangan?.undangan_content?.resepsi_time}
                   </p>
                   <div
