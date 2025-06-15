@@ -74,7 +74,7 @@ export default function Theme8({
               <IconBrandSnowflake size={20} className="text-green-soft-kwn" />
             </div>
           ))}
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black to-theme5-primary opacity-80"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black to-theme8-primary opacity-80"></div>
         <div className="relative z-10 text-center">
           <motion.div
             initial={{ opacity: 0, y: 100 }}
@@ -116,7 +116,7 @@ export default function Theme8({
           viewport={{ once: false }}
           className="flex flex-col gap-6 relative z-10 w-full mb-12"
         >
-          <div className="bg-white p-4 rounded-2xl text-center w-[80%] mx-auto border border-dashed border-theme5-primary">
+          <div className="bg-white p-4 rounded-2xl text-center w-[80%] mx-auto border border-dashed border-theme8-primary">
             <p>Kepada Yth.</p>
             <p className="text-xs">Bapak/Ibu/Saudara/i</p>
             <p className="font-semibold text-lg mt-2">
@@ -262,7 +262,7 @@ export default function Theme8({
             }}
             viewport={{ once: false }}
           >
-            <Badge className="text-xs rounded-full bg-theme5-primary text-white px-4">
+            <Badge className="text-xs rounded-full bg-theme8-primary text-white px-4">
               Undangan Pernikahan
             </Badge>
           </motion.div>
@@ -309,7 +309,7 @@ export default function Theme8({
                 ease: "easeInOut",
                 delay: 0.7,
               }}
-              className="flex flex-col gap-6 w-full text-center py-12 px-6 mt-8 bg-gradient-to-b from-theme5-primary to-theme5-secondary text-white rounded-4xl"
+              className="flex flex-col gap-6 w-full text-center py-12 px-6 mt-8 bg-gradient-to-b from-theme8-primary to-theme8-secondary text-white rounded-4xl"
             >
               <motion.div
                 initial={{ opacity: 0 }}
@@ -400,7 +400,7 @@ export default function Theme8({
         </div>
       </div>
       {/* Informasi Resepsi */}
-      <div className="relative bg-gradient-to-b from-theme5-primary to-theme5-secondary pb-12">
+      <div className="relative bg-gradient-to-b from-theme8-primary to-theme8-secondary pb-12">
         <div className="py-[380px] -mt-[400px] px-6 bg-[url('/images/theme5/bg-1.png')] bg-cover bg-center">
           <motion.div
             initial={{ opacity: 0 }}
@@ -415,7 +415,7 @@ export default function Theme8({
             <CountdownTimer
               targetDate={undangan?.undangan_content?.date_wedding ?? ""}
               textHeadingColor="text-white"
-              bgColor="bg-theme5-primary"
+              bgColor="bg-theme8-primary"
             />
           </motion.div>
         </div>
@@ -451,7 +451,7 @@ export default function Theme8({
                   className="py-6"
                 >
                   <p className="text-center text-xl font-recoleta-alt uppercase font-semibold mb-1">Akad Nikah</p>
-                  <p className="text-center text-sm font-medium font-recoleta text-theme5-secondary">
+                  <p className="text-center text-sm font-medium font-recoleta text-theme8-secondary">
                     {undangan?.undangan_content?.akad_time}
                   </p>
                   <div
@@ -491,7 +491,7 @@ export default function Theme8({
                   <p className="text-center text-xl font-recoleta-alt uppercase font-semibold mb-1">
                     Resepsi Nikah
                   </p>
-                  <p className="text-center text-sm font-medium font-recoleta-alt text-theme5-secondary">
+                  <p className="text-center text-sm font-medium font-recoleta-alt text-theme8-secondary">
                     {undangan?.undangan_content?.resepsi_time}
                   </p>
                   <div
@@ -519,7 +519,7 @@ export default function Theme8({
                 href={undangan?.undangan_content?.gmaps ?? ""}
                 target="_blank"
               >
-                <Button className="bg-theme5-primary hover:bg-theme5-primary text-white hover:text-white font-semibold">
+                <Button className="bg-theme8-primary hover:bg-theme8-primary text-white hover:text-white font-semibold">
                   <IconMapPin size={16} />
                   <span>Lihat di Google Maps</span>
                 </Button>
@@ -543,7 +543,7 @@ export default function Theme8({
                   href={undangan?.undangan_content?.stream_link ?? ""}
                   target="_blank"
                 >
-                  <Button className="bg-theme5-primary hover:bg-theme5-primary text-white hover:text-white font-semibold">
+                  <Button className="bg-theme8-primary hover:bg-theme8-primary text-white hover:text-white font-semibold">
                     <IconDeviceTvOld size={16} />
                     <span>Live Streaming</span>
                   </Button>
@@ -596,19 +596,19 @@ export default function Theme8({
         }}
         bgColor="bg-black"
         fontHeading="font-glitten"
-        bgButton="bg-theme5-primary"
+        bgButton="bg-theme8-primary"
         colorButton="text-white"
         colorHeading="text-white"
       />
       {/* Ucapan Doa List */}
-      <div className="py-16 px-6 bg-gradient-to-b from-black to-theme5-primary border-t border-white/20">
+      <div className="py-16 px-6 bg-gradient-to-b from-black to-theme8-primary border-t border-white/20">
         <div className="flex flex-col mb-8 items-center justify-center text-white">
           <h3 className="font-glitten text-3xl">Doa Terbaik</h3>
           <p className="text-sm">untuk {undangan?.undangan_content?.title}</p>
         </div>
         <div className="flex flex-col gap-6">
           {ucapan?.length === 0 && (
-            <div className="text-center text-sm">
+            <div className="text-center text-sm text-white">
               Jadilah yang pertama untuk mengirimkan
               <br />
               doa ke calon pengantin
@@ -616,11 +616,11 @@ export default function Theme8({
           )}
           {ucapan?.map((item, index) => (
             <div
-              className="bg-white border-l-3 border-theme5-primary rounded-br-4xl p-4 flex flex-col gap-3 bg-gradient-to-br from-white to-theme5-primary/15"
+              className="bg-white border-l-3 border-theme8-primary rounded-br-4xl p-4 flex flex-col gap-3 bg-gradient-to-br from-white to-theme8-primary/15"
               key={index}
             >
               <div className="flex gap-3">
-                <div className="w-8 h-8 bg-theme5-primary rounded-full flex items-center justify-center font-semibold text-white">
+                <div className="w-8 h-8 bg-theme8-primary rounded-full flex items-center justify-center font-semibold text-white">
                   {item.name.charAt(0)}
                 </div>
                 <div className="flex-wrap">
@@ -657,7 +657,7 @@ export default function Theme8({
         onPlayMusic={onPlayMusic}
         isPlayMusic={isPlayMusic}
         onOpenGift={() => setIsOpenGift(true)}
-        bgColor="bg-theme5-primary"
+        bgColor="bg-theme8-primary"
         darkMode={true}
       />
 

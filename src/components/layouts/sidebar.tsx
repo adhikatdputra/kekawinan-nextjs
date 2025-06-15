@@ -89,7 +89,7 @@ export function AppSidebar() {
     },
 
     {
-      title: "Kambali",
+      title: "Kembali",
       url: `/user/undangan-list`,
       icon: ArrowLeftToLine,
     },

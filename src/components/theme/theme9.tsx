@@ -546,7 +546,7 @@ export default function Theme9({
         </div>
         <div className="flex flex-col gap-6">
           {ucapan?.length === 0 && (
-            <div className="text-center text-sm">
+            <div className="text-center text-sm text-white">
               Jadilah yang pertama untuk mengirimkan
               <br />
               doa ke calon pengantin

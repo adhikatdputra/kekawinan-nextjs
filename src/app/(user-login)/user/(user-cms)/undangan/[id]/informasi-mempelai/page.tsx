@@ -72,16 +72,16 @@ export default function InformasiMempelaiPage() {
 
   useEffect(() => {
     if (undanganContent) {
-      setNameMale(undanganContent.name_male);
-      setNameFemale(undanganContent.name_female);
-      setFatherMale(undanganContent.father_male);
-      setMotherMale(undanganContent.mother_male);
-      setFatherFemale(undanganContent.father_female);
-      setMotherFemale(undanganContent.mother_female);
-      setImgMale(undanganContent.img_male);
-      setImgFemale(undanganContent.img_female);
-      setMaleNo(undanganContent.male_no);
-      setFemaleNo(undanganContent.female_no);
+      setNameMale(undanganContent.name_male || "");
+      setNameFemale(undanganContent.name_female || "");
+      setFatherMale(undanganContent.father_male || "");
+      setMotherMale(undanganContent.mother_male || "");
+      setFatherFemale(undanganContent.father_female || "");
+      setMotherFemale(undanganContent.mother_female || "");
+      setImgMale(undanganContent.img_male || "");
+      setImgFemale(undanganContent.img_female || "");
+      setMaleNo(undanganContent.male_no || "");
+      setFemaleNo(undanganContent.female_no || "");
     }
   }, [undanganContent]);
 

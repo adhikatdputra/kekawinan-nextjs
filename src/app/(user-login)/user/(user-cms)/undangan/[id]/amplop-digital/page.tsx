@@ -59,12 +59,12 @@ export default function AmplopDigitalPage() {
 
   useEffect(() => {
     if (gift) {
-      setBankName(gift.bank_name);
-      setBankNumber(gift.bank_number);
-      setName(gift.name);
-      setNameAddress(gift.name_address);
-      setPhone(gift.phone);
-      setAddress(gift.address);
+      setBankName(gift.bank_name || "");
+      setBankNumber(gift.bank_number || "");
+      setName(gift.name || "");
+      setNameAddress(gift.name_address || "");
+      setPhone(gift.phone || "");
+      setAddress(gift.address || "");
     }
   }, [gift]);
 

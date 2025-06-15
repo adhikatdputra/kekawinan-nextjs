@@ -490,7 +490,7 @@ export default function Theme5({
                 href={undangan?.undangan_content?.gmaps ?? ""}
                 target="_blank"
               >
-                <Button className="bg-theme7-primary hover:bg-theme7-primary text-white hover:text-white font-semibold">
+                <Button className="bg-theme7-secondary hover:bg-theme7-secondary text-white hover:text-white font-semibold">
                   <IconMapPin size={16} />
                   <span>Lihat di Google Maps</span>
                 </Button>
@@ -514,7 +514,7 @@ export default function Theme5({
                   href={undangan?.undangan_content?.stream_link ?? ""}
                   target="_blank"
                 >
-                  <Button className="bg-theme7-primary hover:bg-theme7-primary text-white hover:text-white font-semibold">
+                  <Button className="bg-theme7-secondary hover:bg-theme7-secondary text-white hover:text-white font-semibold">
                     <IconDeviceTvOld size={16} />
                     <span>Live Streaming</span>
                   </Button>

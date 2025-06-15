@@ -78,11 +78,11 @@ export default function CoverPembukaPage() {
 
   useEffect(() => {
     if (undanganContent) {
-      setTitle(undanganContent.title);
-      setImgThumbnail(undanganContent.img_thumbnail);
-      setImgBg(undanganContent.img_bg);
-      setStreamLink(undanganContent.stream_link);
-      setMusic(undanganContent.music);
+      setTitle(undanganContent.title || "");
+      setImgThumbnail(undanganContent.img_thumbnail || "");
+      setImgBg(undanganContent.img_bg || "");
+      setStreamLink(undanganContent.stream_link || "");
+      setMusic(undanganContent.music || null);
       if (undanganContent.music) {
         setIsMusic(true);
       }
@@ -108,7 +108,7 @@ export default function CoverPembukaPage() {
           <div className="grid gap-2">
             <div className="md:w-1/2">
               <Label htmlFor="date" className="pb-2">
-              Tanggal Pernikahan
+                Tanggal Pernikahan
               </Label>
               <DateTimePicker
                 onChange={setDateWedding}
@@ -192,6 +192,9 @@ export default function CoverPembukaPage() {
               placeholder="Masukkan nama pengantin / judul undangan"
               className="h-10"
             />
+            <p className="text-sm text-muted-foreground">
+              Masukkan nama pengantin: Romeo & Juliet
+            </p>
           </div>
           <div className="grid gap-2">
             <Label htmlFor="music">Music (Optional)</Label>

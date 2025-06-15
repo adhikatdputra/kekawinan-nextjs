@@ -252,8 +252,8 @@
   --theme6-secondary: oklch(0.1956 0.1135 286.07);
   --theme7-primary: oklch(0.7587 0.0797 22.99);
   --theme7-secondary: oklch(0.2892 0.0404 24.63);
-  --theme8-primary: oklch(0.5684 0.1696 295.47);
-  --theme8-secondary: oklch(1 0 0);
+  --theme8-primary: oklch(0.5926 0.223498 258.4146);
+  --theme8-secondary: oklch(0.2784 0.0937 255.62);
   --theme9-primary: oklch(0.5684 0.1696 295.47);
   --theme9-secondary: oklch(1 0 0);
 }
@@ -310,8 +310,8 @@
   --theme6-secondary: oklch(0.1956 0.1135 286.07);
   --theme7-primary: oklch(0.7587 0.0797 22.99);
   --theme7-secondary: oklch(0.2892 0.0404 24.63);
-  --theme8-primary: oklch(0.5684 0.1696 295.47);
-  --theme8-secondary: oklch(1 0 0);
+  --theme8-primary: oklch(0.5926 0.223498 258.4146);
+  --theme8-secondary: oklch(0.2784 0.0937 255.62);
   --theme9-primary: oklch(0.5684 0.1696 295.47);
   --theme9-secondary: oklch(1 0 0);
 }

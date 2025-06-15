@@ -160,6 +160,10 @@ export default function UndanganListPage() {
     } else {
       createUndangan({ name, permalink, theme_id: selectedTheme });
     }
+    setSelectedItem(null);
+    setName("");
+    setPermalink("");
+    setSelectedTheme("");
   };
 
   const handleCancel = () => {
