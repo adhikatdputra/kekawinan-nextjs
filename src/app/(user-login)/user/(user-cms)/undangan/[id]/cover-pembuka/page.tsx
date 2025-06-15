@@ -199,11 +199,13 @@ export default function CoverPembukaPage() {
           <div className="grid gap-2">
             <Label htmlFor="music">Music (Optional)</Label>
             {is_music ? (
-              <div className="flex gap-4 items-center">
+              <div className="flex flex-col md:flex-row gap-4 md:items-center">
                 <audio src={music || ""} controls></audio>
-                <Button variant="outline" onClick={() => setIsMusic(false)}>
-                  Ganti Music
-                </Button>
+                <div>
+                  <Button variant="outline" onClick={() => setIsMusic(false)}>
+                    Ganti Music
+                  </Button>
+                </div>
               </div>
             ) : (
               <Input
