@@ -308,7 +308,7 @@ export default function Theme3({
                 ease: "easeInOut",
                 delay: 0.7,
               }}
-              className="flex flex-col gap-6 w-full text-center py-12 px-6 mt-8 bg-[#EEEEEE] to-theme3-secondary text-black rounded-4xl"
+              className="flex flex-col gap-6 w-full text-center py-12 px-6 mt-8 bg-[#f9f9f9] to-theme3-secondary text-black rounded-4xl"
             >
               <motion.div
                 initial={{ opacity: 0 }}
