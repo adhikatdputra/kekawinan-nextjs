@@ -128,7 +128,7 @@ export default function CoverPembukaPage() {
           </div>
           <div className="grid gap-2">
             <Label htmlFor="img_thumbnail">Gambar Thumbnail</Label>
-            <div className="flex flex-col md:flex-row gap-4 items-center">
+            <div className="flex flex-col md:flex-row gap-4 md:items-center">
               <ImageUpload
                 placeholder="w-32 h-32 bg-gray-200 rounded-full"
                 icon={Upload}
@@ -157,7 +157,7 @@ export default function CoverPembukaPage() {
           </div>
           <div className="grid gap-2">
             <Label htmlFor="img_bg">Foto Cover Undangan</Label>
-            <div className="flex flex-col md:flex-row gap-4 items-center">
+            <div className="flex flex-col md:flex-row gap-4 md:items-center">
               <ImageUpload
                 placeholder="w-40 h-[200px] bg-gray-200 rounded-md"
                 icon={Upload}
