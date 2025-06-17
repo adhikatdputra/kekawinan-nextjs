@@ -173,6 +173,7 @@ export default function TamuPage() {
           setSelectedItem(null);
           refetch();
           refetchTotalKirimWA();
+          refetchOverview();
         }
       },
     });
@@ -201,6 +202,7 @@ export default function TamuPage() {
             setSelectedItem(null);
             refetch();
             refetchTotalKirimWA();
+            refetchOverview();
           }
         },
       }
