@@ -53,6 +53,7 @@ import Pagination from "@/components/ui/custom/pagination";
 
 import { useQuery } from "@tanstack/react-query";
 import undanganUcapanApi from "@/frontend/api/undangan-ucapan";
+import undanganApi from "@/frontend/api/undangan";
 import UcapanStore from "@/frontend/store/ucapan-store";
 import { debounce } from "lodash";
 
@@ -95,31 +96,20 @@ export default function OverviewPage() {
   });
 
   const {
-    data: totalHadir,
-    isLoading: isLoadingTotalHadir,
-    refetch: refetchTotalHadir,
+    data: undanganOverview,
+    isLoading: isLoadingOverview,
+    refetch: refetchOverview,
   } = useQuery({
-    queryKey: ["total-hadir", id],
-    queryFn: () => undanganUcapanApi.getAttend(id),
-    select: (data) => data.data.data.Total,
-  });
-
-  const {
-    data: totalTidakHadir,
-    isLoading: isLoadingTotalTidakHadir,
-    refetch: refetchTotalTidakHadir,
-  } = useQuery({
-    queryKey: ["tidak-hadir", id],
-    queryFn: () => undanganUcapanApi.getNoAttend(id),
-    select: (data) => data.data.data.Total,
+    queryKey: ["undangan-overview", id],
+    queryFn: () => undanganApi.getUndanganOverview(id),
+    select: (data) => data.data.data,
   });
 
   const handleDeleteUcapan = () => {
     deleteUcapan(selectedItem?.id as string, {
       onSuccess: () => {
         refetch();
-        refetchTotalHadir();
-        refetchTotalTidakHadir();
+        refetchOverview();
       },
     });
   };
@@ -157,8 +147,7 @@ export default function OverviewPage() {
           setMessage("");
           setSelectedItem(null);
           refetch();
-          refetchTotalHadir();
-          refetchTotalTidakHadir();
+          refetchOverview();
         },
       }
     );
@@ -230,16 +219,16 @@ export default function OverviewPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-[url('/images/bg-fitur.png')] bg-cover bg-center rounded-2xl p-6 border border-gray-200 min-h-[180px] flex  items-end">
           <div>
-            <h3 className="text-lg font-bold">Total Doa & Ucapan</h3>
+            <h3 className="text-lg font-bold">Total Tamu Undangan</h3>
             <div className="flex items-end gap-2 mt-4">
               <h6 className="text-6xl font-bold">
-                {isLoading ? (
+                {isLoadingOverview ? (
                   <IconLoader2 size={40} className="animate-spin pb-1" />
                 ) : (
-                  undanganUcapan?.count || 0
+                  undanganOverview?.total_tamu || 0
                 )}
               </h6>
-              <p className="text-muted-foreground pb-1">Ucapan</p>
+              <p className="text-muted-foreground pb-1">Tamu</p>
             </div>
           </div>
         </div>
@@ -248,10 +237,10 @@ export default function OverviewPage() {
             <h3 className="text-lg font-bold">Akan Hadir</h3>
             <div className="flex items-end gap-2 mt-4">
               <h6 className="text-6xl font-bold">
-                {isLoadingTotalHadir ? (
+                {isLoadingOverview ? (
                   <IconLoader2 size={40} className="animate-spin pb-1" />
                 ) : (
-                  totalHadir || 0
+                  undanganOverview?.total_tamu_hadir || 0
                 )}
               </h6>
               <p className="text-muted-foreground pb-1">Tamu</p>
@@ -263,10 +252,10 @@ export default function OverviewPage() {
             <h3 className="text-lg font-bold">Tidak Hadir</h3>
             <div className="flex items-end gap-2 mt-4">
               <h6 className="text-6xl font-bold">
-                {isLoadingTotalTidakHadir ? (
+                {isLoadingOverview ? (
                   <IconLoader2 size={40} className="animate-spin pb-1" />
                 ) : (
-                  totalTidakHadir || 0
+                  undanganOverview?.total_tamu_tidak_hadir || 0
                 )}
               </h6>
               <p className="text-muted-foreground pb-1">Tamu</p>
@@ -275,13 +264,24 @@ export default function OverviewPage() {
         </div>
       </div>
       <div className="border border-border p-6 rounded-2xl grid gap-4">
-        <div className="flex gap-2 justify-end">
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari ucapan"
-            className="max-w-xs"
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 items-center">
+          <div className="font-semibold flex items-center gap-2">
+            Total:{" "}
+            {isLoading ? (
+              <IconLoader2 size={16} className="animate-spin pb-1" />
+            ) : (
+              undanganUcapan?.count
+            )}{" "}
+            Doa & Ucapan
+          </div>
+          <div className="flex gap-2 justify-end">
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cari ucapan"
+              className="max-w-xs"
+            />
+          </div>
         </div>
         <Table>
           <TableCaption>Ucapan dan Doa dari Tamu Undangan</TableCaption>

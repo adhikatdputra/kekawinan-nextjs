@@ -121,6 +121,16 @@ export default function TamuPage() {
     select: (data) => data.data.data,
   });
 
+  const {
+    data: undanganOverview,
+    isLoading: isLoadingOverview,
+    refetch: refetchOverview,
+  } = useQuery({
+    queryKey: ["undangan-overview", id],
+    queryFn: () => undanganApi.getUndanganOverview(id),
+    select: (data) => data.data.data,
+  });
+
   const handleDeleteTamu = () => {
     deleteTamu(selectedItem?.id as string, {
       onSuccess: (data) => {
@@ -282,10 +292,10 @@ export default function TamuPage() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1 border-b pb-4">
-        <h1 className="text-2xl font-bold">Dashboard Undangan</h1>
+        <h1 className="text-2xl font-bold">Tamu Undangan</h1>
         <p>
           Kamu dapat melihat perkiraan tamu yang akan hadir serta mengatur data
-          Doa & Ucapan yang sudah diberikan tamu yang di undang
+          tamu yang di undang
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -350,6 +360,43 @@ export default function TamuPage() {
           </div>
         </div>
       </div>
+      <div className="max-w-[700px] mx-auto w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-[url('/images/bg-fitur.png')] bg-cover bg-center rounded-2xl p-4 border border-gray-200 flex items-end">
+            <h3 className="font-semibold flex items-center gap-2 justify-center md:w-full">
+              Total Tamu:{" "}
+              {isLoadingOverview ? (
+                <IconLoader2 size={20} className="animate-spin pb-1" />
+              ) : (
+                undanganOverview?.total_tamu
+              )}{" "}
+              Orang
+            </h3>
+          </div>
+          <div className="bg-[url('/images/bg-fitur.png')] bg-cover bg-center rounded-2xl p-4 border border-gray-200 flex items-end">
+            <h3 className="font-semibold flex items-center gap-2 justify-center md:w-full">
+              Akan Hadir:{" "}
+              {isLoadingOverview ? (
+                <IconLoader2 size={20} className="animate-spin pb-1" />
+              ) : (
+                undanganOverview?.total_tamu_hadir
+              )}{" "}
+              Orang
+            </h3>
+          </div>
+          <div className="bg-[url('/images/bg-fitur.png')] bg-cover bg-center rounded-2xl p-4 border border-gray-200 flex items-end">
+            <h3 className="font-semibold flex items-center gap-2 justify-center md:w-full">
+              Tidak Hadir:{" "}
+              {isLoadingOverview ? (
+                <IconLoader2 size={20} className="animate-spin pb-1" />
+              ) : (
+                undanganOverview?.total_tamu_tidak_hadir
+              )}{" "}
+              Orang
+            </h3>
+          </div>
+        </div>
+      </div>
       <div className="border border-border p-6 rounded-2xl grid gap-4">
         <div className="flex gap-2 justify-end items-center">
           <Button
@@ -373,7 +420,7 @@ export default function TamuPage() {
             <TableRow>
               <TableHead>Nama Tamu</TableHead>
               <TableHead>No. Whatsapp</TableHead>
-              <TableHead>Tamu</TableHead>
+              <TableHead>Total Tamu (Orang)</TableHead>
               <TableHead>Dilihat</TableHead>
               <TableHead>Konfirmasi</TableHead>
               <TableHead className="text-right w-[10%]"></TableHead>
