@@ -4,9 +4,9 @@ import FooterWeb from "@/components/layouts/footer-web";
 import Trakteer from "@/components/layouts/trakteer";
 
 export const metadata: Metadata = {
-  title: "Profil | Kekawinan",
+  title: "Ubah Password | Kekawinan",
   description:
-    "Profil Kekawinan - Ubah profil dan password kamu di sini",
+    "Ubah password Kekawinan - Ubah password kamu di sini",
 };
 
 export default function LandingLayout({

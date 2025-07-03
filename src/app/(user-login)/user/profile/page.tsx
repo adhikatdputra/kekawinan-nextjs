@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/frontend/composable/useAuth";
+import Link from "next/link";
 
 export default function ProfilePage() {
   const [fullname, setFullname] = useState("");
@@ -40,8 +41,28 @@ export default function ProfilePage() {
     },
   });
 
+  const whatsappRegex = /^\+?\d{9,}$/;
+
+  const changeNoPhone = (phone: string) => {
+    if (phone.startsWith("0")) {
+      return phone.replace("0", "+62");
+    }
+    if (phone.startsWith("62")) {
+      return phone.replace("62", "+62");
+    }
+    if (phone.startsWith("+620")) {
+      return phone.replace("+620", "+62");
+    }
+    return phone;
+  };
+
   const handleSubmit = () => {
-    updateUser({ fullname, phone });
+    if (!whatsappRegex.test(phone)) {
+      toast.error("Nomor Whatsapp tidak valid");
+      return;
+    }
+
+    updateUser({ fullname, phone: changeNoPhone(phone) });
   };
 
   useEffect(() => {
@@ -91,19 +112,24 @@ export default function ProfilePage() {
               onChange={(e) => setPhone(e.target.value)}
             />
           </div>
-          <div className="flex justify-center mt-6">
-            <Button
-              disabled={isPendingUpdate || isLoading || !fullname || !phone}
-              onClick={handleSubmit}
-            >
-              {isPendingUpdate ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Please wait...
-                </>
-              ) : (
-                "Simpan Perubahan"
-              )}
-            </Button>
+          <div className="flex flex-col md:flex-row gap-4 justify-center items-center mt-6">
+            <div>
+              <Button
+                disabled={isPendingUpdate || isLoading || !fullname || !phone}
+                onClick={handleSubmit}
+              >
+                {isPendingUpdate ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" /> Please wait...
+                  </>
+                ) : (
+                  "Simpan Perubahan"
+                )}
+              </Button>
+            </div>
+            <div>
+              <Link href="/user/profile/change-password" className="text-sm text-green-kwn font-semibold underline">Ubah Password</Link>
+            </div>
           </div>
         </div>
       </div>

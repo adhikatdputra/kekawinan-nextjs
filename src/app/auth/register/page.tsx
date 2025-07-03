@@ -34,12 +34,44 @@ export default function RegisterPage() {
     },
   });
 
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const whatsappRegex = /^\+?\d{9,}$/;
+
+  const changeNoPhone = (phone: string) => {
+    if (phone.startsWith("0")) {
+      return phone.replace("0", "+62");
+    }
+    if (phone.startsWith("62")) {
+      return phone.replace("62", "+62");
+    }
+    if (phone.startsWith("+620")) {
+      return phone.replace("+620", "+62");
+    }
+    return phone;
+  };
+
   const handleRegister = () => {
+    if (!passwordRegex.test(password)) {
+      toast.error("Password harus mengandung setidaknya 8 karakter, satu huruf besar, satu huruf kecil, satu angka, dan satu simbol");
+      return;
+    }
+
+    if (!emailRegex.test(email)) {
+      toast.error("Email tidak valid");
+      return;
+    }
+
+    if (!whatsappRegex.test(whatsapp)) {
+      toast.error("Nomor Whatsapp tidak valid");
+      return;
+    }
+
     register.mutate({
       fullname,
       email,
       password,
-      phone: whatsapp,
+      phone: changeNoPhone(whatsapp),
       level: "user",
     });
   };

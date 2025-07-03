@@ -16,10 +16,10 @@ const undanganGaleriApi = {
     return axios.delete(`/users/undangangallery/${id}`);
   },
   moveUp: (id: string) => {
-    return axios.put(`/users/undangangallery/${id}/move-up`);
+    return axios.patch(`/users/undangangallery/${id}/move-up`);
   },
   moveDown: (id: string) => {
-    return axios.put(`/users/undangangallery/${id}/move-down`);
+    return axios.patch(`/users/undangangallery/${id}/move-down`);
   },
 };
 

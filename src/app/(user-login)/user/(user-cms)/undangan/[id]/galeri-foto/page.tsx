@@ -7,8 +7,12 @@ import undanganGaleriApi from "@/frontend/api/undangan-galeri";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
-import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import {
+  IconChevronUp,
+  IconChevronDown,
+  IconLoader2,
+} from "@tabler/icons-react";
 import { UndanganGaleri } from "@/frontend/interface/undangan";
 import Image from "next/image";
 import MenuAction from "@/components/ui/custom/menu-action";
@@ -89,6 +93,38 @@ export default function GaleriFotoPage() {
       },
     });
 
+  const { mutate: moveUpFoto } = useMutation({
+    mutationFn: (id: string) => undanganGaleriApi.moveUp(id),
+    onSuccess: (data) => {
+      const response = data.data;
+      if (response.success) {
+        toast.success("Moveup is successful");
+        refetch();
+      } else {
+        toast.error(response.message);
+      }
+    },
+    onError: () => {
+      toast.error("Moveup is failed");
+    },
+  });
+
+  const { mutate: moveDownFoto } = useMutation({
+    mutationFn: (id: string) => undanganGaleriApi.moveDown(id),
+    onSuccess: (data) => {
+      const response = data.data;
+      if (response.success) {
+        toast.success("Movedown is successful");
+        refetch();
+      } else {
+        toast.error(response.message);
+      }
+    },
+    onError: () => {
+      toast.error("Movedown is failed");
+    },
+  });
+
   const handleDeleteFoto = () => {
     deleteUndanganGaleri(selectedItem?.id as string);
   };
@@ -143,7 +179,7 @@ export default function GaleriFotoPage() {
             >
               {isCreating ? (
                 <>
-                  <Loader2 className="animate-spin" />
+                  <IconLoader2 className="animate-spin" />
                   <span>Menyimpan...</span>
                 </>
               ) : (
@@ -169,7 +205,7 @@ export default function GaleriFotoPage() {
             {isLoading ? (
               <TablePending colSpan={2} />
             ) : tableData.length > 0 ? (
-              tableData.map((item) => (
+              tableData.map((item, index) => (
                 <TableRow key={item.id}>
                   <TableCell>
                     <Image
@@ -180,7 +216,27 @@ export default function GaleriFotoPage() {
                       className="w-[160px] rounded-md"
                     />
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right flex gap-2 justify-end items-center">
+                    {index > 0 && (
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => moveUpFoto(item.id)}
+                        className="rounded-md h-7 w-7 bg-green-kwn text-white"
+                      >
+                        <IconChevronUp />
+                      </Button>
+                    )}
+                    {index < tableData.length - 1 && (
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => moveDownFoto(item.id)}
+                        className="rounded-md h-7 w-7 bg-blue-600 text-white"
+                      >
+                        <IconChevronDown />
+                      </Button>
+                    )}
                     <MenuAction
                       handleDelete={() => {
                         setIsOpenDelete(true);
@@ -223,7 +279,7 @@ export default function GaleriFotoPage() {
             >
               {isPendingDelete ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <IconLoader2 className="w-4 h-4 animate-spin" />
                   <span>Menghapus...</span>
                 </>
               ) : (
