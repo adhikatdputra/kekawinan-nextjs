@@ -78,7 +78,7 @@ export default function UndanganListPage() {
     isLoading: isLoadingUndangan,
     refetch: refetchUndangan,
   } = useQuery({
-    queryKey: ["undangan-me"],
+    queryKey: ["undangan-me", getUser()?.id],
     queryFn: () => undanganApi.getUndangan(),
     select: (data) => data.data.data,
   });

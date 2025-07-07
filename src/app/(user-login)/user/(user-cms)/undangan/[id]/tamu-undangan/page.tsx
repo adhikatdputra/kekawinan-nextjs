@@ -58,7 +58,7 @@ import {
 } from "@/components/ui/tooltip";
 import Pagination from "@/components/ui/custom/pagination";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import TamuStore from "@/frontend/store/tamu-store";
 import { debounce } from "lodash";
 import undanganTamuApi from "@/frontend/api/undangan-tamu";
@@ -109,6 +109,7 @@ export default function TamuPage() {
     queryKey: ["undangan-tamu", id],
     queryFn: () => undanganTamuApi.getData(id, queryParams),
     select: (data) => data.data.data,
+    placeholderData: keepPreviousData,
   });
 
   const {

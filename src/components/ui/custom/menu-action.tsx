@@ -12,11 +12,13 @@ export default function MenuAction({
   handleDelete,
   handleEdit,
   items,
+  slotItem,
 }: {
   handleLihat?: () => void;
   handleDelete?: () => void;
   handleEdit?: () => void;
   items: ("Lihat" | "Edit" | "Hapus")[];
+  slotItem?: React.ReactNode;
 }) {
   return (
     <Popover>
@@ -58,6 +60,7 @@ export default function MenuAction({
               Hapus
             </Button>
           )}
+          {slotItem}
         </div>
       </PopoverContent>
     </Popover>

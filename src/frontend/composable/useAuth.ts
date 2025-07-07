@@ -69,6 +69,11 @@ export const useAuth = () => {
     return null;
   };
 
+  const isAdmin = () => {
+    const user = getUser();
+    return user?.level === "admin";
+  };
+
   const getUserName = () => {
     return Cookies.get("fullname");
   };
@@ -132,5 +137,6 @@ export const useAuth = () => {
     getToken,
     getUserName,
     setUserName,
+    isAdmin,
   };
 };

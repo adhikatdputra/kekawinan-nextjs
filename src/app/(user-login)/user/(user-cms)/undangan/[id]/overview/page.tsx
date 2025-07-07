@@ -51,7 +51,7 @@ import {
 } from "@/components/ui/tooltip";
 import Pagination from "@/components/ui/custom/pagination";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import undanganUcapanApi from "@/frontend/api/undangan-ucapan";
 import undanganApi from "@/frontend/api/undangan";
 import UcapanStore from "@/frontend/store/ucapan-store";
@@ -93,6 +93,7 @@ export default function OverviewPage() {
     queryKey: ["undangan-ucapan", id],
     queryFn: () => undanganUcapanApi.getData(id, queryParams),
     select: (data) => data.data.data,
+    placeholderData: keepPreviousData,
   });
 
   const {

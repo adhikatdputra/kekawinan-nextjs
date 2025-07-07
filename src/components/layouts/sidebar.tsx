@@ -87,7 +87,6 @@ export function AppSidebar() {
       url: `/user/undangan/${id}/setting`,
       icon: Settings,
     },
-
     {
       title: "Kembali",
       url: `/user/undangan-list`,
