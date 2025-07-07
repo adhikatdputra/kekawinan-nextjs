@@ -124,6 +124,36 @@ export default function UndanganView({
   const [ThemeComponent, setThemeComponent] =
     useState<React.ComponentType<ThemeComponentProps> | null>(null);
 
+  // Handle page visibility change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      const audioElement = document.getElementById("music") as HTMLAudioElement;
+
+      if (document.hidden) {
+        // Halaman tersembunyi - pause musik
+        if (audioElement && !audioElement.paused) {
+          audioElement.pause();
+        }
+      } else {
+        // Halaman terlihat kembali - selalu auto play musik
+        if (audioElement && music) {
+          audioElement.play().catch((error) => {
+            console.log("Auto-play failed:", error);
+          });
+          setIsPlayMusic(true);
+        }
+      }
+    };
+
+    // Tambahkan event listener untuk page visibility
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Cleanup event listener
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [music]);
+
   useEffect(() => {
     const loadTheme = async () => {
       const name = undanganData?.theme?.component_name;

@@ -60,20 +60,20 @@ export default function Themes() {
         >
           {themes?.map((theme: Theme, index: number) => (
             <div className="w-full md:w-1/6" key={index}>
-              <div className="relative group">
-                <Image
-                  src={theme?.thumbnail}
-                  alt=""
-                  className="w-full rounded-2xl"
-                  width={100}
-                  height={100}
-                />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-center">
-                  <Link href={`/${theme?.component_name.toLowerCase()}/demo`}>
+              <Link href={`/${theme?.component_name.toLowerCase()}/demo`}>
+                <div className="relative group">
+                  <Image
+                    src={theme?.thumbnail}
+                    alt=""
+                    className="w-full rounded-2xl"
+                    width={100}
+                    height={100}
+                  />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-center">
                     <Button>Lihat Undangan</Button>
-                  </Link>
+                  </div>
                 </div>
-              </div>
+              </Link>
             </div>
           ))}
         </motion.div>
@@ -95,6 +95,11 @@ export default function Themes() {
               autoplay={{ delay: 2500, disableOnInteraction: false }}
               navigation={true}
               className="mySwiper"
+              style={
+                {
+                  "--swiper-navigation-color": "#A5BA9E",
+                } as React.CSSProperties
+              }
             >
               {themes?.map((theme: Theme, index: number) => (
                 <SwiperSlide key={index}>
