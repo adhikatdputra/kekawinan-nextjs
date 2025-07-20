@@ -12,15 +12,21 @@ import { Gift } from "@/frontend/interface/undangan";
 import { IconClipboard, IconCheck } from "@tabler/icons-react";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function DialogGift({
   gift,
   isOpen,
   setIsOpen,
+  giftLength,
+  slug,
 }: {
   gift: Gift;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  giftLength: number;
+  slug: string;
 }) {
   const [isCopied, setIsCopied] = useState(false);
   const handleCopy = () => {
@@ -84,9 +90,20 @@ export default function DialogGift({
             <div className="flex flex-col gap-2 items-start">
               <h3 className="text-xl font-bold">Kirim Hadiah</h3>
               <div className="flex flex-col gap-1 items-start bg-gray-100 p-4 rounded-lg w-full border border-dashed border-gray-300">
-                <p className="text-sm font-semibold">{gift.name_address}</p>
-                <p className="text-sm text-left">{gift.phone}</p>
-                <p className="text-sm text-left">{gift.address}</p>
+                <p className="font-semibold">{gift.name_address}</p>
+                <p className="text-left">{gift.phone}</p>
+                <p className="text-left">{gift.address}</p>
+                <hr />
+                {giftLength > 0 && (
+                  <>
+                    <h3 className="font-bold mt-4">Pilihan Kado Spesial</h3>
+                    <Link href={`/${slug}/gift`} target="_blank">
+                      <Button className="w-full rounded-lg bg-gray-500">
+                        Lihat Kado Spesial
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>

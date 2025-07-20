@@ -32,6 +32,8 @@ export default function Theme6({
   undanganData,
   tamuData,
   ucapan,
+  giftLength,
+  slug,
 }: {
   onPlayMusic: () => void;
   isPlayMusic: boolean;
@@ -45,6 +47,8 @@ export default function Theme6({
     message: string;
   }) => void;
   ucapan: UndanganUcapan[];
+  giftLength: number;
+  slug: string;
 }) {
   const [undangan, setUndangan] = useState<UndanganDetail | null>(null);
   const [tamu, setTamu] = useState<UndanganTamu | null>(null);
@@ -592,6 +596,8 @@ export default function Theme6({
         isPlayMusic={isPlayMusic}
         onOpenGift={() => setIsOpenGift(true)}
         bgColor="bg-theme6-primary"
+        giftLength={giftLength}
+        slug={slug}
       />
 
       {/* Open Dialog Gift */}
@@ -599,6 +605,8 @@ export default function Theme6({
         gift={undanganData.undangan_gift}
         isOpen={isOpenGift}
         setIsOpen={setIsOpenGift}
+        giftLength={giftLength}
+        slug={slug}
       />
     </div>
   );

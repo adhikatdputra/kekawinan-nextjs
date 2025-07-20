@@ -32,6 +32,8 @@ export default function Theme2({
   undanganData,
   tamuData,
   ucapan,
+  giftLength,
+  slug,
 }: {
   onPlayMusic: () => void;
   isPlayMusic: boolean;
@@ -45,6 +47,8 @@ export default function Theme2({
     message: string;
   }) => void;
   ucapan: UndanganUcapan[];
+  giftLength: number;
+  slug: string;
 }) {
   const [undangan, setUndangan] = useState<UndanganDetail | null>(null);
   const [tamu, setTamu] = useState<UndanganTamu | null>(null);
@@ -124,8 +128,7 @@ export default function Theme2({
             <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full px-2">
               <div className="text-center line-clamp-2">
                 <p className="font-semibold text-lg mt-2">
-                  {tamuData?.name ||
-                    "Tamu Spesial"}
+                  {tamuData?.name || "Tamu Spesial"}
                 </p>
               </div>
             </div>
@@ -615,6 +618,8 @@ export default function Theme2({
         isPlayMusic={isPlayMusic}
         onOpenGift={() => setIsOpenGift(true)}
         bgColor="bg-theme2-primary"
+        giftLength={giftLength}
+        slug={slug}
       />
 
       {/* Open Dialog Gift */}
@@ -622,6 +627,8 @@ export default function Theme2({
         gift={undanganData.undangan_gift}
         isOpen={isOpenGift}
         setIsOpen={setIsOpenGift}
+        giftLength={giftLength}
+        slug={slug}
       />
     </div>
   );

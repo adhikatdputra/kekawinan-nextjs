@@ -32,6 +32,8 @@ export default function Theme8({
   undanganData,
   tamuData,
   ucapan,
+  giftLength,
+  slug,
 }: {
   onPlayMusic: () => void;
   isPlayMusic: boolean;
@@ -45,6 +47,8 @@ export default function Theme8({
     message: string;
   }) => void;
   ucapan: UndanganUcapan[];
+  giftLength: number;
+  slug: string;
 }) {
   const [undangan, setUndangan] = useState<UndanganDetail | null>(null);
   const [tamu, setTamu] = useState<UndanganTamu | null>(null);
@@ -450,7 +454,9 @@ export default function Theme8({
                   viewport={{ once: false }}
                   className="py-6"
                 >
-                  <p className="text-center text-xl font-recoleta-alt uppercase font-semibold mb-1">Akad Nikah</p>
+                  <p className="text-center text-xl font-recoleta-alt uppercase font-semibold mb-1">
+                    Akad Nikah
+                  </p>
                   <p className="text-center text-sm font-medium font-recoleta text-theme8-secondary">
                     {undangan?.undangan_content?.akad_time}
                   </p>
@@ -585,7 +591,11 @@ export default function Theme8({
             Galeri Kami
           </h2>
         </motion.div>
-        <Galeri galeri={undanganData.undangan_gallery} view={2} color="#FFFFFF" />
+        <Galeri
+          galeri={undanganData.undangan_gallery}
+          view={2}
+          color="#FFFFFF"
+        />
       </div>
       {/* Reservasi Ucapan Doa */}
       <UcapanConfirm
@@ -659,6 +669,8 @@ export default function Theme8({
         onOpenGift={() => setIsOpenGift(true)}
         bgColor="bg-theme8-primary"
         darkMode={true}
+        giftLength={giftLength}
+        slug={slug}
       />
 
       {/* Open Dialog Gift */}
@@ -666,6 +678,8 @@ export default function Theme8({
         gift={undanganData.undangan_gift}
         isOpen={isOpenGift}
         setIsOpen={setIsOpenGift}
+        giftLength={giftLength}
+        slug={slug}
       />
     </div>
   );

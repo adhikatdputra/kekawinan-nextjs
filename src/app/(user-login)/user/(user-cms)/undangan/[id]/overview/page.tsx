@@ -111,6 +111,8 @@ export default function OverviewPage() {
       onSuccess: () => {
         refetch();
         refetchOverview();
+        setIsOpenDelete(false);
+        setSelectedItem(null);
       },
     });
   };

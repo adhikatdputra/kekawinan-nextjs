@@ -146,3 +146,17 @@ export interface UndanganTamu {
   updatedAt: string;
 }
 
+export interface Gift {
+  id: string;
+  undangan_id: string;
+  title: string;
+  description: string;
+  price: string;
+  thumbnail: string;
+  link_product: string;
+  name: string;
+  phone: string;
+  is_confirm: number;
+  createdAt: string;
+  updatedAt: string;
+}

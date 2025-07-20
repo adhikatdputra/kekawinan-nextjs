@@ -4,10 +4,12 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import undanganUserApi from "@/frontend/api/undangan-user";
+import giftApi from "@/frontend/api/gift";
 import {
   UndanganTamu,
   UndanganDetail,
   UndanganUcapan,
+  Gift,
 } from "@/frontend/interface/undangan";
 import { toast } from "react-hot-toast";
 import Loading from "@/components/layouts/loading";
@@ -25,6 +27,8 @@ interface ThemeComponentProps {
     attend_total: string;
     message: string;
   }) => void;
+  giftLength: number;
+  slug: string;
 }
 
 export default function UndanganView({
@@ -39,7 +43,8 @@ export default function UndanganView({
   const [music, setMusic] = useState<string | null>(null);
   const [isPlayMusic, setIsPlayMusic] = useState(false);
   const [ucapan, setUcapan] = useState<UndanganUcapan[]>([]);
-
+  const [giftList, setGiftList] = useState<Gift[]>([]);
+  
   const {
     data: undanganData,
     isError,
@@ -64,6 +69,15 @@ export default function UndanganView({
     mutationFn: undanganUserApi.changeStatusUcapan,
     onSuccess: () => {
       refetchTamu();
+    },
+  });
+
+  const {
+    mutate: mutateGiftList,
+  } = useMutation({
+    mutationFn: (undangan_id: string) => giftApi.getAll(undangan_id),
+    onSuccess: (data) => {
+      setGiftList(data.data.data);
     },
   });
 
@@ -178,6 +192,9 @@ export default function UndanganView({
 
     setMusic(undanganData?.undangan_content?.music ?? null);
     setUcapan(undanganData?.ucapan ?? []);
+    if (undanganData?.id) {
+      mutateGiftList(undanganData.id);
+    }
 
     loadTheme();
   }, [undanganData]);
@@ -199,6 +216,8 @@ export default function UndanganView({
           isSubmitting={isSubmitting}
           onSubmitUcapan={onSubmitUcapan}
           onPlayMusic={handlePlayMusic}
+          giftLength={giftList.length}
+          slug={slug}
         />
       ) : (
         <Loading />

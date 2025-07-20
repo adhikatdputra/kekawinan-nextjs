@@ -11,6 +11,7 @@ import {
   CalendarHeart,
   Gift,
   ArrowLeftToLine,
+  CakeSlice,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import useSession from "@/frontend/hook/useSession";
@@ -55,6 +56,24 @@ export function AppSidebar() {
     },
   ];
 
+  const menuGift = [
+    {
+      title: "Kado",
+      url: `/user/undangan/${id}/kado-pernikahan`,
+      icon: Gift,
+    },
+    {
+      title: "Amplop Digital",
+      url: `/user/undangan/${id}/amplop-digital`,
+      icon: CakeSlice,
+    },
+    {
+      title: "Kembali",
+      url: `/user/undangan-list`,
+      icon: ArrowLeftToLine,
+    },
+  ];
+
   // Menu items.
   const items = [
     {
@@ -78,19 +97,9 @@ export function AppSidebar() {
       icon: Images,
     },
     {
-      title: "Amplop Digital",
-      url: `/user/undangan/${id}/amplop-digital`,
-      icon: Gift,
-    },
-    {
       title: "Setting",
       url: `/user/undangan/${id}/setting`,
       icon: Settings,
-    },
-    {
-      title: "Kembali",
-      url: `/user/undangan-list`,
-      icon: ArrowLeftToLine,
     },
   ];
 
@@ -160,6 +169,28 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    className={cn(
+                      pathname === item.url && "bg-gray-200 hover:bg-gray-200"
+                    )}
+                  >
+                    <Link href={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Kado Pernikahan</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {menuGift.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild

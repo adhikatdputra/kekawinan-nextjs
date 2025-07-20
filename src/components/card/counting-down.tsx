@@ -86,7 +86,7 @@ export default function CountdownTimer({
           <p className="text-sm text-gray-600 mb-6">
             Selamat menempuh hidup baru, semoga bahagia selalu selamanya!
           </p>
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg">
+          <div className="bg-green-kwn/10 border border-green-kwn text-green-kwn px-4 py-3 rounded-lg">
             <span className="text-sm">
               {formatDateId(targetDate.toISOString())}
             </span>
