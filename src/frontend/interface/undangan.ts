@@ -22,6 +22,13 @@ export interface Theme {
   name: string;
   thumbnail: string;
   component_name: string;
+  link_url: string;
+  credit: number;
+  promo: number;
+  is_active: number;
+  createdAt: string;
+  updatedAt: string;
+  undanganCount: number;
 }
 
 export interface UndanganDetail {

@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { formatNumber } from "@/helper/number";
 import { Input } from "@/components/ui/input";
+import NotFound from "@/components/card/not-found";
 
 import {
   Dialog,
@@ -63,6 +64,14 @@ export default function GiftDetailView({ id }: { id: string }) {
   }, [isError]);
 
   if (isLoading) return <Loading />;
+
+  if (!giftData)
+    return (
+      <NotFound
+        title="Waduh, tujuanmu nggak ada!"
+        description="Mungkin kamu salah klik link ini, atau link ini sudah tidak ada."
+      />
+    );
 
   return (
     <>

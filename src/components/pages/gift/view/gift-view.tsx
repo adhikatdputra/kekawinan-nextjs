@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { formatNumber } from "@/helper/number";
 import { Skeleton } from "@/components/ui/skeleton";
+import NotFound from "@/components/card/not-found";
 
 export default function GiftView({ slug }: { slug: string }) {
   const router = useRouter();
@@ -29,13 +30,9 @@ export default function GiftView({ slug }: { slug: string }) {
     select: (data) => data.data as UndanganDetail,
   });
 
-  const {
-    isPending: isLoadingGiftList,
-    mutate: mutateGiftList,
-  } = useMutation({
+  const { isPending: isLoadingGiftList, mutate: mutateGiftList } = useMutation({
     mutationFn: (undangan_id: string) => giftApi.getAll(undangan_id),
     onSuccess: (data) => {
-      console.log(data);
       setGiftList(data.data.data);
     },
   });
@@ -53,6 +50,14 @@ export default function GiftView({ slug }: { slug: string }) {
   }, [undanganData]);
 
   if (isLoading) return <Loading />;
+
+  if (!undanganData)
+    return (
+      <NotFound
+        title="Waduh, undanganmu nggak ada!"
+        description="Mungkin kamu salah klik link ini, atau link ini sudah tidak ada."
+      />
+    );
 
   return (
     <>
@@ -157,13 +162,25 @@ export default function GiftView({ slug }: { slug: string }) {
           </div>
         </div>
       ) : (
-        <GiftList slug={slug} giftList={giftList} isLoading={isLoadingGiftList} />
+        <GiftList
+          slug={slug}
+          giftList={giftList}
+          isLoading={isLoadingGiftList}
+        />
       )}
     </>
   );
 }
 
-function GiftList({ slug, giftList, isLoading }: { slug: string, giftList: Gift[], isLoading: boolean }) {
+function GiftList({
+  slug,
+  giftList,
+  isLoading,
+}: {
+  slug: string;
+  giftList: Gift[];
+  isLoading: boolean;
+}) {
   return (
     <div className="max-w-[450px] mx-auto min-h-screen p-6 pt-3 flex flex-col relative bg-[#F9F9F9]">
       <div className="sticky top-0 bg-white z-10 py-3 px-3">
@@ -218,18 +235,18 @@ function GiftCard({ gift }: { gift: Gift }) {
 }
 
 function GiftLoading() {
-    return (
-      <div
-        className={`p-3  rounded-lg shadow-xl flex gap-4 items-center bg-white`}
-      >
-        <div className="w-[130px]">
-          <Skeleton className="w-full h-[130px] rounded-lg" />
-        </div>
-        <div className="flex flex-col gap-1 w-[calc(100%-130px)] text-left">
-          <Skeleton className="w-full h-[20px] rounded-lg" />
-          <Skeleton className="w-full h-[20px] rounded-lg" />
-          <Skeleton className="w-full h-[20px] rounded-lg mt-1" />
-        </div>
+  return (
+    <div
+      className={`p-3  rounded-lg shadow-xl flex gap-4 items-center bg-white`}
+    >
+      <div className="w-[130px]">
+        <Skeleton className="w-full h-[130px] rounded-lg" />
       </div>
-    );
-  }
+      <div className="flex flex-col gap-1 w-[calc(100%-130px)] text-left">
+        <Skeleton className="w-full h-[20px] rounded-lg" />
+        <Skeleton className="w-full h-[20px] rounded-lg" />
+        <Skeleton className="w-full h-[20px] rounded-lg mt-1" />
+      </div>
+    </div>
+  );
+}

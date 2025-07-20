@@ -13,6 +13,7 @@ import {
 } from "@/frontend/interface/undangan";
 import { toast } from "react-hot-toast";
 import Loading from "@/components/layouts/loading";
+import NotFound from "@/components/card/not-found";
 
 interface ThemeComponentProps {
   undanganData: UndanganDetail;
@@ -204,6 +205,14 @@ export default function UndanganView({
       router.push("/");
     }
   }, [isError]);
+
+  if (!undanganData)
+    return (
+      <NotFound
+        title="Waduh, undanganmu nggak ada!"
+        description="Mungkin kamu salah klik link ini, atau link ini sudah tidak ada."
+      />
+    );
 
   return (
     <div className="max-w-[450px] mx-auto overflow-x-hidden">
