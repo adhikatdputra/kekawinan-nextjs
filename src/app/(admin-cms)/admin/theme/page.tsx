@@ -280,9 +280,9 @@ export default function ThemeAdminPage() {
                   <TableCell className="w-[20%] whitespace-break-spaces">
                     {item.credit} Credits
                     {item.promo > 0 && (
-                      <span className="text-xs text-muted-foreground">
+                      <div className="text-sm text-muted-foreground">
                         Promo: {item.promo} Credits
-                      </span>
+                      </div>
                     )}
                   </TableCell>
                   <TableCell className="w-[15%] whitespace-break-spaces">
