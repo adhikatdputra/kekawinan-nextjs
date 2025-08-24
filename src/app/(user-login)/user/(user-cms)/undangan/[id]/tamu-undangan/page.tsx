@@ -403,6 +403,7 @@ export default function TamuPage() {
       <div className="border border-border p-6 rounded-2xl grid gap-4">
         <div className="flex gap-2 justify-end items-center">
           <Button
+            variant="outline"
             onClick={() => {
               setIsOpen(true);
               setSelectedItem(null);

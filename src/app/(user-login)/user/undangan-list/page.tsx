@@ -252,16 +252,6 @@ export default function UndanganListPage() {
                         </div>
                         <div className="flex items-center gap-2">
                           <Tooltip>
-                            <TooltipTrigger className="bg-purple-600 text-white p-1 rounded-sm">
-                              <Link href={`/user/undangan/${item.id}/kado-pernikahan`}>
-                                <IconGift size={18} />
-                              </Link>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Atur kado pernikahan</p>
-                            </TooltipContent>
-                          </Tooltip>
-                          <Tooltip>
                             <TooltipTrigger className="bg-green-kwn text-white p-1 rounded-sm">
                               <Link href={`/user/undangan/${item.id}/overview`}>
                                 <IconAdjustments size={18} />
@@ -272,8 +262,22 @@ export default function UndanganListPage() {
                             </TooltipContent>
                           </Tooltip>
                           <Tooltip>
+                            <TooltipTrigger className="bg-purple-600 text-white p-1 rounded-sm">
+                              <Link
+                                href={`/user/undangan/${item.id}/kado-pernikahan`}
+                              >
+                                <IconGift size={18} />
+                              </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Atur kado pernikahan</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
                             <TooltipTrigger className="bg-blue-600 text-white p-1 rounded-sm">
-                              <Link href={`/user/undangan/${item.id}/tamu-undangan`}>
+                              <Link
+                                href={`/user/undangan/${item.id}/tamu-undangan`}
+                              >
                                 <IconUsers size={18} />
                               </Link>
                             </TooltipTrigger>
