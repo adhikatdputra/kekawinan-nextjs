@@ -3,16 +3,31 @@ import { Toaster } from "react-hot-toast";
 import ReactQueryProvider from "@/lib/tanstack";
 import { GoogleTagManager } from "@next/third-parties/google";
 import "./globals.css";
+import { home } from "@/frontend/constants/meta";
 
 export const metadata: Metadata = {
-  title: "Kekawinan | Undangan Pernikahan Digital",
-  description:
-    "Undangan Pernikahan Digital Gratis, Mudah, dan Berkesan! Buat undangan pernikahan digital yang bisa kamu atur sendiri dari tema, foto prewed, sampai playlist favorit! Gratis, gampang, dan pastinya berkesan!",
+  title: home.title,
+  description: home.description,
+  alternates: home.alternates,
+  publisher: "Partnerinaja",
+  robots: {
+    index: true,
+    follow: true,
+  },
   icons: {
     icon: "/favicon.ico", // pastikan file ini ada di folder /public
     shortcut: "/favicon.ico", // opsional
     apple: "/apple-touch-icon.png", // opsional
   },
+  keywords: [
+    "undangan pernikahan digital",
+    "undangan online",
+    "website undangan nikah",
+    "template undangan",
+    "kado pernikahan",
+    "kekawinan",
+    "undangan gratis"
+  ]
 };
 
 export default function RootLayout({
