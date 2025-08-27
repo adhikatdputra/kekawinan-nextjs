@@ -10,7 +10,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/user/", "/admin/"],
       },
     ],
-    sitemap: "https://kekawinan.com/sitemap.xml",
-    host: "https://kekawinan.com",
+    sitemap: "https://www.kekawinan.com/sitemap.xml",
+    host: "https://www.kekawinan.com/",
   };
 }
