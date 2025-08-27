@@ -1,10 +1,9 @@
 // app/[slug]/page.tsx
 import { redirect } from "next/navigation";
 
-interface PageProps {
-  params: { slug: string };
-}
-
-export default function SlugIndex({ params }: PageProps) {
-  redirect(`/${params.slug}/demo`);
+export default async function SlugIndex(
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  const { slug } = await params;
+  redirect(`/${slug}/demo`);
 }
