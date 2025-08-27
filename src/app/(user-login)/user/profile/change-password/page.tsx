@@ -65,7 +65,7 @@ export default function ProfilePage() {
           </h1>
         </div>
       </div>
-      <div className="py-12 md:py-24 max-w-[600px] mx-auto">
+      <div className="container py-12 md:py-24 max-w-[600px] mx-auto">
         <div className="grid gap-4">
           <div className="grid gap-3">
             <Label htmlFor="email">Password Lama</Label>

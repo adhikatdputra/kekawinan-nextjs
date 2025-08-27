@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Toaster } from "react-hot-toast";
 import ReactQueryProvider from "@/lib/tanstack";
+import { GoogleTagManager } from "@next/third-parties/google";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -21,6 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
+      <GoogleTagManager gtmId="G-L2V3T9RFZJ" />
       <body className="antialiased">
         <ReactQueryProvider>
           {children}
