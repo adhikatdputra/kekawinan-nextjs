@@ -133,6 +133,7 @@ export default function KadoPernikahanPage() {
         setIsOpen(false);
         setSelectedItem(null);
         refetch();
+        resetForm();
       },
     });
   };

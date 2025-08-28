@@ -216,14 +216,14 @@ export default function TamuPage() {
     const name = item.name;
     const tamu = name.replace("&", "dan");
 
-    const title = undangan?.name;
+    const title = undangan?.undangan_content?.title;
     const pengantin = title.replace("&", "dan");
 
     const tglwaktu = encodeURI(undangan?.undangan_content?.resepsi_time);
     const tempat = encodeURI(undangan?.undangan_content?.resepsi_place);
     const link = encodeURI(undangan?.permalink);
 
-    const msg = `Bismillahirrahmanirrahim%0AAssalamu'alaikum Warahmatullahi Wabarakatuh%0A%0AYth. Bpk/Ibu/Sdr/i *${tamu}*,%0A%0ADengan mengharap ridha dan rahmat Allah SWT, serta tanpa mengurangi rasa hormat. Perkenankan kami mengundang Bpk/Ibu/Sdr/i untuk hadir di acara pernikahan kami:%0A%0A*Nama:* ${pengantin}%0A*Acara:* ${tglwaktu}%0A*Lokasi:* ${tempat}%0A%0AMerupakan suatu kehormatan bagi kami apabila Bpk/Ibu/Sdr/i dapat menghadiri/ menyaksikan prosesi pernikahan kami, serta jangan lupa konfirmasi kehadiranmu ya pada tautan dibawah ini:%0A%0Ahttps://kekawinan.com/${link}/${item.id}%0A%0AKami juga mengharapkan ucapan, harapan, serta doa Bpk/Ibu/Sdr/i untuk kami.%0A%0AAtas perhatiannya kami ucapkan terimakasih.`;
+    const msg = `Bismillahirrahmanirrahim%0AAssalamu'alaikum Warahmatullahi Wabarakatuh%0A%0AYth. Bpk/Ibu/Sdr/i *${tamu}*,%0A%0ADengan mengharap ridha dan rahmat Allah SWT, serta tanpa mengurangi rasa hormat. Perkenankan kami mengundang Bpk/Ibu/Sdr/i untuk hadir di acara pernikahan kami:%0A%0A*Pernikahan ${pengantin}*%0A*Tanggal:* ${tglwaktu}%0A*Lokasi:* ${tempat}%0A%0AMerupakan suatu kehormatan bagi kami apabila Bpk/Ibu/Sdr/i dapat menghadiri/ menyaksikan prosesi pernikahan kami, serta jangan lupa konfirmasi kehadiranmu ya pada tautan dibawah ini:%0A%0Ahttps://kekawinan.com/${link}/${item.id}%0A%0AKami juga mengharapkan ucapan, harapan, serta doa Bpk/Ibu/Sdr/i untuk kami.%0A%0AAtas perhatiannya kami ucapkan terimakasih.`;
 
     sendWhatsappTamu(item.id, {
       onSuccess: () => {
