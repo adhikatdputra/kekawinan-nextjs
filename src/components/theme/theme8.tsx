@@ -609,6 +609,7 @@ export default function Theme8({
         bgButton="bg-theme8-primary"
         colorButton="text-white"
         colorHeading="text-white"
+        labelColor="text-white"
       />
       {/* Ucapan Doa List */}
       <div className="py-16 px-6 bg-gradient-to-b from-black to-theme8-primary border-t border-white/20">

@@ -23,6 +23,7 @@ export default function UcapanConfirm({
   colorHeading,
   fontHeading = "font-glitten",
   isLoading,
+  labelColor = "text-black",
   onSubmit,
 }: {
   tamu: UndanganTamu;
@@ -32,6 +33,7 @@ export default function UcapanConfirm({
   colorHeading?: string;
   fontHeading?: string;
   isLoading?: boolean;
+  labelColor?: string;
   onSubmit: ({
     data,
   }: {
@@ -81,7 +83,7 @@ export default function UcapanConfirm({
       {!is_confirm ? (
         <div className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="name">Nama</Label>
+            <Label htmlFor="name" className={labelColor}>Nama</Label>
             <Input
               id="name"
               value={name}
@@ -91,7 +93,7 @@ export default function UcapanConfirm({
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="attend">Kehadiran</Label>
+            <Label htmlFor="attend" className={labelColor}>Kehadiran</Label>
             <Select value={attend} onValueChange={setAttend}>
               <SelectTrigger className="w-full bg-white">
                 <SelectValue placeholder="Pilih Kehadiran" />
@@ -104,7 +106,7 @@ export default function UcapanConfirm({
           </div>
           {attend === "Yes" && (
             <div className="grid gap-2">
-              <Label htmlFor="attend_total">Jumlah Kehadiran</Label>
+              <Label htmlFor="attend_total" className={labelColor}>Jumlah Kehadiran</Label>
               <Select value={attend_total} onValueChange={setAttendTotal}>
                 <SelectTrigger className="w-full bg-white">
                   <SelectValue placeholder="Pilih Jumlah Kehadiran" />
@@ -120,7 +122,7 @@ export default function UcapanConfirm({
             </div>
           )}
           <div className="grid gap-2">
-            <Label htmlFor="message">Pesan untuk kami</Label>
+            <Label htmlFor="message" className={labelColor}>Pesan untuk kami</Label>
             <Textarea
               id="message"
               value={message}

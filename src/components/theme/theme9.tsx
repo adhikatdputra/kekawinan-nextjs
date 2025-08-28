@@ -541,6 +541,7 @@ export default function Theme9({
         bgButton="bg-theme9-primary"
         colorButton="text-white"
         colorHeading="text-theme9-secondary"
+        labelColor="text-white"
       />
       {/* Ucapan Doa List */}
       <div className="py-16 px-6 bg-gradient-to-b from-black to-theme9-primary  border-t border-white/20">
