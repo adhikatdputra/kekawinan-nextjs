@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { Toaster } from "react-hot-toast";
 import ReactQueryProvider from "@/lib/tanstack";
-import { GoogleTagManager } from "@next/third-parties/google";
+import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import { home } from "@/frontend/constants/meta";
-
 export const metadata: Metadata = {
   title: home.title,
   description: home.description,
@@ -26,9 +25,12 @@ export const metadata: Metadata = {
     "template undangan",
     "kado pernikahan",
     "kekawinan",
-    "undangan gratis"
-  ]
+    "undangan gratis",
+  ],
 };
+
+const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || "GTM-PLMJCNCM";
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID || "G-L2V3T9RFZJ";
 
 export default function RootLayout({
   children,
@@ -37,7 +39,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <GoogleTagManager gtmId="G-L2V3T9RFZJ" />
+      <GoogleTagManager gtmId={GTM_ID} />
+      <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />
+      
       <body className="antialiased">
         <ReactQueryProvider>
           {children}
