@@ -35,7 +35,7 @@ export default function GiftFeature() {
             transition={{ duration: 0.2 }}
           >
             <h2 className="text-4xl md:text-5xl text-black font-bold">
-              Bingung Mau Kasih Kado? Sekarang Gak Lagi!
+              Atur List Kado Impianmu, <br/>Biar Kado Pernikahan Gak Mubazir!
             </h2>
             <div
               className="text-lg text-black"

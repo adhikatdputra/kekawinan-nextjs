@@ -11,24 +11,29 @@ import "swiper/css/navigation";
 
 const testimonial = [
   {
-    img: "/images/testi/aden.jpeg",
-    name: "Rachman Muizzu",
-    msg: "Undangannya keren banget! Desain kece, template oke, dan... GRATIS! Terbaik sih Kekawinan.com 🙌",
+    img: "/images/testi/image-1.png",
+    name: "Arga & Nabila",
+    msg: "Awalnya cuma coba-coba, ternyata hasilnya mewah banget! Tamu-tamu bilang undangannya modern dan elegan. Prosesnya juga gampang banget, tinggal klik langsung jadi 💍✨",
   },
   {
-    img: "/images/testi/aden.jpeg",
-    name: "Tengku Reza",
-    msg: "Suka banget! Simpel, ada CMS-nya, dan timnya bantuin terus. Padahal gratis loh 😍",
+    img: "/images/testi/image-2.png",
+    name: "Fahri & Alya",
+    msg: "Design-nya clean, animasinya halus, dan bisa atur semuanya sendiri lewat CMS. Bener-bener ngebantu banget buat kita yang pengen praktis tapi tetap berkelas 🤍",
   },
   {
-    img: "/images/testi/aden.jpeg",
-    name: "Reno & Dea",
-    msg: "Nggak nyangka, template-nya cakep dan gampang banget dipakai. Bener-bener top! 👌",
+    img: "/images/testi/image-3.png",
+    name: "Rizky & Intan",
+    msg: "Nggak perlu ribet cetak-cetak lagi. Undangan online ini bikin semuanya lebih simple dan tetap terlihat eksklusif. Banyak yang kira ini custom mahal loh! 🔥",
   },
   {
-    img: "/images/testi/aden.jpeg",
-    name: "Adenda & Bella",
-    msg: "Gratis tapi hasilnya estetik parah! Thank you Kekawinan.com 💕",
+    img: "/images/testi/image-4.png",
+    name: "Dimas & Shafira",
+    msg: "Template-nya estetik, loading-nya cepat, dan bisa share ke mana aja. Kita jadi lebih hemat waktu dan biaya tanpa ngorbanin kualitas 💐",
+  },
+  {
+    img: "/images/testi/image-5.png",
+    name: "Rafi & Zahra",
+    msg: "Dari awal sampai launch, semuanya smooth banget. Undangannya cantik, responsif di HP, dan bikin hari bahagia kita terasa makin spesial 🥂✨",
   },
 ];
 
