@@ -27,6 +27,7 @@ export default function GiftFeature() {
               className="w-[80%] mx-auto"
             />
           </motion.div>
+          
           <motion.div
             className="w-full md:w-1/2 flex flex-col gap-4 mt-10 md:mt-0 text-center md:text-left"
             initial={{ opacity: 0 }}
