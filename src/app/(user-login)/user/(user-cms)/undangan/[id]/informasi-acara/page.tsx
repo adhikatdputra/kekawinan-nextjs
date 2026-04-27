@@ -60,10 +60,10 @@ export default function InformasiAcaraPage() {
 
   useEffect(() => {
     if (undanganContent) {
-      setAkadTime(undanganContent.akad_time || "");
-      setAkadPlace(undanganContent.akad_place || "");
-      setResepsiTime(undanganContent.resepsi_time || "");
-      setResepsiPlace(undanganContent.resepsi_place || "");
+      setAkadTime(undanganContent.akadTime || "");
+      setAkadPlace(undanganContent.akadPlace || "");
+      setResepsiTime(undanganContent.resepsiTime || "");
+      setResepsiPlace(undanganContent.resepsiPlace || "");
       setGmaps(undanganContent.gmaps || "");
     }
   }, [undanganContent]);

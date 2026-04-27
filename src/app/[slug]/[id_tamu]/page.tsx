@@ -28,17 +28,17 @@ export async function generateMetadata(
   // Ambil metadata sebelumnya dari parent
   const previousImages = (await parent).openGraph?.images || [];
   return {
-    title: `Kekawinan ${data?.data?.undangan_content?.title ?? ""}`.trim(),
+    title: `Kekawinan ${data?.data?.content?.title ?? ""}`.trim(),
     description: `Undangan Pernikahan dari ${
-      data?.data?.undangan_content?.title ?? ""
+      data?.data?.content?.title ?? ""
     }`,
     openGraph: {
-      title: `Kekawinan ${data?.data?.undangan_content?.title ?? ""}`.trim(),
+      title: `Kekawinan ${data?.data?.content?.title ?? ""}`.trim(),
       description: `Undangan Pernikahan dari ${
-        data?.data?.undangan_content?.title ?? ""
+        data?.data?.content?.title ?? ""
       }`,
       images: [
-        data?.data?.undangan_content?.img_thumbnail ?? "",
+        data?.data?.content?.imgThumbnail ?? "",
         ...previousImages,
       ],
     },

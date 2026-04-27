@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Gift } from "@/frontend/interface/undangan";
+import { UndanganGift } from "@/frontend/interface/undangan";
 import { IconClipboard, IconCheck } from "@tabler/icons-react";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
@@ -16,27 +16,29 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default function DialogGift({
-  gift,
+  gifts,
   isOpen,
   setIsOpen,
   giftLength,
   slug,
 }: {
-  gift: Gift;
+  gifts: UndanganGift[];
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   giftLength: number;
   slug: string;
 }) {
-  const [isCopied, setIsCopied] = useState(false);
-  const handleCopy = () => {
-    navigator.clipboard.writeText(gift.bank_number);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopy = (gift: UndanganGift) => {
+    navigator.clipboard.writeText(gift.bankNumber);
     toast.success("Nomor rekening berhasil disalin");
-    setIsCopied(true);
-    setTimeout(() => {
-      setIsCopied(false);
-    }, 2000);
+    setCopiedId(gift.id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
+
+  // Use first entry with an address for the physical delivery section
+  const addressEntry = gifts.find((g) => g.nameAddress || g.address);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -51,61 +53,78 @@ export default function DialogGift({
                 Tanpa mengurangi rasa hormat, Anda dapat mengirimkan tanda kasih
                 untuk kedua mempelai melalui nomor rekening / alamat berikut:
               </p>
-              <div className="bg-[url('/images/bg-atm.png')] bg-cover bg-right rounded-lg p-6 mt-4 w-full shadow-xl flex flex-col gap-8">
-                <div className="flex gap-2 justify-between items-center">
-                  <Image
-                    src="/images/icon-bank.png"
-                    alt="logo-atm"
-                    width={200}
-                    height={200}
-                    className="w-10"
-                  />
-                  <div>
-                    <p className="font-bold text-xl">{gift.bank_name}</p>
+
+              {gifts.length === 0 && (
+                <p className="text-sm text-gray-400 mt-2">Belum ada rekening yang ditambahkan.</p>
+              )}
+
+              {gifts.map((gift) => (
+                <div
+                  key={gift.id}
+                  className="bg-[url('/images/bg-atm.png')] bg-cover bg-right rounded-lg p-6 mt-4 w-full shadow-xl flex flex-col gap-8"
+                >
+                  <div className="flex gap-2 justify-between items-center">
+                    <Image
+                      src="/images/icon-bank.png"
+                      alt="logo-atm"
+                      width={200}
+                      height={200}
+                      className="w-10"
+                    />
+                    <div>
+                      <p className="font-bold text-xl">{gift.bankName}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1 items-start">
+                    <p className="text-sm">Nomor Rekening</p>
+                    <button
+                      className="flex gap-4 items-center"
+                      onClick={() => handleCopy(gift)}
+                    >
+                      <p className="text-2xl font-bold">{gift.bankNumber}</p>
+                      {copiedId === gift.id ? (
+                        <IconCheck size={20} className="-mt-1 text-green-kwn" />
+                      ) : (
+                        <IconClipboard
+                          size={20}
+                          className="-mt-1 text-blue-600 cursor-pointer"
+                        />
+                      )}
+                    </button>
+                  </div>
+                  <div className="flex flex-col gap-1 items-start">
+                    <p className="text-sm">Atas Nama</p>
+                    <p className="text-xl font-semibold">{gift.name}</p>
                   </div>
                 </div>
-                <div className="flex flex-col gap-1 items-start">
-                  <p className="text-sm">Nomor Rekening</p>
-                  <button
-                    className="flex gap-4 items-center"
-                    onClick={handleCopy}
-                  >
-                    <p className="text-2xl font-bold">{gift.bank_number}</p>
-                    {isCopied ? (
-                      <IconCheck size={20} className="-mt-1 text-green-kwn" />
-                    ) : (
-                      <IconClipboard
-                        size={20}
-                        className="-mt-1 text-blue-600 cursor-pointer"
-                      />
-                    )}
-                  </button>
-                </div>
-                <div className="flex flex-col gap-1 items-start">
-                  <p className="text-sm">Atas Nama</p>
-                  <p className="text-xl font-semibold">{gift.name}</p>
+              ))}
+            </div>
+
+            {(addressEntry || giftLength > 0) && (
+              <div className="flex flex-col gap-2 items-start">
+                <h3 className="text-xl font-bold">Kirim Hadiah</h3>
+                <div className="flex flex-col gap-1 items-start bg-gray-100 p-4 rounded-lg w-full border border-dashed border-gray-300">
+                  {addressEntry && (
+                    <>
+                      <p className="font-semibold">{addressEntry.nameAddress}</p>
+                      <p className="text-left">{addressEntry.phone}</p>
+                      <p className="text-left">{addressEntry.address}</p>
+                      <hr />
+                    </>
+                  )}
+                  {giftLength > 0 && (
+                    <>
+                      <h3 className="font-bold mt-4">Pilihan Kado Spesial</h3>
+                      <Link href={`/${slug}/gift`} target="_blank">
+                        <Button className="w-full rounded-lg bg-gray-500">
+                          Lihat Kado Spesial
+                        </Button>
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
-            </div>
-            <div className="flex flex-col gap-2 items-start">
-              <h3 className="text-xl font-bold">Kirim Hadiah</h3>
-              <div className="flex flex-col gap-1 items-start bg-gray-100 p-4 rounded-lg w-full border border-dashed border-gray-300">
-                <p className="font-semibold">{gift.name_address}</p>
-                <p className="text-left">{gift.phone}</p>
-                <p className="text-left">{gift.address}</p>
-                <hr />
-                {giftLength > 0 && (
-                  <>
-                    <h3 className="font-bold mt-4">Pilihan Kado Spesial</h3>
-                    <Link href={`/${slug}/gift`} target="_blank">
-                      <Button className="w-full rounded-lg bg-gray-500">
-                        Lihat Kado Spesial
-                      </Button>
-                    </Link>
-                  </>
-                )}
-              </div>
-            </div>
+            )}
           </div>
         </DialogHeader>
       </DialogContent>

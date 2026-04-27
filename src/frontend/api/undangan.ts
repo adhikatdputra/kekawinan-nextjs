@@ -3,25 +3,25 @@ import { UndanganBody } from "../interface/undangan";
 
 const undanganApi = {
   getUndangan: () => {
-    return axios.post(`/users/undangan/me`);
+    return axios.get(`/undangan`);
   },
   getUndanganOverview: (id: string) => {
-    return axios.get(`/users/undangan/${id}/overview`);
+    return axios.get(`/undangan/${id}/overview`);
   },
   getUndanganDetail: (id: string) => {
-    return axios.get(`/users/undangan/${id}`);
+    return axios.get(`/undangan/${id}`);
   },
   createUndangan: (formData: UndanganBody) => {
-    return axios.post(`/users/undangan/`, formData);
+    return axios.post(`/undangan`, formData);
   },
   updateUndangan: (id: string, formData: UndanganBody) => {
-    return axios.put(`/users/undangan/${id}`, formData);
+    return axios.put(`/undangan/${id}`, formData);
   },
   deleteUndangan: (id: string) => {
-    return axios.delete(`/users/undangan/${id}`);
+    return axios.delete(`/undangan/${id}`);
   },
   getThemeUndangan: () => {
-    return axios.get(`/users/theme-all?sortBy=createdAt&order=ASC`);
+    return axios.get(`/theme/public?sortBy=createdAt&order=ASC`);
   },
 };
 

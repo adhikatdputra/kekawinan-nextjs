@@ -62,7 +62,7 @@ export default function GaleriFotoPage() {
   });
 
   const { mutate: createUndanganGaleri, isPending: isCreating } = useMutation({
-    mutationFn: (formData: FormData) => undanganGaleriApi.create(formData),
+    mutationFn: (formData: FormData) => undanganGaleriApi.create(id, formData),
     onSuccess: (data) => {
       const response = data.data;
       if (response.success) {
@@ -81,7 +81,7 @@ export default function GaleriFotoPage() {
 
   const { mutate: deleteUndanganGaleri, isPending: isPendingDelete } =
     useMutation({
-      mutationFn: (id: string) => undanganGaleriApi.remove(id),
+      mutationFn: (galleryId: string) => undanganGaleriApi.remove(id, galleryId),
       onSuccess: (data) => {
         const response = data.data;
         if (response.success) {
@@ -94,7 +94,7 @@ export default function GaleriFotoPage() {
     });
 
   const { mutate: moveUpFoto } = useMutation({
-    mutationFn: (id: string) => undanganGaleriApi.moveUp(id),
+    mutationFn: (galleryId: string) => undanganGaleriApi.moveUp(id, galleryId),
     onSuccess: (data) => {
       const response = data.data;
       if (response.success) {
@@ -110,7 +110,7 @@ export default function GaleriFotoPage() {
   });
 
   const { mutate: moveDownFoto } = useMutation({
-    mutationFn: (id: string) => undanganGaleriApi.moveDown(id),
+    mutationFn: (galleryId: string) => undanganGaleriApi.moveDown(id, galleryId),
     onSuccess: (data) => {
       const response = data.data;
       if (response.success) {

@@ -20,7 +20,7 @@ export default function UcapanStore() {
   });
 
   const updateIsShow = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: { is_show: string } }) =>
+    mutationFn: ({ id, data }: { id: string; data: { isShow: number } }) =>
       undanganUcapanApi.changeShow(id, data),
     onSuccess: (data) => {
       const response = data.data;

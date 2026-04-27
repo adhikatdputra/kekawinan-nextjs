@@ -31,7 +31,7 @@ export default function AmplopDigitalPage() {
 
   const { mutate: updateGift, isPending: isUpdating } = useMutation({
     mutationFn: (formData: FormData) =>
-      undanganContentApi.updateGift(gift?.id as string, formData),
+      undanganContentApi.updateGift(id, gift?.id as string, formData),
     onSuccess: (data) => {
       const response = data.data;
       if (response.success) {
@@ -59,10 +59,10 @@ export default function AmplopDigitalPage() {
 
   useEffect(() => {
     if (gift) {
-      setBankName(gift.bank_name || "");
-      setBankNumber(gift.bank_number || "");
+      setBankName(gift.bankName || "");
+      setBankNumber(gift.bankNumber || "");
       setName(gift.name || "");
-      setNameAddress(gift.name_address || "");
+      setNameAddress(gift.nameAddress || "");
       setPhone(gift.phone || "");
       setAddress(gift.address || "");
     }

@@ -95,7 +95,7 @@ export default function KadoPernikahanPage() {
   });
 
   const handleDelete = () => {
-    deleteGift(selectedItem?.id as string, {
+    deleteGift({ undanganId: id, id: selectedItem?.id as string }, {
       onSuccess: () => {
         refetch();
         setIsOpenDelete(false);
@@ -108,7 +108,7 @@ export default function KadoPernikahanPage() {
     setTitle(item.title);
     setPrice(item.price);
     setThumbnail(item.thumbnail as unknown as File);
-    setLinkProduct(item.link_product);
+    setLinkProduct(item.linkProduct);
     setSelectedItem(item);
   };
 
@@ -121,14 +121,7 @@ export default function KadoPernikahanPage() {
   };
 
   const handleCreate = () => {
-    const formData = new FormData();
-    formData.append("undangan_id", id);
-    formData.append("title", title);
-    formData.append("price", price);
-    formData.append("thumbnail", thumbnail as unknown as string);
-    formData.append("description", " ");
-    formData.append("link_product", linkProduct);
-    createGift(formData, {
+    createGift({ undanganId: id, data: { title, price, linkProduct, description: " " } }, {
       onSuccess: () => {
         setIsOpen(false);
         setSelectedItem(null);
@@ -139,16 +132,11 @@ export default function KadoPernikahanPage() {
   };
 
   const handleUpdate = () => {
-    const formData = new FormData();
-    formData.append("undangan_id", id);
-    formData.append("title", title as string);
-    formData.append("price", price as string);
-    formData.append("thumbnail", thumbnail as unknown as string);
-    formData.append("link_product", linkProduct as string);
     updateGift(
       {
+        undanganId: id,
         id: selectedItem?.id as string,
-        data: formData,
+        data: { title, price, linkProduct },
       },
       {
         onSuccess: () => {
@@ -285,17 +273,17 @@ export default function KadoPernikahanPage() {
                     {formatNumber(Number(item.price))}
                   </TableCell>
                   <TableCell className="w-[20%] whitespace-break-spaces">
-                    <Link href={item.link_product} target="_blank" className="text-green-kwn underline">
+                    <Link href={item.linkProduct} target="_blank" className="text-green-kwn underline">
                       Lihat Kado
                     </Link>
                   </TableCell>
                   <TableCell className="w-[15%]">
                     <p>
-                      {item.is_confirm
+                      {item.isConfirm
                         ? "Dihadiahkan oleh"
                         : "Belum"}
                     </p>
-                    {item.is_confirm ? (
+                    {item.isConfirm ? (
                       <>
                         <p className="text-sm text-muted-foreground">
                           {item.name}

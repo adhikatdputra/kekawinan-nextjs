@@ -1,25 +1,23 @@
 import axios from "@/lib/axios";
 
 const undanganGaleriApi = {
-  getData: (id: string) => {
-    return axios.get(
-      `/users/undangangallery/slug/${id}?limit=10&page=1&sortBy=createdAt&order=ASC`
-    );
+  getData: (undanganId: string) => {
+    return axios.get(`/undangan/${undanganId}/gallery`);
   },
-  create: (formData: FormData) => {
-    return axios.post(`/users/undangangallery`, formData);
+  create: (undanganId: string, formData: object) => {
+    return axios.post(`/undangan/${undanganId}/gallery`, formData);
   },
-  update: (id: string, formData: FormData) => {
-    return axios.put(`/users/undangangallery/${id}`, formData);
+  update: (undanganId: string, galleryId: string, formData: object) => {
+    return axios.put(`/undangan/${undanganId}/gallery/${galleryId}`, formData);
   },
-  remove: (id: string) => {
-    return axios.delete(`/users/undangangallery/${id}`);
+  remove: (undanganId: string, galleryId: string) => {
+    return axios.delete(`/undangan/${undanganId}/gallery/${galleryId}`);
   },
-  moveUp: (id: string) => {
-    return axios.patch(`/users/undangangallery/${id}/move-up`);
+  moveUp: (undanganId: string, galleryId: string) => {
+    return axios.patch(`/undangan/${undanganId}/gallery/${galleryId}/move`, { direction: "up" });
   },
-  moveDown: (id: string) => {
-    return axios.patch(`/users/undangangallery/${id}/move-down`);
+  moveDown: (undanganId: string, galleryId: string) => {
+    return axios.patch(`/undangan/${undanganId}/gallery/${galleryId}/move`, { direction: "down" });
   },
 };
 

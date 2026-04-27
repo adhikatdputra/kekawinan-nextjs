@@ -40,7 +40,7 @@ export default function UcapanConfirm({
     data: {
       name: string;
       attend: string;
-      attend_total: string;
+      attendTotal: string;
       message: string;
     };
   }) => void;
@@ -61,7 +61,7 @@ export default function UcapanConfirm({
     const data = {
       name: name,
       attend: attend,
-      attend_total: attend_total,
+      attendTotal: attend_total,
       message: message,
     };
     onSubmit({ data });
@@ -70,7 +70,7 @@ export default function UcapanConfirm({
 
   useEffect(() => {
     setName(tamu?.name ?? "Tamu Spesial");
-    setIsConfirm(Boolean(tamu?.is_confirm) ?? false);
+    setIsConfirm(Boolean(tamu?.isConfirm) ?? false);
   }, [tamu]);
 
   return (
@@ -112,7 +112,7 @@ export default function UcapanConfirm({
                   <SelectValue placeholder="Pilih Jumlah Kehadiran" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Array.from({ length: tamu.max_invite ?? 4 }, (_, i) => (
+                  {Array.from({ length: tamu.maxInvite ?? 4 }, (_, i) => (
                     <SelectItem key={i} value={(i + 1).toString()}>
                       {i + 1}
                     </SelectItem>

@@ -159,7 +159,7 @@ export default function UndanganListPage() {
     if (selectedItem) {
       updateUndangan({ id: selectedItem.id, data: { name, permalink } });
     } else {
-      createUndangan({ name, permalink, theme_id: selectedTheme });
+      createUndangan({ name, permalink, themeId: selectedTheme });
     }
     setSelectedItem(null);
     setName("");
@@ -293,7 +293,7 @@ export default function UndanganListPage() {
                                   setSelectedItem(item);
                                   setName(item.name);
                                   setPermalink(item.permalink);
-                                  setSelectedTheme(item.theme_id);
+                                  setSelectedTheme(item.themeId);
                                   setIsOpen(true);
                                 }}
                               />
@@ -440,7 +440,7 @@ export default function UndanganListPage() {
                                 </div>
                                 <div className="absolute bottom-0 left-0 right-0 p-2 bg-black text-white text-sm flex items-center justify-center  opacity-0 group-hover:opacity-100 transition-all duration-300">
                                   <Link
-                                    href={`/${item.component_name.toLowerCase()}/demo`}
+                                    href={`/${item.componentName.toLowerCase()}/demo`}
                                   >
                                     Preview
                                   </Link>

@@ -78,8 +78,8 @@ export default function SettingPage() {
 
   useEffect(() => {
     if (undanganContent) {
-      setIsCovid(undanganContent.is_covid);
-      setReligionVersion(undanganContent.religion_version);
+      setIsCovid(undanganContent.isCovid);
+      setReligionVersion(undanganContent.religionVersion);
     }
   }, [undanganContent]);
 

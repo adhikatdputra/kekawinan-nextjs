@@ -38,7 +38,7 @@ export default function GiftDetailView({ id }: { id: string }) {
     refetch,
   } = useQuery({
     queryKey: ["gift-detail", id],
-    queryFn: () => giftApi.getDetail(id),
+    queryFn: () => giftApi.getPublicDetail(id),
     select: (data) => data.data.data as Gift,
   });
 
@@ -94,7 +94,7 @@ export default function GiftDetailView({ id }: { id: string }) {
           </div>
         </div>
         <div className="flex flex-col gap-3 mt-12">
-          {giftData?.is_confirm ? (
+          {giftData?.isConfirm ? (
             <div className="text-center text-green-kwn">
               Sudah dihadiahkan oleh{" "}
               <span className="font-recoleta font-semibold">
@@ -103,7 +103,7 @@ export default function GiftDetailView({ id }: { id: string }) {
             </div>
           ) : (
             <div className="flex flex-col gap-3">
-              <Link href={giftData?.link_product || "#"} target="_blank">
+              <Link href={giftData?.linkProduct || "#"} target="_blank">
                 <Button className="w-full" size={"md"}>
                   Checkout Sekarang
                 </Button>

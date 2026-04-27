@@ -79,16 +79,16 @@ export default function CoverPembukaPage() {
   useEffect(() => {
     if (undanganContent) {
       setTitle(undanganContent.title || "");
-      setImgThumbnail(undanganContent.img_thumbnail || "");
-      setImgBg(undanganContent.img_bg || "");
-      setStreamLink(undanganContent.stream_link || "");
+      setImgThumbnail(undanganContent.imgThumbnail || "");
+      setImgBg(undanganContent.imgBg || "");
+      setStreamLink(undanganContent.streamLink || "");
       setMusic(undanganContent.music || null);
       if (undanganContent.music) {
         setIsMusic(true);
       }
       setDateWedding(
-        undanganContent.date_wedding
-          ? new Date(undanganContent.date_wedding)
+        undanganContent.dateWedding
+          ? new Date(undanganContent.dateWedding)
           : new Date()
       );
     }

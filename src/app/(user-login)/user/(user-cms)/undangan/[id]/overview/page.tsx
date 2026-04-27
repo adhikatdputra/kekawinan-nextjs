@@ -118,13 +118,13 @@ export default function OverviewPage() {
   };
 
   const handleUpdateIsShowUcapan = (item: UndanganUcapan) => {
-    const getShow = !item.is_show;
-    const isShow = getShow ? "1" : "0";
+    const getShow = !item.isShow;
+    const isShow = getShow ? 1 : 0;
 
     updateIsShowUcapan(
       {
         id: item.id as string,
-        data: { is_show: isShow },
+        data: { isShow: isShow },
       },
       {
         onSuccess: () => {
@@ -312,7 +312,7 @@ export default function OverviewPage() {
                     <p>
                       {item.attend == "Yes" ? "Hadir" : "Tidak Hadir ❌"}{" "}
                       {item.attend == "Yes" && (
-                        <span>- {item.attend_total} Orang</span>
+                        <span>- {item.attendTotal} Orang</span>
                       )}
                     </p>
                   </TableCell>
@@ -325,10 +325,10 @@ export default function OverviewPage() {
                               handleUpdateIsShowUcapan(item);
                             }}
                             className={`${
-                              item.is_show ? "bg-green-soft-kwn" : "bg-red-400"
+                              item.isShow ? "bg-green-soft-kwn" : "bg-red-400"
                             } cursor-pointer border border-border rounded-md p-1 `}
                           >
-                            {item.is_show ? (
+                            {item.isShow ? (
                               <IconEye size={18} />
                             ) : (
                               <IconEyeOff size={18} />
@@ -336,7 +336,7 @@ export default function OverviewPage() {
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>
-                              {item.is_show
+                              {item.isShow
                                 ? "Ucapan ditampilkan"
                                 : "Ucapan disembunyikan"}
                             </p>

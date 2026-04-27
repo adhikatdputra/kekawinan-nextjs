@@ -23,20 +23,20 @@ export async function generateMetadata(
   const previousImages = (await parent).openGraph?.images || [];
   return {
     title: `Kado Pernikahan ${
-      data?.data?.undangan_content?.title ?? ""
+      data?.data?.content?.title ?? ""
     }`.trim(),
     description: `Kado Pernikahan untuk ${
-      data?.data?.undangan_content?.title ?? ""
+      data?.data?.content?.title ?? ""
     }`,
     openGraph: {
       title: `Kado Pernikahan ${
-        data?.data?.undangan_content?.title ?? ""
+        data?.data?.content?.title ?? ""
       }`.trim(),
       description: `Kado Pernikahan untuk ${
-        data?.data?.undangan_content?.title ?? ""
+        data?.data?.content?.title ?? ""
       }`,
       images: [
-        data?.data?.undangan_content?.img_thumbnail ?? "",
+        data?.data?.content?.imgThumbnail ?? "",
         ...previousImages,
       ],
     },

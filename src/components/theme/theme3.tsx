@@ -43,7 +43,7 @@ export default function Theme3({
   onSubmitUcapan: (data: {
     name: string;
     attend: string;
-    attend_total: string;
+    attendTotal: string;
     message: string;
   }) => void;
   ucapan: UndanganUcapan[];
@@ -68,7 +68,7 @@ export default function Theme3({
       <div
         className="relative h-screen p-6 py-8 flex flex-col justify-between items-center bg-cover bg-center"
         style={{
-          backgroundImage: `url(${undanganData?.undangan_content?.img_bg})`,
+          backgroundImage: `url(${undanganData?.content?.imgBg})`,
         }}
       >
         {Array(10)
@@ -105,7 +105,7 @@ export default function Theme3({
             viewport={{ once: false }}
           >
             <h1 className="text-4xl font-glitten text-white mt-4">
-              {undanganData?.undangan_content?.title}
+              {undanganData?.content?.title}
             </h1>
           </motion.div>
         </div>
@@ -173,7 +173,7 @@ export default function Theme3({
             viewport={{ once: false }}
           >
             <h2 className="text-4xl text-black font-recoleta-alt font-bold">
-              {undangan?.undangan_content?.title}
+              {undangan?.content?.title}
             </h2>
           </motion.div>
           <motion.div
@@ -187,7 +187,7 @@ export default function Theme3({
             viewport={{ once: false }}
           >
             <p className="text-black text-center">
-              {formatDateId(undangan?.undangan_content?.date_wedding ?? "")}
+              {formatDateId(undangan?.content?.dateWedding ?? "")}
             </p>
             <p className="text-black text-center text-xs mt-6">
               “Maha Suci Allah SWT yang telah menciptakan <br />
@@ -245,7 +245,7 @@ export default function Theme3({
           <div className="absolute top-8 left-0 w-full p-6 py-6"></div>
           <div className="w-full relative z-[5]">
             <img
-              src={undangan?.undangan_content?.img_bg}
+              src={undangan?.content?.imgBg}
               alt=""
               className="w-full h-[65%] object-cover rounded-t-full"
             />
@@ -325,7 +325,7 @@ export default function Theme3({
                 viewport={{ once: false }}
               >
                 <img
-                  src={undangan?.undangan_content?.img_female}
+                  src={undangan?.content?.imgFemale}
                   alt=""
                   className="w-[150px] h-[150px] object-cover rounded-full mx-auto"
                 />
@@ -341,13 +341,13 @@ export default function Theme3({
                 viewport={{ once: false }}
               >
                 <h6 className="font-recoleta-alt text-xl font-bold">
-                  {undangan?.undangan_content?.name_female}
+                  {undangan?.content?.nameFemale}
                 </h6>
                 <p className="text-sm pt-1">
-                  Putri {undangan?.undangan_content?.female_no} dari pasangan
+                  Putri {undangan?.content?.femaleNo} dari pasangan
                   <br />
-                  Bpk. {undangan?.undangan_content?.father_female} dan Ibu{" "}
-                  {undangan?.undangan_content?.mother_female}
+                  Bpk. {undangan?.content?.fatherFemale} dan Ibu{" "}
+                  {undangan?.content?.motherFemale}
                 </p>
               </motion.div>
               <motion.div
@@ -373,7 +373,7 @@ export default function Theme3({
                 viewport={{ once: false }}
               >
                 <img
-                  src={undangan?.undangan_content?.img_male}
+                  src={undangan?.content?.imgMale}
                   alt=""
                   className="w-[150px] h-[150px] object-cover rounded-full mx-auto"
                 />
@@ -389,13 +389,13 @@ export default function Theme3({
                 viewport={{ once: false }}
               >
                 <h6 className="font-recoleta-alt text-xl font-bold">
-                  {undangan?.undangan_content?.name_male}
+                  {undangan?.content?.nameMale}
                 </h6>
                 <p className="text-sm pt-1">
-                  Putra {undangan?.undangan_content?.male_no} dari pasangan
+                  Putra {undangan?.content?.maleNo} dari pasangan
                   <br />
-                  Bpk. {undangan?.undangan_content?.father_male} dan Ibu{" "}
-                  {undangan?.undangan_content?.mother_male}
+                  Bpk. {undangan?.content?.fatherMale} dan Ibu{" "}
+                  {undangan?.content?.motherMale}
                 </p>
               </motion.div>
             </motion.div>
@@ -418,7 +418,7 @@ export default function Theme3({
             viewport={{ once: false }}
           >
             <CountdownTimer
-              targetDate={undangan?.undangan_content?.date_wedding ?? ""}
+              targetDate={undangan?.content?.dateWedding ?? ""}
               textHeadingColor="text-theme3-secondary"
               bgColor="bg-theme3-secondary"
               textColor="text-white"
@@ -451,12 +451,12 @@ export default function Theme3({
                   Akad Nikah
                 </p>
                 <p className="text-sm font-medium text-theme3-primary">
-                  {undangan?.undangan_content?.akad_time}
+                  {undangan?.content?.akadTime}
                 </p>
                 <div
                   className="text-sm mt-2"
                   dangerouslySetInnerHTML={{
-                    __html: undangan?.undangan_content?.akad_place ?? "",
+                    __html: undangan?.content?.akadPlace ?? "",
                   }}
                 />
               </div>
@@ -484,12 +484,12 @@ export default function Theme3({
                   Resepsi Pernikahan
                 </p>
                 <p className="text-sm font-medium text-theme3-primary">
-                  {undangan?.undangan_content?.resepsi_time}
+                  {undangan?.content?.resepsiTime}
                 </p>
                 <div
                   className="text-sm mt-2"
                   dangerouslySetInnerHTML={{
-                    __html: undangan?.undangan_content?.resepsi_place ?? "",
+                    __html: undangan?.content?.resepsiPlace ?? "",
                   }}
                 />
               </div>
@@ -507,7 +507,7 @@ export default function Theme3({
               viewport={{ once: false }}
             >
               <Link
-                href={undangan?.undangan_content?.gmaps ?? ""}
+                href={undangan?.content?.gmaps ?? ""}
                 target="_blank"
               >
                 <Button className="bg-theme3-primary hover:bg-theme3-primary text-white hover:text-white font-semibold">
@@ -516,7 +516,7 @@ export default function Theme3({
                 </Button>
               </Link>
             </motion.div>
-            {undangan?.undangan_content?.stream_link && (
+            {undangan?.content?.streamLink && (
               <motion.div
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
@@ -531,7 +531,7 @@ export default function Theme3({
                   Virtual Akad session:
                 </p>
                 <Link
-                  href={undangan?.undangan_content?.stream_link ?? ""}
+                  href={undangan?.content?.streamLink ?? ""}
                   target="_blank"
                 >
                   <Button className="bg-theme3-primary hover:bg-theme3-primary text-white hover:text-white font-semibold">
@@ -577,7 +577,7 @@ export default function Theme3({
           </h2>
         </motion.div>
         <Galeri
-          galeri={undanganData.undangan_gallery}
+          galeri={undanganData.gallery}
           view={1.2}
           color="#df9d99"
         />
@@ -599,7 +599,7 @@ export default function Theme3({
       <div className="py-16 px-6 bg-white border-t border-theme3-primary">
         <div className="flex flex-col mb-8 items-center justify-center text-black">
           <h3 className="font-glitten text-3xl">Doa Terbaik</h3>
-          <p className="text-sm">untuk {undangan?.undangan_content?.title}</p>
+          <p className="text-sm">untuk {undangan?.content?.title}</p>
         </div>
         <div className="flex flex-col gap-6">
           {ucapan?.length === 0 && (
@@ -659,7 +659,7 @@ export default function Theme3({
 
       {/* Open Dialog Gift */}
       <DialogGift
-        gift={undanganData.undangan_gift}
+        gifts={undanganData.gifts}
         isOpen={isOpenGift}
         setIsOpen={setIsOpenGift}
         giftLength={giftLength}

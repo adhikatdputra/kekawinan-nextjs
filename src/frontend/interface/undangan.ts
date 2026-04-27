@@ -2,17 +2,17 @@ export interface UndanganBody {
   permalink: string;
   name: string;
   expired?: string;
-  theme_id?: string;
+  themeId?: string;
 }
 
 export interface Undangan {
   id: string;
-  user_id: string;
+  userId: string;
   permalink: string;
   name: string;
   status: string;
   expired: string;
-  theme_id: string;
+  themeId: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -21,70 +21,70 @@ export interface Theme {
   id: string;
   name: string;
   thumbnail: string;
-  component_name: string;
-  link_url: string;
+  componentName: string;
+  linkUrl: string;
   credit: number;
   promo: number;
-  is_active: number;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
-  undanganCount: number;
 }
 
 export interface UndanganDetail {
   id: string;
-  user_id: string;
+  userId: string;
   permalink: string;
   name: string;
   status: string;
   expired: string;
-  theme_id: string;
+  themeId: string;
   createdAt: string;
   updatedAt: string;
-  undangan_content: UndanganContent;
-  undangan_gift: Gift;
-  undangan_gallery: UndanganGaleri[];
+  content: UndanganContent | null;
+  gifts: UndanganGift[];
+  gallery: UndanganGaleri[];
   ucapan: UndanganUcapan[];
-  theme: Theme;
+  theme: Theme | null;
 }
 
 export interface UndanganContent {
   id: string;
-  undangan_id: string;
+  undanganId: string;
   title: string;
-  name_male: string;
-  name_female: string;
-  date_wedding: string;
-  mother_female: string;
-  father_female: string;
-  mother_male: string;
-  father_male: string;
-  male_no: string;
-  female_no: string;
-  akad_time: string;
-  akad_place: string;
-  resepsi_time: string;
-  resepsi_place: string;
+  nameMale: string;
+  nameFemale: string;
+  dateWedding: string;
+  motherFemale: string;
+  fatherFemale: string;
+  motherMale: string;
+  fatherMale: string;
+  maleNo: string;
+  femaleNo: string;
+  akadTime: string;
+  akadPlace: string;
+  resepsiTime: string;
+  resepsiPlace: string;
   gmaps: string;
-  stream_link: string;
-  img_bg: string;
-  img_male: string;
-  img_female: string;
-  img_thumbnail: string;
+  streamLink: string;
+  imgBg: string;
+  imgMale: string;
+  imgFemale: string;
+  imgThumbnail: string;
   music: string;
-  is_covid: number;
-  religion_version: string;
+  isCovid: number;
+  religionVersion: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface Gift {
+// UndanganGift: bank account entry for amplop digital
+export interface UndanganGift {
   id: string;
-  undangan_id: string;
-  bank_name: string;
+  undanganId: string;
+  bankName: string;
   name: string;
-  bank_number: string;
-  name_address: string;
+  bankNumber: string;
+  nameAddress: string;
   phone: string;
   address: string;
   createdAt: string;
@@ -93,16 +93,17 @@ export interface Gift {
 
 export interface UndanganGaleriResponse {
   rows: UndanganGaleri[];
-  count: number;
+  total_data: number;
   current_page: number;
-  page_size: number;
+  total_page: number;
 }
 
 export interface UndanganGaleri {
-  createdAt: string;
   id: string;
+  undanganId: string;
   image: string;
-  undangan_id: string;
+  rank: number;
+  createdAt: string;
   updatedAt: string;
 }
 
@@ -116,54 +117,55 @@ export interface Params {
 
 export interface UndanganUcapanResponse {
   rows: UndanganUcapan[];
-  count: number;
+  total_data: number;
   current_page: number;
-  page_size: number;
+  total_page: number;
 }
 
 export interface UndanganUcapan {
-  undangan_id?: string;
   id?: string;
+  undanganId?: string;
   name: string;
   message: string;
   attend: string;
-  attend_total: number;
-  is_show?: number;
+  attendTotal: number;
+  isShow?: number;
   createdAt?: string;
   updatedAt?: string;
 }
 
 export interface UndanganTamuResponse {
   rows: UndanganTamu[];
-  count: number;
+  total_data: number;
   current_page: number;
-  page_size: number;
+  total_page: number;
 }
 
 export interface UndanganTamu {
   id: string;
-  undangan_id: string;
+  undanganId: string;
   name: string;
   phone: string;
-  send_status: number;
-  is_read: number;
-  is_confirm: number;
-  max_invite: number;
+  sendStatus: number;
+  isRead: number;
+  isConfirm: number;
+  maxInvite: number;
   createdAt: string;
   updatedAt: string;
 }
 
+// Gift = kado / wishlist item
 export interface Gift {
   id: string;
-  undangan_id: string;
+  undanganId: string;
   title: string;
   description: string;
   price: string;
   thumbnail: string;
-  link_product: string;
+  linkProduct: string;
   name: string;
   phone: string;
-  is_confirm: number;
+  isConfirm: number;
   createdAt: string;
   updatedAt: string;
 }

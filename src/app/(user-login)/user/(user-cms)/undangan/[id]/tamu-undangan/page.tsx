@@ -118,7 +118,7 @@ export default function TamuPage() {
     refetch: refetchTotalKirimWA,
   } = useQuery({
     queryKey: ["total-tamu", id],
-    queryFn: () => undanganTamuApi.totalKirimWA(id),
+    queryFn: () => undanganTamuApi.getStats(id),
     select: (data) => data.data.data,
   });
 
@@ -216,11 +216,11 @@ export default function TamuPage() {
     const name = item.name;
     const tamu = name.replace("&", "dan");
 
-    const title = undangan?.undangan_content?.title;
+    const title = undangan?.content?.title;
     const pengantin = title.replace("&", "dan");
 
-    const tglwaktu = encodeURI(undangan?.undangan_content?.resepsi_time);
-    const tempat = encodeURI(undangan?.undangan_content?.resepsi_place);
+    const tglwaktu = encodeURI(undangan?.content?.resepsiTime);
+    const tempat = encodeURI(undangan?.content?.resepsiPlace);
     const link = encodeURI(undangan?.permalink);
 
     const msg = `Bismillahirrahmanirrahim%0AAssalamu'alaikum Warahmatullahi Wabarakatuh%0A%0AYth. Bpk/Ibu/Sdr/i *${tamu}*,%0A%0ADengan mengharap ridha dan rahmat Allah SWT, serta tanpa mengurangi rasa hormat. Perkenankan kami mengundang Bpk/Ibu/Sdr/i untuk hadir di acara pernikahan kami:%0A%0A*Pernikahan ${pengantin}*%0A*Tanggal:* ${tglwaktu}%0A*Lokasi:* ${tempat}%0A%0AMerupakan suatu kehormatan bagi kami apabila Bpk/Ibu/Sdr/i dapat menghadiri/ menyaksikan prosesi pernikahan kami, serta jangan lupa konfirmasi kehadiranmu ya pada tautan dibawah ini:%0A%0Ahttps://kekawinan.com/${link}/${item.id}%0A%0AKami juga mengharapkan ucapan, harapan, serta doa Bpk/Ibu/Sdr/i untuk kami.%0A%0AAtas perhatiannya kami ucapkan terimakasih.`;
@@ -438,26 +438,26 @@ export default function TamuPage() {
                 <TableRow key={item.id}>
                   <TableCell>{item.name}</TableCell>
                   <TableCell>{item.phone}</TableCell>
-                  <TableCell>{item.max_invite}</TableCell>
-                  <TableCell>{item.is_read ? "Sudah" : "Belum"}</TableCell>
-                  <TableCell>{item.is_confirm ? "Sudah" : "Belum"}</TableCell>
+                  <TableCell>{item.maxInvite}</TableCell>
+                  <TableCell>{item.isRead ? "Sudah" : "Belum"}</TableCell>
+                  <TableCell>{item.isConfirm ? "Sudah" : "Belum"}</TableCell>
                   <TableCell className="text-right w-[10%]">
                     <div className="flex gap-2 justify-end">
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger
                             onClick={() => {
-                              if (!item.send_status) {
+                              if (!item.sendStatus) {
                                 handleSendWhatsapp(item);
                               }
                             }}
                             className={`${
-                              !item.send_status
+                              !item.sendStatus
                                 ? "bg-green-soft-kwn"
                                 : "bg-white"
                             } cursor-pointer border border-border rounded-md p-1 `}
                           >
-                            {!item.send_status ? (
+                            {!item.sendStatus ? (
                               <IconBrandWhatsapp size={18} />
                             ) : (
                               <IconSend2 size={18} />
@@ -465,7 +465,7 @@ export default function TamuPage() {
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>
-                              {item.send_status
+                              {item.sendStatus
                                 ? "Undangan sudah dikirim"
                                 : "Kirim Undangan melalui Whatsapp"}
                             </p>
@@ -482,7 +482,7 @@ export default function TamuPage() {
                           setSelectedItem(item);
                           setName(item.name);
                           setPhone(item.phone);
-                          setMaxInvite(item.max_invite.toString());
+                          setMaxInvite(item.maxInvite.toString());
                         }}
                         items={["Hapus", "Edit"]}
                       />

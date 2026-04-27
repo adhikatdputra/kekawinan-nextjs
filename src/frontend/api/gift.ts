@@ -2,26 +2,33 @@ import axios from "@/lib/axios";
 import { Params } from "../interface/undangan";
 
 const giftApi = {
-  getAll: (undangan_id: string) => {
-    return axios.get(`/users/kado/slug/${undangan_id}`);
+  // Public: all kado items for a wedding invitation page
+  getPublic: (undanganId: string) => {
+    return axios.get(`/kado/public/${undanganId}`);
   },
-  getData: (undangan_id: string, params: Params) => {
-    return axios.get(`/users/kado/?undangan_id=${undangan_id}`, { params });
+  // Public: single kado detail for the guest confirmation page
+  getPublicDetail: (kadoId: string) => {
+    return axios.get(`/kado/public/item/${kadoId}`);
   },
-  getDetail: (id: string) => {
-    return axios.get(`/users/kado/${id}`);
+  // Auth: paginated kado list for the CMS
+  getData: (undanganId: string, params: Params) => {
+    return axios.get(`/undangan/${undanganId}/kado`, { params });
   },
-  create: (formData: FormData) => {
-    return axios.post(`/users/kado/`, formData);
+  getDetail: (undanganId: string, kadoId: string) => {
+    return axios.get(`/undangan/${undanganId}/kado/${kadoId}`);
   },
-  update: (id: string, formData: FormData) => {
-    return axios.put(`/users/kado/${id}`, formData);
+  create: (undanganId: string, formData: object) => {
+    return axios.post(`/undangan/${undanganId}/kado`, formData);
   },
-  remove: (id: string) => {
-    return axios.delete(`/users/kado/${id}`);
+  update: (undanganId: string, kadoId: string, formData: object) => {
+    return axios.put(`/undangan/${undanganId}/kado/${kadoId}`, formData);
   },
-  confirm: (id: string, formData: FormData) => {
-    return axios.put(`/users/kado/${id}/confirm`, formData);
+  remove: (undanganId: string, kadoId: string) => {
+    return axios.delete(`/undangan/${undanganId}/kado/${kadoId}`);
+  },
+  // Public: guest confirms they will bring/send this kado item
+  confirm: (kadoId: string, formData: object) => {
+    return axios.patch(`/kado/public/confirm/${kadoId}`, formData);
   },
 };
 

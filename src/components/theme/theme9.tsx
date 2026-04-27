@@ -43,7 +43,7 @@ export default function Theme9({
   onSubmitUcapan: (data: {
     name: string;
     attend: string;
-    attend_total: string;
+    attendTotal: string;
     message: string;
   }) => void;
   ucapan: UndanganUcapan[];
@@ -68,7 +68,7 @@ export default function Theme9({
       <div
         className="relative h-screen p-6 py-8 flex flex-col justify-between items-center bg-cover bg-center"
         style={{
-          backgroundImage: `url(${undanganData?.undangan_content?.img_bg})`,
+          backgroundImage: `url(${undanganData?.content?.imgBg})`,
         }}
       >
         {Array(10)
@@ -105,7 +105,7 @@ export default function Theme9({
             viewport={{ once: false }}
           >
             <h1 className="text-4xl font-semibold text-white mt-4">
-              {undanganData?.undangan_content?.title}
+              {undanganData?.content?.title}
             </h1>
           </motion.div>
         </div>
@@ -149,7 +149,7 @@ export default function Theme9({
       <div
         className="relative h-screen p-6 py-8 flex flex-col items-center bg-cover bg-center"
         style={{
-          backgroundImage: `url(${undangan?.undangan_content?.img_bg})`,
+          backgroundImage: `url(${undangan?.content?.imgBg})`,
         }}
       >
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black to-transparent opacity-80"></div>
@@ -179,7 +179,7 @@ export default function Theme9({
             viewport={{ once: false }}
           >
             <h2 className="text-4xl font-semibold text-white font-recoleta-alt">
-              {undangan?.undangan_content?.title}
+              {undangan?.content?.title}
             </h2>
           </motion.div>
           <motion.div
@@ -193,7 +193,7 @@ export default function Theme9({
             viewport={{ once: false }}
           >
             <p className="text-white text-center">
-              {formatDateId(undangan?.undangan_content?.date_wedding ?? "")}
+              {formatDateId(undangan?.content?.dateWedding ?? "")}
             </p>
             <p className="text-white text-center text-xs mt-8">
               “Lalu Dia menjadikan darinya sepasang <br /> laki-laki dan
@@ -265,7 +265,7 @@ export default function Theme9({
               viewport={{ once: false }}
             >
               <img
-                src={undangan?.undangan_content?.img_female}
+                src={undangan?.content?.imgFemale}
                 alt=""
                 className="w-[150px] h-[150px] object-cover rounded-full mx-auto"
               />
@@ -281,13 +281,13 @@ export default function Theme9({
               viewport={{ once: false }}
             >
               <h6 className="font-recoleta-alt text-xl font-bold">
-                {undangan?.undangan_content?.name_female}
+                {undangan?.content?.nameFemale}
               </h6>
               <p className="text-sm pt-1">
-                Putri {undangan?.undangan_content?.female_no} dari pasangan
+                Putri {undangan?.content?.femaleNo} dari pasangan
                 <br />
-                Bpk. {undangan?.undangan_content?.father_female} dan Ibu{" "}
-                {undangan?.undangan_content?.mother_female}
+                Bpk. {undangan?.content?.fatherFemale} dan Ibu{" "}
+                {undangan?.content?.motherFemale}
               </p>
             </motion.div>
             <motion.div
@@ -313,7 +313,7 @@ export default function Theme9({
               viewport={{ once: false }}
             >
               <img
-                src={undangan?.undangan_content?.img_male}
+                src={undangan?.content?.imgMale}
                 alt=""
                 className="w-[150px] h-[150px] object-cover rounded-full mx-auto"
               />
@@ -329,13 +329,13 @@ export default function Theme9({
               viewport={{ once: false }}
             >
               <h6 className="font-recoleta-alt text-xl font-bold">
-                {undangan?.undangan_content?.name_male}
+                {undangan?.content?.nameMale}
               </h6>
               <p className="text-sm pt-1">
-                Putra {undangan?.undangan_content?.male_no} dari pasangan
+                Putra {undangan?.content?.maleNo} dari pasangan
                 <br />
-                Bpk. {undangan?.undangan_content?.father_male} dan Ibu{" "}
-                {undangan?.undangan_content?.mother_male}
+                Bpk. {undangan?.content?.fatherMale} dan Ibu{" "}
+                {undangan?.content?.motherMale}
               </p>
             </motion.div>
             <motion.div
@@ -370,7 +370,7 @@ export default function Theme9({
           viewport={{ once: false }}
         >
           <CountdownTimer
-            targetDate={undangan?.undangan_content?.date_wedding ?? ""}
+            targetDate={undangan?.content?.dateWedding ?? ""}
             textHeadingColor="text-white"
             bgColor="bg-theme9-primary"
           />
@@ -399,12 +399,12 @@ export default function Theme9({
                 Akad Nikah
               </p>
               <p className="text-sm font-medium text-theme9-primary">
-                {undangan?.undangan_content?.akad_time}
+                {undangan?.content?.akadTime}
               </p>
               <div
                 className="text-sm mt-2"
                 dangerouslySetInnerHTML={{
-                  __html: undangan?.undangan_content?.akad_place ?? "",
+                  __html: undangan?.content?.akadPlace ?? "",
                 }}
               />
             </div>
@@ -432,12 +432,12 @@ export default function Theme9({
                 Resepsi Pernikahan
               </p>
               <p className="text-sm font-medium text-theme9-primary">
-                {undangan?.undangan_content?.resepsi_time}
+                {undangan?.content?.resepsiTime}
               </p>
               <div
                 className="text-sm mt-2"
                 dangerouslySetInnerHTML={{
-                  __html: undangan?.undangan_content?.resepsi_place ?? "",
+                  __html: undangan?.content?.resepsiPlace ?? "",
                 }}
               />
             </div>
@@ -455,7 +455,7 @@ export default function Theme9({
             viewport={{ once: false }}
           >
             <Link
-              href={undangan?.undangan_content?.gmaps ?? ""}
+              href={undangan?.content?.gmaps ?? ""}
               target="_blank"
             >
               <Button className="bg-theme9-primary hover:bg-theme9-primary text-white hover:text-white font-semibold">
@@ -464,7 +464,7 @@ export default function Theme9({
               </Button>
             </Link>
           </motion.div>
-          {undangan?.undangan_content?.stream_link && (
+          {undangan?.content?.streamLink && (
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
@@ -479,7 +479,7 @@ export default function Theme9({
                 Virtual Akad session:
               </p>
               <Link
-                href={undangan?.undangan_content?.stream_link ?? ""}
+                href={undangan?.content?.streamLink ?? ""}
                 target="_blank"
               >
                 <Button className="bg-theme9-primary hover:bg-theme9-primary text-white hover:text-white font-semibold">
@@ -524,7 +524,7 @@ export default function Theme9({
           </h2>
         </motion.div>
         <Galeri
-          galeri={undanganData.undangan_gallery}
+          galeri={undanganData.gallery}
           view={1.5}
           color="#FFFFFF"
         />
@@ -547,7 +547,7 @@ export default function Theme9({
       <div className="py-16 px-6 bg-gradient-to-b from-black to-theme9-primary  border-t border-white/20">
         <div className="flex flex-col mb-8 items-center justify-center text-theme9-secondary">
           <h3 className="font-recoleta text-3xl font-semibold">Doa Terbaik</h3>
-          <p className="text-sm">untuk {undangan?.undangan_content?.title}</p>
+          <p className="text-sm">untuk {undangan?.content?.title}</p>
         </div>
         <div className="flex flex-col gap-6">
           {ucapan?.length === 0 && (
@@ -608,7 +608,7 @@ export default function Theme9({
 
       {/* Open Dialog Gift */}
       <DialogGift
-        gift={undanganData.undangan_gift}
+        gifts={undanganData.gifts}
         isOpen={isOpenGift}
         setIsOpen={setIsOpenGift}
         giftLength={giftLength}
