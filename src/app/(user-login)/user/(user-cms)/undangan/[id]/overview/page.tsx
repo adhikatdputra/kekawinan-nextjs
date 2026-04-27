@@ -135,14 +135,13 @@ export default function OverviewPage() {
   };
 
   const handleUpdateUcapan = () => {
-    const formData = new FormData();
-    formData.append("message", message);
-    formData.append("name", selectedItem?.name as string);
-    formData.append("undangan_id", id);
     updateUcapan(
       {
         id: selectedItem?.id as string,
-        data: formData,
+        data: {
+          message,
+          name: selectedItem?.name as string,
+        },
       },
       {
         onSuccess: () => {
@@ -273,7 +272,7 @@ export default function OverviewPage() {
             {isLoading ? (
               <IconLoader2 size={16} className="animate-spin pb-1" />
             ) : (
-              undanganUcapan?.count
+              undanganUcapan?.total_data
             )}{" "}
             Doa & Ucapan
           </div>
@@ -291,22 +290,26 @@ export default function OverviewPage() {
           <TableHeader>
             <TableRow>
               <TableHead className="w-[20%]">Nama Tamu</TableHead>
-              <TableHead className="w-[55%]">Ucapan & Doa</TableHead>
+              <TableHead className="w-[45%]">Ucapan & Doa</TableHead>
+              <TableHead className="w-[10%]">Undangan</TableHead>
               <TableHead className="w-[15%]">Kehadiran</TableHead>
               <TableHead className="text-right w-[10%]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TablePending colSpan={4} />
+              <TablePending colSpan={5} />
             ) : tableData.length > 0 ? (
               tableData.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell className="w-[20%]">{item.name}</TableCell>
-                  <TableCell className="w-[55%] whitespace-break-spaces">
+                  <TableCell className="w-[45%] whitespace-break-spaces">
                     <div
                       dangerouslySetInnerHTML={{ __html: item.message }}
                     ></div>
+                  </TableCell>
+                  <TableCell className="w-[10%]">
+                    {item.maxInvite ? `${item.maxInvite} Orang` : "-"}
                   </TableCell>
                   <TableCell className="w-[15%]">
                     <p>
@@ -360,7 +363,7 @@ export default function OverviewPage() {
                 </TableRow>
               ))
             ) : (
-              <TableNoData colSpan={4} />
+              <TableNoData colSpan={5} />
             )}
           </TableBody>
         </Table>
@@ -370,7 +373,7 @@ export default function OverviewPage() {
             page={page}
             setPage={setPage}
             totalPage={undanganUcapan?.total_page}
-            totalData={undanganUcapan?.count}
+            totalData={undanganUcapan?.total_data}
             pageSize={limit}
             setPageSize={setLimit}
             totalDataPerPage={tableData.length}

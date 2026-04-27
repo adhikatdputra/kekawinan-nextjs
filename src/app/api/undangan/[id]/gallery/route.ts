@@ -57,15 +57,20 @@ export async function POST(request: NextRequest, { params }: Params) {
 
     if (!image) return badRequest('image URL is required')
 
-    // Assign rank atomically: count existing + 1
+    // Assign rank atomically: max existing rank + 1 (safe after deletions)
     const item = await prisma.$transaction(async (tx) => {
-      const count = await tx.undanganGallery.count({ where: { undanganId: id } })
+      const maxRankItem = await tx.undanganGallery.findFirst({
+        where: { undanganId: id },
+        orderBy: { rank: 'desc' },
+        select: { rank: true },
+      })
+      const nextRank = (maxRankItem?.rank ?? 0) + 1
       return tx.undanganGallery.create({
         data: {
           id: nanoid(),
           undanganId: id,
           image,
-          rank: count + 1,
+          rank: nextRank,
         },
       })
     })

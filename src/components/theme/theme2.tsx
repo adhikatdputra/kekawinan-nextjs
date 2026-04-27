@@ -22,6 +22,7 @@ import CountdownTimer from "@/components/card/counting-down";
 import UcapanConfirm from "@/components/card/ucapan-confirm";
 import { motion } from "motion/react";
 import { formatDateId } from "@/helper/date";
+import { nl2br } from "@/helper/text";
 import Link from "next/link";
 
 export default function Theme2({
@@ -418,7 +419,7 @@ export default function Theme2({
                 <div
                   className="text-center text-sm mt-2"
                   dangerouslySetInnerHTML={{
-                    __html: undangan?.content?.akadPlace ?? "",
+                    __html: nl2br(undangan?.content?.akadPlace),
                   }}
                 />
               </motion.div>
@@ -458,7 +459,7 @@ export default function Theme2({
                 <div
                   className="text-center text-sm mt-2"
                   dangerouslySetInnerHTML={{
-                    __html: undangan?.content?.resepsiPlace ?? "",
+                    __html: nl2br(undangan?.content?.resepsiPlace),
                   }}
                 />
               </motion.div>
@@ -593,7 +594,7 @@ export default function Theme2({
                 <div
                   className="text-sm"
                   dangerouslySetInnerHTML={{
-                    __html: item.message,
+                    __html: nl2br(item.message),
                   }}
                 />
               </div>

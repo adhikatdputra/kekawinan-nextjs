@@ -113,6 +113,9 @@ export interface Params {
   page?: number;
   sortBy?: string;
   order?: string;
+  sendStatus?: string;
+  isRead?: string;
+  isConfirm?: string;
 }
 
 export interface UndanganUcapanResponse {
@@ -129,6 +132,8 @@ export interface UndanganUcapan {
   message: string;
   attend: string;
   attendTotal: number;
+  notAttendTotal?: number | null;
+  maxInvite?: number | null;
   isShow?: number;
   createdAt?: string;
   updatedAt?: string;

@@ -101,9 +101,11 @@ model Ucapan {
   undanganId   String   @db.VarChar(64)
   name         String?  @db.VarChar(255)
   message      String?  @db.Text
-  attend       String?  @db.VarChar(50)
-  attendTotal  Int?
-  isShow       Int      @default(1)
+  attend          String?  @db.VarChar(50)
+  attendTotal     Int?
+  notAttendTotal  Int?
+  maxInvite       Int?
+  isShow          Int      @default(1)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

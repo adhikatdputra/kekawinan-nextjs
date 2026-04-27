@@ -43,11 +43,8 @@ export default function GiftDetailView({ id }: { id: string }) {
   });
 
   const handleConfirm = () => {
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("phone", phone);
     confirmGift(
-      { id, data: formData },
+      { id, data: { name, phone } },
       {
         onSuccess: () => {
           refetch();

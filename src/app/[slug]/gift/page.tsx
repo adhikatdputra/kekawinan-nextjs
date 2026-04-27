@@ -3,8 +3,8 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import undanganUserApi from "@/frontend/api/undangan-user";
 import { GiftView } from "@/components/pages/gift/view";
+import { fetchUndanganBySlug } from "@/lib/fetch-undangan";
 
 type Props = {
   params: Promise<{
@@ -19,7 +19,7 @@ export default async function UndanganPage({ params }: Props) {
 
   await queryClient.prefetchQuery({
     queryKey: ["undangan-user-page", slug],
-    queryFn: () => undanganUserApi.getUndangan(slug),
+    queryFn: () => fetchUndanganBySlug(slug),
   });
 
   return (

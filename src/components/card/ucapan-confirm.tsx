@@ -112,7 +112,7 @@ export default function UcapanConfirm({
                   <SelectValue placeholder="Pilih Jumlah Kehadiran" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Array.from({ length: tamu.maxInvite ?? 4 }, (_, i) => (
+                  {Array.from({ length: tamu?.maxInvite ?? 4 }, (_, i) => (
                     <SelectItem key={i} value={(i + 1).toString()}>
                       {i + 1}
                     </SelectItem>

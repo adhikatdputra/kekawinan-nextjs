@@ -26,12 +26,12 @@ export default function AmplopDigitalPage() {
   const { data: gift, refetch } = useQuery({
     queryKey: ["undangan-gift", id],
     queryFn: () => undanganContentApi.getDataGift(id),
-    select: (data) => data.data.data,
+    select: (data) => data.data.data[0],
   });
 
   const { mutate: updateGift, isPending: isUpdating } = useMutation({
-    mutationFn: (formData: FormData) =>
-      undanganContentApi.updateGift(id, gift?.id as string, formData),
+    mutationFn: (body: object) =>
+      undanganContentApi.updateGift(id, gift?.id as string, body),
     onSuccess: (data) => {
       const response = data.data;
       if (response.success) {
@@ -47,14 +47,14 @@ export default function AmplopDigitalPage() {
   });
 
   const handleUpdateUndanganContent = () => {
-    const formData = new FormData();
-    formData.append("bank_name", bank_name);
-    formData.append("bank_number", bank_number);
-    formData.append("name", name);
-    formData.append("name_address", name_address);
-    formData.append("phone", phone);
-    formData.append("address", address);
-    updateGift(formData);
+    updateGift({
+      bankName: bank_name,
+      bankNumber: bank_number,
+      name,
+      nameAddress: name_address,
+      phone,
+      address,
+    });
   };
 
   useEffect(() => {

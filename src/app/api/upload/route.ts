@@ -3,8 +3,11 @@ import { requireAuth } from '@/lib/jwt'
 import { uploadToCloudinary } from '@/lib/cloudinary'
 import { badRequest, ok, serverError } from '@/lib/api-response'
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
-const MAX_SIZE_BYTES = 1 * 1024 * 1024 // 1 MB
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+const ALLOWED_AUDIO_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/ogg', 'audio/wav', 'audio/aac']
+const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_AUDIO_TYPES]
+const MAX_IMAGE_SIZE_BYTES = 1 * 1024 * 1024   // 1 MB
+const MAX_AUDIO_SIZE_BYTES = 10 * 1024 * 1024  // 10 MB
 
 /**
  * POST /api/upload
@@ -29,11 +32,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   if (!ALLOWED_TYPES.includes(file.type)) {
-    return badRequest('Only JPEG, PNG, GIF, and WEBP images are allowed')
+    return badRequest('Only JPEG, PNG, GIF, WEBP images and MP3, OGG, WAV, AAC audio files are allowed')
   }
 
-  if (file.size > MAX_SIZE_BYTES) {
-    return badRequest('File size must not exceed 1MB')
+  const isAudio = ALLOWED_AUDIO_TYPES.includes(file.type)
+  const maxSize = isAudio ? MAX_AUDIO_SIZE_BYTES : MAX_IMAGE_SIZE_BYTES
+  if (file.size > maxSize) {
+    return badRequest(`File size must not exceed ${isAudio ? '10MB' : '1MB'}`)
   }
 
   const folder = (formData.get('folder') as string | null)?.trim() || 'kekawinan/general'

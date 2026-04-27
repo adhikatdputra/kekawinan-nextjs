@@ -25,9 +25,17 @@ export async function GET(request: NextRequest, { params }: Params) {
       ['name', 'createdAt'],
     )
 
-    const where = {
+    const sp = request.nextUrl.searchParams
+    const sendStatus = sp.get('sendStatus')
+    const isRead = sp.get('isRead')
+    const isConfirm = sp.get('isConfirm')
+
+    const where: Record<string, unknown> = {
       undanganId,
       ...(search && { name: { contains: search, mode: 'insensitive' as const } }),
+      ...(sendStatus !== null && sendStatus !== '' && { sendStatus: Number(sendStatus) }),
+      ...(isRead !== null && isRead !== '' && { isRead: Number(isRead) }),
+      ...(isConfirm !== null && isConfirm !== '' && { isConfirm: Number(isConfirm) }),
     }
 
     const [rows, count] = await prisma.$transaction([

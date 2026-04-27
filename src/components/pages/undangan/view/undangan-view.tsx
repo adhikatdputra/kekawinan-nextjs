@@ -56,10 +56,14 @@ export default function UndanganView({
     select: (data) => data.data as UndanganDetail,
   });
 
-  const { data: tamu, refetch: refetchTamu } = useQuery({
+  const isDemo = id_tamu === "demo";
+
+  const { data: tamu, refetch: refetchTamu, isError: isTamuError } = useQuery({
     queryKey: ["undangan-user-tamu", id_tamu],
     queryFn: () => undanganUserApi.getTamu(id_tamu),
     select: (data) => data.data,
+    enabled: !isDemo,
+    retry: false,
   });
 
   const { mutate: submitUcapan, isPending: isSubmitting } = useMutation({
@@ -88,15 +92,17 @@ export default function UndanganView({
     attendTotal: string;
     message: string;
   }) => {
-    if (id_tamu != "demo") {
-      const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("attend", data.attend);
-      formData.append("attend_total", data.attendTotal || tamu?.maxInvite);
-      formData.append("message", data.message);
-      formData.append("undangan_id", undanganData?.id ?? "");
+    if (!isDemo) {
+      const payload = {
+        name: data.name,
+        attend: data.attend,
+        attendTotal: data.attendTotal || tamu?.maxInvite,
+        message: data.message,
+        undanganId: undanganData?.id ?? "",
+        tamuId: id_tamu,
+      };
 
-      submitUcapan(formData, {
+      submitUcapan(payload, {
         onSuccess: (data) => {
           const res = data.data;
           if (res.success) {
@@ -211,6 +217,14 @@ export default function UndanganView({
       <NotFound
         title="Waduh, undanganmu nggak ada!"
         description="Mungkin kamu salah klik link ini, atau link ini sudah tidak ada."
+      />
+    );
+
+  if (!isDemo && isTamuError)
+    return (
+      <NotFound
+        title="Link undangan tidak valid!"
+        description="Link undangan ini tidak ditemukan atau sudah tidak berlaku."
       />
     );
 

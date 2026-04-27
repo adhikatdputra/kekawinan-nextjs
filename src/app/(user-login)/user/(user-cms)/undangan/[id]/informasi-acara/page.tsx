@@ -29,11 +29,8 @@ export default function InformasiAcaraPage() {
   });
 
   const { mutate: updateUndanganContent, isPending: isUpdating } = useMutation({
-    mutationFn: (formData: FormData) =>
-      undanganContentApi.updateUndanganContent(
-        undanganContent?.id as string,
-        formData
-      ),
+    mutationFn: (body: object) =>
+      undanganContentApi.updateUndanganContent(id, body),
     onSuccess: (data) => {
       const response = data.data;
       if (response.success) {
@@ -49,13 +46,13 @@ export default function InformasiAcaraPage() {
   });
 
   const handleUpdateUndanganContent = () => {
-    const formData = new FormData();
-    formData.append("akad_time", akad_time);
-    formData.append("akad_place", akad_place);
-    formData.append("resepsi_time", resepsi_time);
-    formData.append("resepsi_place", resepsi_place);
-    formData.append("gmaps", gmaps);
-    updateUndanganContent(formData);
+    updateUndanganContent({
+      akadTime: akad_time,
+      akadPlace: akad_place,
+      resepsiTime: resepsi_time,
+      resepsiPlace: resepsi_place,
+      gmaps,
+    });
   };
 
   useEffect(() => {

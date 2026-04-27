@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import undanganGaleriApi from "@/frontend/api/undangan-galeri";
+import uploadApi from "@/frontend/api/upload";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
@@ -62,7 +63,7 @@ export default function GaleriFotoPage() {
   });
 
   const { mutate: createUndanganGaleri, isPending: isCreating } = useMutation({
-    mutationFn: (formData: FormData) => undanganGaleriApi.create(id, formData),
+    mutationFn: (body: object) => undanganGaleriApi.create(id, body),
     onSuccess: (data) => {
       const response = data.data;
       if (response.success) {
@@ -129,16 +130,19 @@ export default function GaleriFotoPage() {
     deleteUndanganGaleri(selectedItem?.id as string);
   };
 
-  const handleCreateUndanganGaleri = () => {
-    const formData = new FormData();
-    formData.append("undangan_id", id);
-    formData.append("image", image as unknown as File);
-    createUndanganGaleri(formData);
+  const handleCreateUndanganGaleri = async () => {
+    if (!image) {
+      toast.error("Pilih gambar terlebih dahulu");
+      return;
+    }
+    const uploadRes = await uploadApi.uploadImage(image, "kekawinan/gallery");
+    const imageUrl = uploadRes.data.data.url;
+    createUndanganGaleri({ image: imageUrl });
   };
 
   useEffect(() => {
     if (undanganGaleri) {
-      setTableData(undanganGaleri.rows);
+      setTableData(undanganGaleri);
     }
   }, [undanganGaleri]);
 

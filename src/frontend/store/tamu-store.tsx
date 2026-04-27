@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 
 export default function TamuStore() {
   const update = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: FormData }) =>
+    mutationFn: ({ id, data }: { id: string; data: object }) =>
       undanganTamuApi.update(id, data),
     onSuccess: (data) => {
       const response = data.data;
@@ -20,7 +20,7 @@ export default function TamuStore() {
   });
 
   const create = useMutation({
-    mutationFn: (formData: FormData) => undanganTamuApi.create(formData),
+    mutationFn: (body: object) => undanganTamuApi.create(body),
     onSuccess: (data) => {
       const response = data.data;
       if (response.success) {
