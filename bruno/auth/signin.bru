@@ -1,0 +1,66 @@
+meta {
+  name: Sign In
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/auth/signin
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "user@example.com",
+    "password": "password123"
+  }
+}
+
+script:post-response {
+  if (res.status === 200 && res.body.data) {
+    bru.setVar("token", res.body.data.token);
+    bru.setVar("refresh_token", res.body.data.refresh_token);
+  }
+}
+
+docs {
+  # Sign In
+
+  Autentikasi pengguna dengan email dan password. Mengembalikan access token dan refresh token.
+
+  ## Request Body
+
+  | Field    | Type   | Required | Description        |
+  |----------|--------|----------|--------------------|
+  | email    | string | Ya       | Email pengguna     |
+  | password | string | Ya       | Password pengguna  |
+
+  ## Response Success (200)
+
+  ```json
+  {
+    "success": true,
+    "message": "Sign in success",
+    "data": {
+      "id": "user_id",
+      "email": "user@example.com",
+      "fullname": "Nama Lengkap",
+      "level": "USER",
+      "token": "<access_token>",
+      "exp_token": 1234567890,
+      "refresh_token": "<refresh_token>",
+      "exp_refresh_token": 1234567890
+    }
+  }
+  ```
+
+  ## Response Error
+
+  | Status | Kondisi                             |
+  |--------|-------------------------------------|
+  | 400    | Email/password kosong atau format email tidak valid |
+  | 401    | Email atau password salah           |
+  | 403    | Akun tidak aktif                    |
+  | 500    | Internal server error               |
+}

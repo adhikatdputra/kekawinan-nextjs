@@ -1,0 +1,59 @@
+meta {
+  name: Refresh Token
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/auth/refresh-token
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "refresh_token": "{{refresh_token}}"
+  }
+}
+
+script:post-response {
+  if (res.status === 200 && res.body.data) {
+    bru.setVar("token", res.body.data.token);
+    bru.setVar("refresh_token", res.body.data.refresh_token);
+  }
+}
+
+docs {
+  # Refresh Token
+
+  Memperbarui access token menggunakan refresh token yang masih valid. Token lama akan diganti dengan token baru.
+
+  ## Request Body
+
+  | Field         | Type   | Required | Description           |
+  |---------------|--------|----------|-----------------------|
+  | refresh_token | string | Ya       | Refresh token aktif   |
+
+  ## Response Success (200)
+
+  ```json
+  {
+    "success": true,
+    "message": "Refresh token success",
+    "data": {
+      "token": "<new_access_token>",
+      "exp_token": 1234567890,
+      "refresh_token": "<new_refresh_token>",
+      "exp_refresh_token": 1234567890
+    }
+  }
+  ```
+
+  ## Response Error
+
+  | Status | Kondisi                         |
+  |--------|---------------------------------|
+  | 400    | refresh_token tidak disertakan  |
+  | 401    | Refresh token expired atau invalid |
+  | 500    | Internal server error           |
+}
