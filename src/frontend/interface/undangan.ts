@@ -28,6 +28,7 @@ export interface Theme {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  _count?: { undangan: number };
 }
 
 export interface UndanganDetail {

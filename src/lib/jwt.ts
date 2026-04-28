@@ -4,7 +4,7 @@ import { unauthorized } from './api-response'
 
 const ACCESS_SECRET = process.env.SECRET_KEY_JWT!
 const REFRESH_SECRET = process.env.SECRET_KEY_JWT_REFRESH!
-const ISSUER = 'partnerinaja'
+const ISSUER = 'CTRL Spark'
 
 export interface JwtPayload {
   id: string

@@ -608,7 +608,7 @@ export default function Theme2({
             className="w-[40%] mx-auto"
           />
           <p className="text-xs text-center text-green-kwn">
-            Part of Partnerinaja
+            Part of CTRL Spark
           </p>
         </div>
       </div>

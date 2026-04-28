@@ -34,6 +34,9 @@ export async function POST(request: NextRequest) {
       return unauthorized('Email or password is wrong')
     }
 
+    // Update lastLogin
+    await prisma.user.update({ where: { id: user.id }, data: { lastLogin: new Date() } })
+
     // Generate tokens
     const tokenPayload = { id: user.id, level: user.level, fullname: user.fullname ?? '' }
     const token = signAccessToken(tokenPayload)

@@ -286,7 +286,7 @@ export default function ThemeAdminPage() {
                     )}
                   </TableCell>
                   <TableCell className="w-[15%] whitespace-break-spaces">
-                    0 Undangan
+                    {item._count?.undangan ?? 0} Undangan
                   </TableCell>
                   <TableCell className="text-right w-[10%]">
                     <div className="flex gap-2 justify-end">

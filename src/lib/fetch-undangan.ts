@@ -1,9 +1,13 @@
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+import { getPublicUndanganBySlug } from '@/lib/queries/undangan-public'
 
-// Returns full response body { success, data, message } to match axios response shape
-// so React Query hydration works with client-side select: (data) => data.data
+// Server-only. Called in Server Components (prefetchQuery + generateMetadata).
+// Returns the same { success, data, message } shape as the API route so
+// TanStack Query hydration is compatible with the client-side axios fetcher
+// that uses select: (data) => data.data
 export async function fetchUndanganBySlug(slug: string) {
-  const res = await fetch(`${baseUrl}/api/undangan/public/${slug}`).catch(() => null);
-  if (!res?.ok) return null;
-  return await res.json();
+  try {
+    return await getPublicUndanganBySlug(slug)
+  } catch {
+    return null
+  }
 }

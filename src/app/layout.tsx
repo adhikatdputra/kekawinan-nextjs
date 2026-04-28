@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: home.title,
   description: home.description,
   alternates: home.alternates,
-  publisher: "Partnerinaja",
+  publisher: "CTRL Spark",
   robots: {
     index: true,
     follow: true,

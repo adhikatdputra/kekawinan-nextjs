@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
         skip: (page - 1) * limit,
         take: limit,
         orderBy: { [sortBy]: order },
+        include: { _count: { select: { undangan: true } } },
       }),
       prisma.theme.count({ where }),
     ])

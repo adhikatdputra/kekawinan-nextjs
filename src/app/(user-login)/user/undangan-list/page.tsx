@@ -533,7 +533,7 @@ export default function UndanganListPage() {
         open={isOpenTrakteer}
         onOpenChange={() => {
           setIsOpenTrakteer(false);
-          window.open("https://trakteer.id/partnerinaja/tip", "_blank");
+          window.open("https://trakteer.id/CTRL Spark/tip", "_blank");
         }}
       >
         <DialogContent showCloseButton={false}>
@@ -551,7 +551,7 @@ export default function UndanganListPage() {
               </p>
             </div>
             <Link
-              href="https://trakteer.id/partnerinaja/tip"
+              href="https://trakteer.id/CTRL Spark/tip"
               target="_blank"
               className="flex items-center justify-center gap-2 bg-red-700 text-white px-4 py-2 rounded-full"
               onClick={() => setIsOpenTrakteer(false)}
