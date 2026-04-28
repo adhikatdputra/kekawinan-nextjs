@@ -1,0 +1,21 @@
+meta {
+  name: Ucapan Stats
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{base_url}}/api/ucapan/undangan/:undanganId/stats
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Ucapan Stats
+
+  Statistik ucapan: total hadir, total tidak hadir, jumlah masing-masing.
+}

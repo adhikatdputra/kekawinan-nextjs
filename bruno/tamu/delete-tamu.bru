@@ -1,0 +1,21 @@
+meta {
+  name: Delete Tamu
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{base_url}}/api/tamu/:id
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Delete Tamu
+
+  Hapus tamu undangan berdasarkan ID.
+}

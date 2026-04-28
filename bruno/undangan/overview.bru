@@ -1,0 +1,21 @@
+meta {
+  name: Undangan Overview
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{base_url}}/api/undangan/:id/overview
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Undangan Overview
+
+  Statistik ringkasan undangan: total tamu diundang, total hadir, total tidak hadir.
+}

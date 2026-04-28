@@ -1,0 +1,30 @@
+meta {
+  name: Update Ucapan
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{base_url}}/api/ucapan/:id
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Keluarga Besar",
+    "message": "Selamat menempuh hidup baru!",
+    "attend": "Yes",
+    "attendTotal": 2
+  }
+}
+
+docs {
+  # Update Ucapan
+
+  Update data ucapan.
+}

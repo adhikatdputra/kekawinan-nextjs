@@ -1,0 +1,75 @@
+meta {
+  name: Update Content
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{base_url}}/api/undangan/:id/content
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "title": "Budi & Ani",
+    "nameMale": "Budi Santoso",
+    "nameFemale": "Ani Rahayu",
+    "fatherMale": "Bapak Santoso",
+    "motherMale": "Ibu Sari",
+    "fatherFemale": "Bapak Rahayu",
+    "motherFemale": "Ibu Dewi",
+    "maleNo": "5",
+    "femaleNo": "3",
+    "dateWedding": "2025-06-15T00:00:00.000Z",
+    "akadTime": "08:00",
+    "akadPlace": "Masjid Al-Ikhlas, Jakarta",
+    "resepsiTime": "11:00",
+    "resepsiPlace": "Gedung Serbaguna, Jakarta",
+    "gmaps": "https://maps.google.com/?q=...",
+    "streamLink": "",
+    "religionVersion": "Islam",
+    "imgBg": "https://res.cloudinary.com/example/bg.jpg",
+    "imgMale": "https://res.cloudinary.com/example/male.jpg",
+    "imgFemale": "https://res.cloudinary.com/example/female.jpg",
+    "imgThumbnail": "https://res.cloudinary.com/example/thumb.jpg",
+    "music": "https://res.cloudinary.com/example/music.mp3",
+    "isCovid": 0
+  }
+}
+
+docs {
+  # Update Content
+
+  Update konten undangan. Semua field opsional.
+
+  | Field           | Type   | Description                        |
+  |-----------------|--------|------------------------------------|
+  | title           | string | Judul undangan                     |
+  | nameMale        | string | Nama lengkap mempelai pria         |
+  | nameFemale      | string | Nama lengkap mempelai wanita       |
+  | fatherMale      | string | Nama ayah mempelai pria            |
+  | motherMale      | string | Nama ibu mempelai pria             |
+  | fatherFemale    | string | Nama ayah mempelai wanita          |
+  | motherFemale    | string | Nama ibu mempelai wanita           |
+  | maleNo          | string | Anak ke-N mempelai pria            |
+  | femaleNo        | string | Anak ke-N mempelai wanita          |
+  | dateWedding     | string | Tanggal pernikahan (ISO date)      |
+  | akadTime        | string | Waktu akad                         |
+  | akadPlace       | string | Tempat akad                        |
+  | resepsiTime     | string | Waktu resepsi                      |
+  | resepsiPlace    | string | Tempat resepsi                     |
+  | gmaps           | string | Link Google Maps                   |
+  | streamLink      | string | Link live streaming                |
+  | religionVersion | string | Versi agama                        |
+  | imgBg           | string | URL background (Cloudinary)        |
+  | imgMale         | string | URL foto mempelai pria             |
+  | imgFemale       | string | URL foto mempelai wanita           |
+  | imgThumbnail    | string | URL thumbnail                      |
+  | music           | string | URL musik (Cloudinary)             |
+  | isCovid         | number | 0 = tidak, 1 = ada protokol covid  |
+}

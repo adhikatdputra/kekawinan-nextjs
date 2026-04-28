@@ -1,0 +1,37 @@
+meta {
+  name: Update Tamu
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{base_url}}/api/tamu/:id
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Budi Hartono",
+    "phone": "08123456789",
+    "maxInvite": 2,
+    "sendStatus": 0
+  }
+}
+
+docs {
+  # Update Tamu
+
+  Update data tamu.
+
+  | Field      | Type   | Required |
+  |------------|--------|----------|
+  | name       | string | Ya       |
+  | phone      | string | Ya       |
+  | maxInvite  | number | Ya       |
+  | sendStatus | number | Tidak    |
+}

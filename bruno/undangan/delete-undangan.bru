@@ -1,0 +1,21 @@
+meta {
+  name: Delete Undangan
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{base_url}}/api/undangan/:id
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Delete Undangan
+
+  Hapus undangan beserta semua data terkait (cascade delete).
+}

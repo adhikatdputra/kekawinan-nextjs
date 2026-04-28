@@ -1,0 +1,21 @@
+meta {
+  name: Admin - User Stats
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{base_url}}/api/admin/users/stats
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Admin - User Stats
+
+  Statistik pengguna: pengguna baru 30 hari terakhir, login 30 hari terakhir, login hari ini. Hanya admin/superadmin.
+}

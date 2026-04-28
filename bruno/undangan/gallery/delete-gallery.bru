@@ -1,0 +1,21 @@
+meta {
+  name: Delete Gallery Item
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{base_url}}/api/undangan/:id/gallery/:galleryId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Delete Gallery Item
+
+  Hapus foto galeri. Rank gap otomatis ditutup.
+}

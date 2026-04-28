@@ -1,0 +1,32 @@
+meta {
+  name: Admin - Update Bank
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{base_url}}/api/admin/bank/:id
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Bank Central Asia",
+    "code": "BCA",
+    "icon": "https://res.cloudinary.com/example/icon.png",
+    "color": "#0066AE"
+  }
+}
+
+docs {
+  # Admin - Update Bank
+
+  Update data bank berdasarkan ID. Hanya admin/superadmin.
+
+  **Path Param:** `:id` — ID bank
+}

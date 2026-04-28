@@ -1,0 +1,17 @@
+meta {
+  name: Public - Get Kado Item
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/api/kado/public/item/:kadoId
+  body: none
+  auth: none
+}
+
+docs {
+  # Public - Get Kado Item
+
+  Detail satu item kado untuk halaman konfirmasi tamu. Tidak memerlukan autentikasi.
+}

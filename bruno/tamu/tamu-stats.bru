@@ -1,0 +1,21 @@
+meta {
+  name: Tamu Stats
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{base_url}}/api/tamu/undangan/:undanganId/stats
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Tamu Stats
+
+  Statistik tamu: total dikirim, total dibuka, total konfirmasi kehadiran.
+}

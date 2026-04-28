@@ -1,0 +1,21 @@
+meta {
+  name: List Banks
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/bank
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # List Banks
+
+  Ambil semua data bank (diurutkan berdasarkan nama). Memerlukan autentikasi.
+}

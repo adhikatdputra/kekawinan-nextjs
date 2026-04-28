@@ -1,0 +1,39 @@
+meta {
+  name: Create Ucapan
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/ucapan
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "undanganId": "undangan_id_here",
+    "name": "Keluarga Besar",
+    "message": "Selamat menempuh hidup baru!",
+    "attend": "Yes",
+    "attendTotal": 2
+  }
+}
+
+docs {
+  # Create Ucapan
+
+  Tambah ucapan/doa secara manual oleh pemilik undangan.
+
+  | Field       | Type   | Required | Description               |
+  |-------------|--------|----------|---------------------------|
+  | undanganId  | string | Ya       | ID undangan               |
+  | name        | string | Ya       | Nama pemberi ucapan       |
+  | message     | string | Ya       | Isi ucapan                |
+  | attend      | string | Ya       | "Yes" atau "No"           |
+  | attendTotal | number | Tidak    | Jumlah yang hadir         |
+}

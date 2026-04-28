@@ -1,0 +1,17 @@
+meta {
+  name: Public - Get Undangan
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{base_url}}/api/undangan/public/:permalink
+  body: none
+  auth: none
+}
+
+docs {
+  # Public - Get Undangan
+
+  Ambil data undangan publik beserta content, gifts, gallery, dan ucapan berdasarkan permalink. Tidak memerlukan autentikasi.
+}

@@ -1,0 +1,21 @@
+meta {
+  name: Admin - Remove Expired Undangan
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/admin/undangan/remove-expired
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Admin - Remove Expired Undangan
+
+  Tandai undangan yang sudah kadaluarsa sebagai REMOVED (hingga 50 undangan), membebaskan permalink. Hanya admin/superadmin.
+}

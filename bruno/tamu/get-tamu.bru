@@ -1,0 +1,21 @@
+meta {
+  name: Get Tamu
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/api/tamu/:id
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Get Tamu
+
+  Ambil detail tamu. Otomatis menandai sebagai sudah dibaca.
+}

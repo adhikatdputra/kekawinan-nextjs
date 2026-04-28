@@ -1,0 +1,21 @@
+meta {
+  name: Get Undangan
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/api/undangan/:id
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Get Undangan
+
+  Ambil detail undangan beserta semua relasi (content, gifts, gallery).
+}

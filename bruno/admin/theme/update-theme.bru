@@ -1,0 +1,43 @@
+meta {
+  name: Admin - Update Theme
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{base_url}}/api/admin/theme/:id
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Elegant Rose",
+    "componentName": "ElegantRose",
+    "linkUrl": "https://example.com/preview",
+    "thumbnail": "https://res.cloudinary.com/example/thumb.jpg",
+    "credit": "Designer Name",
+    "promo": false,
+    "isActive": true
+  }
+}
+
+docs {
+  # Admin - Update Theme
+
+  Update tema berdasarkan ID. Hanya admin/superadmin.
+
+  | Field         | Type    | Required |
+  |---------------|---------|----------|
+  | name          | string  | Tidak    |
+  | componentName | string  | Tidak    |
+  | linkUrl       | string  | Tidak    |
+  | thumbnail     | string  | Tidak    |
+  | credit        | string  | Tidak    |
+  | promo         | boolean | Tidak    |
+  | isActive      | boolean | Tidak    |
+}

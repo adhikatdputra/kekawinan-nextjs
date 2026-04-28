@@ -1,0 +1,37 @@
+meta {
+  name: Admin - Create Bank
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/admin/bank
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Bank Central Asia",
+    "code": "BCA",
+    "icon": "https://res.cloudinary.com/example/icon.png",
+    "color": "#0066AE"
+  }
+}
+
+docs {
+  # Admin - Create Bank
+
+  Tambah bank baru. Hanya admin/superadmin.
+
+  | Field | Type   | Required |
+  |-------|--------|----------|
+  | name  | string | Ya       |
+  | code  | string | Ya       |
+  | icon  | string | Tidak    |
+  | color | string | Tidak    |
+}

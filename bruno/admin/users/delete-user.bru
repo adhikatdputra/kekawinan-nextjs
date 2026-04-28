@@ -1,0 +1,21 @@
+meta {
+  name: Admin - Delete User
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{base_url}}/api/admin/users/:id
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Admin - Delete User
+
+  Hapus pengguna berdasarkan ID. Hanya admin/superadmin.
+}

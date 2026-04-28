@@ -1,0 +1,31 @@
+meta {
+  name: Move Gallery Item
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{base_url}}/api/undangan/:id/gallery/:galleryId/move
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "direction": "up"
+  }
+}
+
+docs {
+  # Move Gallery Item
+
+  Geser posisi foto galeri ke atas atau bawah.
+
+  | Field     | Type   | Required | Description    |
+  |-----------|--------|----------|----------------|
+  | direction | string | Ya       | "up" atau "down" |
+}

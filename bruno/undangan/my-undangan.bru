@@ -1,0 +1,29 @@
+meta {
+  name: My Undangan
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{base_url}}/api/undangan/me
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+params:query {
+  page: 1
+  limit: 10
+  search:
+  sortBy: createdAt
+  order: desc
+}
+
+docs {
+  # My Undangan
+
+  Daftar undangan milik pengguna yang sedang login saja (paginated).
+}

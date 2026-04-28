@@ -1,0 +1,21 @@
+meta {
+  name: Mark Tamu as Sent
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{base_url}}/api/tamu/:id/send
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Mark Tamu as Sent
+
+  Tandai undangan WhatsApp tamu sebagai sudah dikirim (sendStatus = 1).
+}

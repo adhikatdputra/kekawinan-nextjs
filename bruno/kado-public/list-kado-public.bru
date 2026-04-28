@@ -1,0 +1,17 @@
+meta {
+  name: Public - List Kado
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/kado/public/:undanganId
+  body: none
+  auth: none
+}
+
+docs {
+  # Public - List Kado
+
+  Daftar item wishlist/kado undangan untuk halaman publik. Tidak memerlukan autentikasi.
+}
