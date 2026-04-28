@@ -96,7 +96,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
     }
 
     if ('password' in body && body.password) {
-      if (body.password.length < 8) return badRequest('Password must be at least 8 characters')
+      const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+      if (!PASSWORD_REGEX.test(body.password)) return badRequest('Password must be at least 8 characters and contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)')
       data.password = await bcrypt.hash(body.password, 10)
     }
 

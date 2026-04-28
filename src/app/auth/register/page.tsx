@@ -150,6 +150,11 @@ export default function RegisterPage() {
                   )}
                 </div>
               </div>
+              {password && !passwordRegex.test(password) && (
+                <p className="text-xs text-red-500 px-2">
+                  Min. 8 karakter, 1 huruf besar, 1 huruf kecil, 1 angka, 1 simbol (@$!%*?&)
+                </p>
+              )}
             </div>
           </form>
         </div>

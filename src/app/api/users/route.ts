@@ -17,8 +17,9 @@ export async function POST(request: NextRequest) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return badRequest('Invalid email format')
     }
-    if (password.length < 8) {
-      return badRequest('Password must be at least 8 characters')
+    const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+    if (!PASSWORD_REGEX.test(password)) {
+      return badRequest('Password must be at least 8 characters and contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)')
     }
 
     const existing = await prisma.user.findUnique({ where: { email } })

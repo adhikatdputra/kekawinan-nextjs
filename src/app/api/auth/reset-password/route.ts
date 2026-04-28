@@ -11,8 +11,9 @@ export async function POST(request: NextRequest) {
     if (!token || !new_password) {
       return badRequest('Token and new password are required')
     }
-    if (new_password.length < 8) {
-      return badRequest('Password must be at least 8 characters')
+    const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+    if (!PASSWORD_REGEX.test(new_password)) {
+      return badRequest('Password must be at least 8 characters and contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)')
     }
 
     const resetEntry = await prisma.resetPassword.findFirst({ where: { token } })

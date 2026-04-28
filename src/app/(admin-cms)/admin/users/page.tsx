@@ -150,6 +150,8 @@ export default function UsersPage() {
 
   useEffect(() => () => debounceSetParamsTable.cancel(), []);
 
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+
   const resetCreateForm = () => {
     setNewFullname("");
     setNewEmail("");
@@ -158,6 +160,7 @@ export default function UsersPage() {
   };
 
   const handleCreate = () => {
+    if (!passwordRegex.test(newPassword)) return;
     createUser(
       { email: newEmail, fullname: newFullname, password: newPassword, level: newLevel },
       {
@@ -175,6 +178,7 @@ export default function UsersPage() {
   const handleChangePassword = () => {
     if (!selectedUser) return;
     if (newPass !== newPassConfirm) return;
+    if (!passwordRegex.test(newPass)) return;
     updateUser(
       { id: selectedUser.id, data: { password: newPass } },
       {
@@ -374,6 +378,11 @@ export default function UsersPage() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
               />
+              {newPassword && !passwordRegex.test(newPassword) && (
+                <p className="text-xs text-red-500">
+                  Min. 8 karakter, 1 huruf besar, 1 huruf kecil, 1 angka, 1 simbol (@$!%*?&)
+                </p>
+              )}
             </div>
             <div className="grid gap-2">
               <Label>Level</Label>
@@ -392,7 +401,7 @@ export default function UsersPage() {
               <Button variant="outline" onClick={() => { setIsOpenCreate(false); resetCreateForm(); }}>
                 Batal
               </Button>
-              <Button onClick={handleCreate} disabled={isPendingCreate}>
+              <Button onClick={handleCreate} disabled={isPendingCreate || !newFullname || !newEmail || !passwordRegex.test(newPassword)}>
                 {isPendingCreate ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /><span>Menyimpan...</span></>
                 ) : (
@@ -423,6 +432,11 @@ export default function UsersPage() {
             <div className="grid gap-2">
               <Label>Password Baru</Label>
               <Input type="password" value={newPass} onChange={(e) => setNewPass(e.target.value)} />
+              {newPass && !passwordRegex.test(newPass) && (
+                <p className="text-xs text-red-500">
+                  Min. 8 karakter, 1 huruf besar, 1 huruf kecil, 1 angka, 1 simbol (@$!%*?&)
+                </p>
+              )}
             </div>
             <div className="grid gap-2">
               <Label>Konfirmasi Password</Label>
@@ -441,7 +455,7 @@ export default function UsersPage() {
               </Button>
               <Button
                 onClick={handleChangePassword}
-                disabled={isPendingUpdate || !newPass || newPass !== newPassConfirm || newPass.length < 8}
+                disabled={isPendingUpdate || !newPass || newPass !== newPassConfirm || !passwordRegex.test(newPass)}
               >
                 {isPendingUpdate ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /><span>Menyimpan...</span></>

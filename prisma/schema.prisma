@@ -238,6 +238,20 @@ model ResetPassword {
   @@map("tbl_reset_password")
 }
 
+// ─── Bank (Master Data) ───────────────────────────────────────────────────────
+
+model Bank {
+  id        String   @id @db.VarChar(64)
+  name      String   @db.VarChar(255)
+  code      String   @unique @db.VarChar(50)
+  icon      String?  @db.Text
+  color     String?  @db.VarChar(50)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tbl_bank")
+}
+
 // ─── Images ───────────────────────────────────────────────────────────────────
 
 model Image {

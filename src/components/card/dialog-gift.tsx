@@ -14,6 +14,7 @@ import { toast } from "react-hot-toast";
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function DialogGift({
   gifts,
@@ -29,6 +30,10 @@ export default function DialogGift({
   slug: string;
 }) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const handlePrev = () => setActiveIndex((i) => Math.max(0, i - 1));
+  const handleNext = () => setActiveIndex((i) => Math.min(gifts.length - 1, i + 1));
 
   const handleCopy = (gift: UndanganGift) => {
     navigator.clipboard.writeText(gift.bankNumber);
@@ -38,7 +43,7 @@ export default function DialogGift({
   };
 
   // Use first entry with an address for the physical delivery section
-  const addressEntry = gifts.find((g) => g.nameAddress || g.address);
+  const addressEntry = gifts.find((g) => g.nameAddress || g.phone || g.address);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -58,46 +63,80 @@ export default function DialogGift({
                 <p className="text-sm text-gray-400 mt-2">Belum ada rekening yang ditambahkan.</p>
               )}
 
-              {gifts.map((gift) => (
-                <div
-                  key={gift.id}
-                  className="bg-[url('/images/bg-atm.png')] bg-cover bg-right rounded-lg p-6 mt-4 w-full shadow-xl flex flex-col gap-8"
-                >
-                  <div className="flex gap-2 justify-between items-center">
-                    <Image
-                      src="/images/icon-bank.png"
-                      alt="logo-atm"
-                      width={200}
-                      height={200}
-                      className="w-10"
-                    />
-                    <div>
-                      <p className="font-bold text-xl">{gift.bankName}</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-1 items-start">
-                    <p className="text-sm">Nomor Rekening</p>
-                    <button
-                      className="flex gap-4 items-center"
-                      onClick={() => handleCopy(gift)}
-                    >
-                      <p className="text-2xl font-bold">{gift.bankNumber}</p>
-                      {copiedId === gift.id ? (
-                        <IconCheck size={20} className="-mt-1 text-green-kwn" />
-                      ) : (
-                        <IconClipboard
-                          size={20}
-                          className="-mt-1 text-blue-600 cursor-pointer"
+              {gifts.length > 0 && (
+                <div className="mt-4 flex flex-col gap-3">
+                  {/* Card + arrows */}
+                  <div className="relative">
+                    <div className="bg-[url('/images/bg-atm.png')] bg-cover bg-right rounded-lg p-6 w-full shadow-xl flex flex-col gap-8">
+                      <div className="flex gap-2 justify-between items-center">
+                        <Image
+                          src="/images/icon-bank.png"
+                          alt="logo-atm"
+                          width={200}
+                          height={200}
+                          className="w-10"
                         />
-                      )}
-                    </button>
+                        <div>
+                          <p className="font-bold text-xl">{gifts[activeIndex].bankName}</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-1 items-start">
+                        <p className="text-sm">Nomor Rekening</p>
+                        <button
+                          className="flex gap-4 items-center"
+                          onClick={() => handleCopy(gifts[activeIndex])}
+                        >
+                          <p className="text-2xl font-bold">{gifts[activeIndex].bankNumber}</p>
+                          {copiedId === gifts[activeIndex].id ? (
+                            <IconCheck size={20} className="-mt-1 text-green-kwn" />
+                          ) : (
+                            <IconClipboard size={20} className="-mt-1 text-blue-600 cursor-pointer" />
+                          )}
+                        </button>
+                      </div>
+                      <div className="flex flex-col gap-1 items-start">
+                        <p className="text-sm">Atas Nama</p>
+                        <p className="text-xl font-semibold">{gifts[activeIndex].name}</p>
+                      </div>
+                    </div>
+
+                    {/* Arrows — centered vertically on card sides */}
+                    {gifts.length > 1 && (
+                      <>
+                        <button
+                          onClick={handlePrev}
+                          disabled={activeIndex === 0}
+                          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center disabled:opacity-30 transition-opacity"
+                        >
+                          <ChevronLeft size={20} />
+                        </button>
+                        <button
+                          onClick={handleNext}
+                          disabled={activeIndex === gifts.length - 1}
+                          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center disabled:opacity-30 transition-opacity"
+                        >
+                          <ChevronRight size={20} />
+                        </button>
+                      </>
+                    )}
                   </div>
-                  <div className="flex flex-col gap-1 items-start">
-                    <p className="text-sm">Atas Nama</p>
-                    <p className="text-xl font-semibold">{gift.name}</p>
-                  </div>
+
+                  {/* Dots */}
+                  {gifts.length > 1 && (
+                    <div className="flex gap-1.5 justify-center">
+                      {gifts.map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setActiveIndex(i)}
+                          className={`h-2 rounded-full transition-all ${
+                            i === activeIndex ? "bg-gray-700 w-4" : "bg-gray-300 w-2"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
-              ))}
+              )}
             </div>
 
             {(addressEntry || giftLength > 0) && (

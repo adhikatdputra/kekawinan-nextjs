@@ -3,7 +3,7 @@ import { requireAuth } from '@/lib/jwt'
 import { uploadToCloudinary } from '@/lib/cloudinary'
 import { badRequest, ok, serverError } from '@/lib/api-response'
 
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
 const ALLOWED_AUDIO_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/ogg', 'audio/wav', 'audio/aac']
 const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_AUDIO_TYPES]
 const MAX_IMAGE_SIZE_BYTES = 1 * 1024 * 1024   // 1 MB
