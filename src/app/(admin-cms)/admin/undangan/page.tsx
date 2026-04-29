@@ -46,15 +46,15 @@ interface Response {
   name: string;
   status: string;
   expired: string;
-  theme_id: string;
+  themeId: string;
   createdAt: string;
   updatedAt: string;
-  undangan_content: {
-    date_wedding: null;
-  };
+  content: {
+    dateWedding: string | null;
+  } | null;
   theme: {
-    component_name: string;
-  };
+    componentName: string;
+  } | null;
   user: {
     fullname: string;
     email: string;
@@ -198,7 +198,7 @@ export default function UsersPage() {
                     {item.name}
                     <div>
                       <span className="font-semibold">Theme:</span>{" "}
-                      {item.theme?.component_name}
+                      {item.theme?.componentName}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -206,14 +206,14 @@ export default function UsersPage() {
                       <span className="font-semibold">Tanggal Nikah:</span>{" "}
                       <span
                         className={`${
-                          item.undangan_content?.date_wedding &&
-                          checkExpired(item.undangan_content?.date_wedding)
+                          item.content?.dateWedding &&
+                          checkExpired(item.content?.dateWedding)
                             ? "bg-red-100"
                             : ""
                         }`}
                       >
-                        {item.undangan_content?.date_wedding
-                          ? formatDate(item.undangan_content?.date_wedding)
+                        {item.content?.dateWedding
+                          ? formatDate(item.content?.dateWedding)
                           : "-"}
                       </span>
                     </div>

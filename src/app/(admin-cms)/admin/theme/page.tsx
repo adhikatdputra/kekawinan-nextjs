@@ -102,7 +102,7 @@ export default function ThemeAdminPage() {
   const setDataEdit = (item: Theme) => {
     setName(item.name);
     setThumbnail(item.thumbnail as unknown as File);
-    setComponentName(item.component_name);
+    setComponentName(item.componentName);
     setCredit(item.credit);
     setPromo(item.promo);
     setSelectedItem(item);
@@ -275,7 +275,7 @@ export default function ThemeAdminPage() {
                     {item.name}
                   </TableCell>
                   <TableCell className="w-[20%] whitespace-break-spaces">
-                    {item.component_name}
+                    {item.componentName}
                   </TableCell>
                   <TableCell className="w-[20%] whitespace-break-spaces">
                     {item.credit} Credits
@@ -286,7 +286,7 @@ export default function ThemeAdminPage() {
                     )}
                   </TableCell>
                   <TableCell className="w-[15%] whitespace-break-spaces">
-                    {item.undanganCount} Undangan
+                    {item._count?.undangan ?? 0} Undangan
                   </TableCell>
                   <TableCell className="text-right w-[10%]">
                     <div className="flex gap-2 justify-end">

@@ -18,7 +18,6 @@ export default function LandingLayout({
     <div>
       <HeaderWeb />
       {children}
-      <FooterWeb />
       <Trakteer />
     </div>
   );

@@ -1,0 +1,35 @@
+meta {
+  name: Update Profile
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{base_url}}/api/users/profile
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "fullname": "Nama Baru",
+    "phone": "08123456789",
+    "dob": "1990-01-01"
+  }
+}
+
+docs {
+  # Update Profile
+
+  Update profil pengguna yang sedang login.
+
+  | Field    | Type   | Required |
+  |----------|--------|----------|
+  | fullname | string | Ya       |
+  | phone    | string | Tidak    |
+  | dob      | string | Tidak    |
+}

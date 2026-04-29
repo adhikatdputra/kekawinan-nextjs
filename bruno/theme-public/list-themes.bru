@@ -1,0 +1,25 @@
+meta {
+  name: Public - List Themes
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/theme/public
+  body: none
+  auth: none
+}
+
+params:query {
+  page: 1
+  limit: 10
+  search:
+  sortBy: name
+  order: asc
+}
+
+docs {
+  # Public - List Themes
+
+  Daftar tema aktif untuk pemilih tema undangan. Tidak memerlukan autentikasi.
+}

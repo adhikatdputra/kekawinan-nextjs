@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 
 export default function UcapanStore() {
   const update = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: FormData }) =>
+    mutationFn: ({ id, data }: { id: string; data: object }) =>
       undanganUcapanApi.update(id, data),
     onSuccess: (data) => {
       const response = data.data;
@@ -20,7 +20,7 @@ export default function UcapanStore() {
   });
 
   const updateIsShow = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: { is_show: string } }) =>
+    mutationFn: ({ id, data }: { id: string; data: { isShow: number } }) =>
       undanganUcapanApi.changeShow(id, data),
     onSuccess: (data) => {
       const response = data.data;

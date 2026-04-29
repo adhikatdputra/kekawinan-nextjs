@@ -1,0 +1,29 @@
+meta {
+  name: List Undangan
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/undangan
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+params:query {
+  page: 1
+  limit: 10
+  search:
+  sortBy: createdAt
+  order: desc
+}
+
+docs {
+  # List Undangan
+
+  Daftar undangan milik pengguna. Admin dapat melihat semua undangan dengan query `userId`.
+}

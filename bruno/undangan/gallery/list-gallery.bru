@@ -1,0 +1,21 @@
+meta {
+  name: List Gallery
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/undangan/:id/gallery
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # List Gallery
+
+  Ambil semua foto galeri undangan, diurutkan berdasarkan rank.
+}

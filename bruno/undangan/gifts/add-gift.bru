@@ -1,0 +1,41 @@
+meta {
+  name: Add Gift (Rekening)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/undangan/:id/gifts
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "bankName": "BCA",
+    "name": "Budi Santoso",
+    "bankNumber": "1234567890",
+    "nameAddress": "Budi Santoso",
+    "phone": "08123456789",
+    "address": "Jl. Contoh No. 1, Jakarta"
+  }
+}
+
+docs {
+  # Add Gift (Rekening)
+
+  Tambah rekening bank untuk amplop digital.
+
+  | Field       | Type   | Required |
+  |-------------|--------|----------|
+  | bankName    | string | Ya       |
+  | name        | string | Ya       |
+  | bankNumber  | string | Ya       |
+  | nameAddress | string | Tidak    |
+  | phone       | string | Tidak    |
+  | address     | string | Tidak    |
+}

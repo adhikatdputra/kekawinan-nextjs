@@ -1,17 +1,24 @@
 import axios from "@/lib/axios";
 
 const undanganContentApi = {
-  getUndanganContent: (id: string) => {
-    return axios.get(`/users/undangancontent/slug/${id}`);
+  getUndanganContent: (undanganId: string) => {
+    return axios.get(`/undangan/${undanganId}/content`);
   },
-  updateUndanganContent: (id: string, formData: FormData) => {
-    return axios.put(`/users/undangancontent/${id}`, formData);
+  updateUndanganContent: (undanganId: string, formData: object) => {
+    return axios.put(`/undangan/${undanganId}/content`, formData);
   },
-  getDataGift: (id: string) => {
-    return axios.get(`/users/gift/slug/${id}`);
+  // Amplop digital (bank accounts)
+  getDataGift: (undanganId: string) => {
+    return axios.get(`/undangan/${undanganId}/gifts`);
   },
-  updateGift: (id: string, formData: FormData) => {
-    return axios.put(`/users/gift/${id}`, formData);
+  createGift: (undanganId: string, formData: object) => {
+    return axios.post(`/undangan/${undanganId}/gifts`, formData);
+  },
+  updateGift: (undanganId: string, giftId: string, formData: object) => {
+    return axios.put(`/undangan/${undanganId}/gifts/${giftId}`, formData);
+  },
+  deleteGift: (undanganId: string, giftId: string) => {
+    return axios.delete(`/undangan/${undanganId}/gifts/${giftId}`);
   },
 };
 

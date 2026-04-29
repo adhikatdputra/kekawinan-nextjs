@@ -1,0 +1,21 @@
+meta {
+  name: List Gifts (Rekening)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/undangan/:id/gifts
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # List Gifts (Rekening)
+
+  Daftar rekening bank untuk amplop digital undangan.
+}

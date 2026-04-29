@@ -1,0 +1,32 @@
+meta {
+  name: Update Gift (Rekening)
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{base_url}}/api/undangan/:id/gifts/:giftId
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "bankName": "BCA",
+    "name": "Budi Santoso",
+    "bankNumber": "1234567890",
+    "nameAddress": "Budi Santoso",
+    "phone": "08123456789",
+    "address": "Jl. Contoh No. 1, Jakarta"
+  }
+}
+
+docs {
+  # Update Gift (Rekening)
+
+  Update data rekening bank.
+}

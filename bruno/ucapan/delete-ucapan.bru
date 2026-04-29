@@ -1,0 +1,21 @@
+meta {
+  name: Delete Ucapan
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{base_url}}/api/ucapan/:id
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Delete Ucapan
+
+  Hapus ucapan berdasarkan ID.
+}

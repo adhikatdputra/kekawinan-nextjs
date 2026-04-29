@@ -1,0 +1,37 @@
+meta {
+  name: Create Undangan
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/undangan
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "permalink": "budi-dan-ani",
+    "name": "Undangan Budi & Ani",
+    "themeId": "theme_id_here",
+    "expired": "2025-12-31T00:00:00.000Z"
+  }
+}
+
+docs {
+  # Create Undangan
+
+  Buat undangan baru.
+
+  | Field     | Type   | Required | Description                      |
+  |-----------|--------|----------|----------------------------------|
+  | permalink | string | Ya       | Slug unik, hanya huruf/angka/strip |
+  | name      | string | Ya       | Nama undangan                    |
+  | themeId   | string | Tidak    | ID tema                          |
+  | expired   | string | Tidak    | Tanggal kadaluarsa (ISO date)    |
+}

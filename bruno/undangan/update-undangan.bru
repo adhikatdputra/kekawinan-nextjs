@@ -1,0 +1,39 @@
+meta {
+  name: Update Undangan
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{base_url}}/api/undangan/:id
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "permalink": "budi-dan-ani",
+    "name": "Undangan Budi & Ani",
+    "status": "ACTIVE",
+    "themeId": "theme_id_here",
+    "expired": "2025-12-31T00:00:00.000Z"
+  }
+}
+
+docs {
+  # Update Undangan
+
+  Update data undangan berdasarkan ID.
+
+  | Field     | Type   | Required |
+  |-----------|--------|----------|
+  | permalink | string | Ya       |
+  | name      | string | Ya       |
+  | status    | string | Tidak    |
+  | themeId   | string | Tidak    |
+  | expired   | string | Tidak    |
+}

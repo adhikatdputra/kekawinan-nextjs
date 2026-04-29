@@ -4,8 +4,8 @@ import { toast } from "react-hot-toast";
 
 export default function GiftStore() {
   const update = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: FormData }) =>
-      giftApi.update(id, data),
+    mutationFn: ({ undanganId, id, data }: { undanganId: string; id: string; data: object }) =>
+      giftApi.update(undanganId, id, data),
     onSuccess: (data) => {
       const response = data.data;
       if (response.success) {
@@ -20,7 +20,8 @@ export default function GiftStore() {
   });
 
   const create = useMutation({
-    mutationFn: (formData: FormData) => giftApi.create(formData),
+    mutationFn: ({ undanganId, data }: { undanganId: string; data: object }) =>
+      giftApi.create(undanganId, data),
     onSuccess: (data) => {
       const response = data.data;
       if (response.success) {
@@ -35,7 +36,8 @@ export default function GiftStore() {
   });
 
   const remove = useMutation({
-    mutationFn: (id: string) => giftApi.remove(id),
+    mutationFn: ({ undanganId, id }: { undanganId: string; id: string }) =>
+      giftApi.remove(undanganId, id),
     onSuccess: (data) => {
       const response = data.data;
       if (response.success) {
@@ -50,7 +52,7 @@ export default function GiftStore() {
   });
 
   const confirm = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: FormData }) =>
+    mutationFn: ({ id, data }: { id: string; data: object }) =>
       giftApi.confirm(id, data),
     onSuccess: (data) => {
       const response = data.data;

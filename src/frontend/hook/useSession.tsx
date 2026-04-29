@@ -10,7 +10,8 @@ export default function useSession() {
       removeAuth();
       router.push("/auth/login");
     }
-    if (Number(getExpiresIn()) < new Date().getTime()) {
+    const expiresIn = getExpiresIn();
+    if (expiresIn && new Date(expiresIn) < new Date()) {
       removeAuth();
       router.push("/auth/login");
     }

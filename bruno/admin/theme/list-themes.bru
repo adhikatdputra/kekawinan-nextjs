@@ -1,0 +1,29 @@
+meta {
+  name: Admin - List Themes
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/admin/theme
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+params:query {
+  page: 1
+  limit: 10
+  search:
+  sortBy: name
+  order: asc
+}
+
+docs {
+  # Admin - List Themes
+
+  Daftar semua tema (aktif & tidak aktif) dengan pagination. Hanya admin/superadmin.
+}

@@ -1,0 +1,47 @@
+meta {
+  name: Admin - Update User
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{base_url}}/api/admin/users/:id
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "fullname": "Nama Baru",
+    "phone": "08123456789",
+    "dob": "1990-01-01",
+    "email": "email@example.com",
+    "level": "user",
+    "status": "ACTIVE",
+    "isMember": true,
+    "expiredMember": "2025-12-31",
+    "password": "NewPassword123!"
+  }
+}
+
+docs {
+  # Admin - Update User
+
+  Update data pengguna berdasarkan ID. Hanya admin/superadmin.
+
+  | Field         | Type    | Required | Description                   |
+  |---------------|---------|----------|-------------------------------|
+  | fullname      | string  | Tidak    |                               |
+  | phone         | string  | Tidak    |                               |
+  | dob           | string  | Tidak    | ISO date                      |
+  | email         | string  | Tidak    |                               |
+  | level         | string  | Tidak    | user / admin / superadmin     |
+  | status        | string  | Tidak    | ACTIVE / SUSPENDED            |
+  | isMember      | boolean | Tidak    |                               |
+  | expiredMember | string  | Tidak    | ISO date                      |
+  | password      | string  | Tidak    | Jika ingin ganti password     |
+}

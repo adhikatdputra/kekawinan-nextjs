@@ -1,0 +1,21 @@
+meta {
+  name: Admin - Get User
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/api/admin/users/:id
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Admin - Get User
+
+  Ambil detail pengguna berdasarkan ID. Hanya admin/superadmin.
+}

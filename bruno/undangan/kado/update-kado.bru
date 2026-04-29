@@ -1,0 +1,31 @@
+meta {
+  name: Update Kado Item
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{base_url}}/api/undangan/:id/kado/:kadoId
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "title": "Rice Cooker",
+    "description": "Rice cooker kapasitas 1.8L",
+    "price": 350000,
+    "linkProduct": "https://tokopedia.com/product/...",
+    "thumbnail": "https://res.cloudinary.com/example/kado.jpg"
+  }
+}
+
+docs {
+  # Update Kado Item
+
+  Update item wishlist (partial update).
+}

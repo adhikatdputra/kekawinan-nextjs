@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import undanganContentApi from "@/frontend/api/undangan-content";
+import uploadApi from "@/frontend/api/upload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -35,7 +36,7 @@ export default function CoverPembukaPage() {
   const [img_bg, setImgBg] = useState<string>("");
   const [img_bg_upload, setImgBgUpload] = useState<File | null>(null);
   const [stream_link, setStreamLink] = useState<string>("");
-  const [music, setMusic] = useState<File | null>(null);
+  const [music, setMusic] = useState<File | string | null>(null);
   const [is_music, setIsMusic] = useState<boolean>(false);
   const [date_wedding, setDateWedding] = useState<Value | null>(new Date());
 
@@ -46,11 +47,8 @@ export default function CoverPembukaPage() {
   });
 
   const { mutate: updateUndanganContent, isPending: isUpdating } = useMutation({
-    mutationFn: (formData: FormData) =>
-      undanganContentApi.updateUndanganContent(
-        undanganContent?.id as string,
-        formData
-      ),
+    mutationFn: (body: object) =>
+      undanganContentApi.updateUndanganContent(id, body),
     onSuccess: (data) => {
       const response = data.data;
       if (response.success) {
@@ -65,30 +63,47 @@ export default function CoverPembukaPage() {
     },
   });
 
-  const handleUpdateUndanganContent = () => {
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("img_thumbnail", img_thumbnail_upload as File);
-    formData.append("img_bg", img_bg_upload as File);
-    formData.append("stream_link", stream_link);
-    formData.append("music", music as File);
-    formData.append("date_wedding", date_wedding?.toString() || "");
-    updateUndanganContent(formData);
+  const handleUpdateUndanganContent = async () => {
+    let imgThumbnailUrl = img_thumbnail;
+    let imgBgUrl = img_bg;
+    let musicUrl = undanganContent?.music || "";
+
+    if (img_thumbnail_upload) {
+      const res = await uploadApi.uploadImage(img_thumbnail_upload, "kekawinan/thumbnail");
+      imgThumbnailUrl = res.data.data.url;
+    }
+    if (img_bg_upload) {
+      const res = await uploadApi.uploadImage(img_bg_upload, "kekawinan/cover");
+      imgBgUrl = res.data.data.url;
+    }
+    if (music instanceof File) {
+      const res = await uploadApi.uploadImage(music, "kekawinan/music");
+      musicUrl = res.data.data.url;
+    }
+
+    updateUndanganContent({
+      title,
+      streamLink: stream_link,
+      dateWedding: date_wedding ? new Date(date_wedding.toString()).toISOString() : null,
+      imgThumbnail: imgThumbnailUrl,
+      imgBg: imgBgUrl,
+      music: musicUrl,
+    });
   };
 
   useEffect(() => {
     if (undanganContent) {
       setTitle(undanganContent.title || "");
-      setImgThumbnail(undanganContent.img_thumbnail || "");
-      setImgBg(undanganContent.img_bg || "");
-      setStreamLink(undanganContent.stream_link || "");
+      setImgThumbnail(undanganContent.imgThumbnail || "");
+      setImgBg(undanganContent.imgBg || "");
+      setStreamLink(undanganContent.streamLink || "");
       setMusic(undanganContent.music || null);
       if (undanganContent.music) {
         setIsMusic(true);
       }
       setDateWedding(
-        undanganContent.date_wedding
-          ? new Date(undanganContent.date_wedding)
+        undanganContent.dateWedding
+          ? new Date(undanganContent.dateWedding)
           : new Date()
       );
     }
@@ -200,7 +215,7 @@ export default function CoverPembukaPage() {
             <Label htmlFor="music">Music (Optional)</Label>
             {is_music ? (
               <div className="flex flex-col md:flex-row gap-4 md:items-center">
-                <audio src={music || ""} controls></audio>
+                <audio src={music instanceof File ? URL.createObjectURL(music) : (music || "")} controls></audio>
                 <div>
                   <Button variant="outline" onClick={() => setIsMusic(false)}>
                     Ganti Music

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import undanganContentApi from "@/frontend/api/undangan-content";
+import uploadApi from "@/frontend/api/upload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -36,11 +37,8 @@ export default function InformasiMempelaiPage() {
   });
 
   const { mutate: updateUndanganContent, isPending: isUpdating } = useMutation({
-    mutationFn: (formData: FormData) =>
-      undanganContentApi.updateUndanganContent(
-        undanganContent?.id as string,
-        formData
-      ),
+    mutationFn: (body: object) =>
+      undanganContentApi.updateUndanganContent(id, body),
     onSuccess: (data) => {
       const response = data.data;
       if (response.success) {
@@ -55,33 +53,45 @@ export default function InformasiMempelaiPage() {
     },
   });
 
-  const handleUpdateUndanganContent = () => {
-    const formData = new FormData();
-    formData.append("name_male", name_male);
-    formData.append("name_female", name_female);
-    formData.append("father_male", father_male);
-    formData.append("mother_male", mother_male);
-    formData.append("father_female", father_female);
-    formData.append("mother_female", mother_female);
-    formData.append("img_male", male_upload as File);
-    formData.append("img_female", female_upload as File);
-    formData.append("male_no", male_no);
-    formData.append("female_no", female_no);
-    updateUndanganContent(formData);
+  const handleUpdateUndanganContent = async () => {
+    let imgMaleUrl = img_male;
+    let imgFemaleUrl = img_female;
+
+    if (male_upload) {
+      const res = await uploadApi.uploadImage(male_upload, "kekawinan/mempelai");
+      imgMaleUrl = res.data.data.url;
+    }
+    if (female_upload) {
+      const res = await uploadApi.uploadImage(female_upload, "kekawinan/mempelai");
+      imgFemaleUrl = res.data.data.url;
+    }
+
+    updateUndanganContent({
+      nameMale: name_male,
+      nameFemale: name_female,
+      fatherMale: father_male,
+      motherMale: mother_male,
+      fatherFemale: father_female,
+      motherFemale: mother_female,
+      maleNo: male_no,
+      femaleNo: female_no,
+      imgMale: imgMaleUrl,
+      imgFemale: imgFemaleUrl,
+    });
   };
 
   useEffect(() => {
     if (undanganContent) {
-      setNameMale(undanganContent.name_male || "");
-      setNameFemale(undanganContent.name_female || "");
-      setFatherMale(undanganContent.father_male || "");
-      setMotherMale(undanganContent.mother_male || "");
-      setFatherFemale(undanganContent.father_female || "");
-      setMotherFemale(undanganContent.mother_female || "");
-      setImgMale(undanganContent.img_male || "");
-      setImgFemale(undanganContent.img_female || "");
-      setMaleNo(undanganContent.male_no || "");
-      setFemaleNo(undanganContent.female_no || "");
+      setNameMale(undanganContent.nameMale || "");
+      setNameFemale(undanganContent.nameFemale || "");
+      setFatherMale(undanganContent.fatherMale || "");
+      setMotherMale(undanganContent.motherMale || "");
+      setFatherFemale(undanganContent.fatherFemale || "");
+      setMotherFemale(undanganContent.motherFemale || "");
+      setImgMale(undanganContent.imgMale || "");
+      setImgFemale(undanganContent.imgFemale || "");
+      setMaleNo(undanganContent.maleNo || "");
+      setFemaleNo(undanganContent.femaleNo || "");
     }
   }, [undanganContent]);
 

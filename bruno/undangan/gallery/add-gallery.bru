@@ -1,0 +1,27 @@
+meta {
+  name: Add Gallery
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/undangan/:id/gallery
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "image": "https://res.cloudinary.com/example/photo.jpg"
+  }
+}
+
+docs {
+  # Add Gallery
+
+  Tambah foto ke galeri undangan. Rank di-assign otomatis.
+}

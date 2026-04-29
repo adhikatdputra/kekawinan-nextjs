@@ -1,0 +1,27 @@
+meta {
+  name: Update Gallery Item
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{base_url}}/api/undangan/:id/gallery/:galleryId
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "image": "https://res.cloudinary.com/example/new-photo.jpg"
+  }
+}
+
+docs {
+  # Update Gallery Item
+
+  Ganti URL gambar galeri.
+}

@@ -1,0 +1,23 @@
+meta {
+  name: Admin - Delete Bank
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{base_url}}/api/admin/bank/:id
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Admin - Delete Bank
+
+  Hapus bank berdasarkan ID. Hanya admin/superadmin.
+
+  **Path Param:** `:id` — ID bank
+}

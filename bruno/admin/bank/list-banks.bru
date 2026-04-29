@@ -1,0 +1,37 @@
+meta {
+  name: Admin - List Banks
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/admin/bank
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+params:query {
+  page: 1
+  limit: 10
+  search:
+  sortBy: name
+  order: asc
+}
+
+docs {
+  # Admin - List Banks
+
+  Ambil daftar bank dengan pagination. Hanya admin/superadmin.
+
+  | Param  | Description              |
+  |--------|--------------------------|
+  | page   | Halaman (default: 1)     |
+  | limit  | Jumlah per halaman       |
+  | search | Cari berdasarkan nama/kode |
+  | sortBy | Field untuk sorting      |
+  | order  | asc / desc               |
+}

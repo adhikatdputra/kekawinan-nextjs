@@ -87,6 +87,10 @@ export default function TamuPage() {
   const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
+  const [filterSendStatus, setFilterSendStatus] = useState("");
+  const [filterIsRead, setFilterIsRead] = useState("");
+  const [filterIsConfirm, setFilterIsConfirm] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all");
 
   const [queryParams, setQueryParams] = useState<Params>({
     limit: limit,
@@ -118,7 +122,7 @@ export default function TamuPage() {
     refetch: refetchTotalKirimWA,
   } = useQuery({
     queryKey: ["total-tamu", id],
-    queryFn: () => undanganTamuApi.totalKirimWA(id),
+    queryFn: () => undanganTamuApi.getStats(id),
     select: (data) => data.data.data,
   });
 
@@ -158,12 +162,12 @@ export default function TamuPage() {
   };
 
   const handleCreateTamu = () => {
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("phone", changeNoPhone(phone));
-    formData.append("max_invite", max_invite);
-    formData.append("undangan_id", id);
-    createTamu(formData, {
+    createTamu({
+      undanganId: id,
+      name,
+      phone: changeNoPhone(phone),
+      maxInvite: max_invite,
+    }, {
       onSuccess: (data) => {
         const res = data.data;
         if (res.success) {
@@ -181,16 +185,15 @@ export default function TamuPage() {
   };
 
   const handleUpdateTamu = () => {
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("phone", changeNoPhone(phone));
-    formData.append("max_invite", max_invite);
-    formData.append("send_status", "0");
-    formData.append("undangan_id", id);
     updateTamu(
       {
         id: selectedItem?.id as string,
-        data: formData,
+        data: {
+          name,
+          phone: changeNoPhone(phone),
+          maxInvite: max_invite,
+          sendStatus: 0,
+        },
       },
       {
         onSuccess: (data) => {
@@ -216,11 +219,11 @@ export default function TamuPage() {
     const name = item.name;
     const tamu = name.replace("&", "dan");
 
-    const title = undangan?.undangan_content?.title;
+    const title = undangan?.content?.title;
     const pengantin = title.replace("&", "dan");
 
-    const tglwaktu = encodeURI(undangan?.undangan_content?.resepsi_time);
-    const tempat = encodeURI(undangan?.undangan_content?.resepsi_place);
+    const tglwaktu = encodeURI(undangan?.content?.resepsiTime);
+    const tempat = encodeURI(undangan?.content?.resepsiPlace);
     const link = encodeURI(undangan?.permalink);
 
     const msg = `Bismillahirrahmanirrahim%0AAssalamu'alaikum Warahmatullahi Wabarakatuh%0A%0AYth. Bpk/Ibu/Sdr/i *${tamu}*,%0A%0ADengan mengharap ridha dan rahmat Allah SWT, serta tanpa mengurangi rasa hormat. Perkenankan kami mengundang Bpk/Ibu/Sdr/i untuk hadir di acara pernikahan kami:%0A%0A*Pernikahan ${pengantin}*%0A*Tanggal:* ${tglwaktu}%0A*Lokasi:* ${tempat}%0A%0AMerupakan suatu kehormatan bagi kami apabila Bpk/Ibu/Sdr/i dapat menghadiri/ menyaksikan prosesi pernikahan kami, serta jangan lupa konfirmasi kehadiranmu ya pada tautan dibawah ini:%0A%0Ahttps://kekawinan.com/${link}/${item.id}%0A%0AKami juga mengharapkan ucapan, harapan, serta doa Bpk/Ibu/Sdr/i untuk kami.%0A%0AAtas perhatiannya kami ucapkan terimakasih.`;
@@ -287,6 +290,19 @@ export default function TamuPage() {
   }, [undanganTamu]);
 
   useEffect(() => {
+    if (isDataLoaded) {
+      setPage(1);
+      setQueryParams((prev) => ({
+        ...prev,
+        page: 1,
+        sendStatus: filterSendStatus,
+        isRead: filterIsRead,
+        isConfirm: filterIsConfirm,
+      }));
+    }
+  }, [filterSendStatus, filterIsRead, filterIsConfirm]);
+
+  useEffect(() => {
     return () => {
       debounceSetParamsTable.cancel();
     };
@@ -310,7 +326,7 @@ export default function TamuPage() {
                 {isLoading ? (
                   <IconLoader2 size={40} className="animate-spin pb-1" />
                 ) : (
-                  undanganTamu?.count || 0
+                  undanganTamu?.total_data || 0
                 )}
               </h6>
               <p className="text-muted-foreground pb-1">Tamu</p>
@@ -401,7 +417,7 @@ export default function TamuPage() {
         </div>
       </div>
       <div className="border border-border p-6 rounded-2xl grid gap-4">
-        <div className="flex gap-2 justify-end items-center">
+        <div className="flex flex-wrap gap-2 justify-end items-center">
           <Button
             variant="outline"
             onClick={() => {
@@ -412,10 +428,32 @@ export default function TamuPage() {
             <IconPlus size={16} />
             Tambah Tamu
           </Button>
+          <Select
+            value={activeFilter}
+            onValueChange={(v) => {
+              setActiveFilter(v);
+              setFilterSendStatus(v === "send_1" ? "1" : v === "send_0" ? "0" : "");
+              setFilterIsRead(v === "read_1" ? "1" : v === "read_0" ? "0" : "");
+              setFilterIsConfirm(v === "confirm_1" ? "1" : v === "confirm_0" ? "0" : "");
+            }}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua</SelectItem>
+              <SelectItem value="send_1">Sudah Dikirim</SelectItem>
+              <SelectItem value="send_0">Belum Dikirim</SelectItem>
+              <SelectItem value="read_1">Sudah Dilihat</SelectItem>
+              <SelectItem value="read_0">Belum Dilihat</SelectItem>
+              <SelectItem value="confirm_1">Sudah Konfirmasi</SelectItem>
+              <SelectItem value="confirm_0">Belum Konfirmasi</SelectItem>
+            </SelectContent>
+          </Select>
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari ucapan"
+            placeholder="Cari tamu"
             className="max-w-xs"
           />
         </div>
@@ -438,26 +476,34 @@ export default function TamuPage() {
                 <TableRow key={item.id}>
                   <TableCell>{item.name}</TableCell>
                   <TableCell>{item.phone}</TableCell>
-                  <TableCell>{item.max_invite}</TableCell>
-                  <TableCell>{item.is_read ? "Sudah" : "Belum"}</TableCell>
-                  <TableCell>{item.is_confirm ? "Sudah" : "Belum"}</TableCell>
+                  <TableCell>{item.maxInvite}</TableCell>
+                  <TableCell>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.isRead ? "bg-primary/10 text-primary" : "bg-red-100 text-red-600"}`}>
+                      {item.isRead ? "Sudah" : "Belum"}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.isConfirm ? "bg-primary/10 text-primary" : "bg-red-100 text-red-600"}`}>
+                      {item.isConfirm ? "Sudah" : "Belum"}
+                    </span>
+                  </TableCell>
                   <TableCell className="text-right w-[10%]">
                     <div className="flex gap-2 justify-end">
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger
                             onClick={() => {
-                              if (!item.send_status) {
+                              if (!item.sendStatus) {
                                 handleSendWhatsapp(item);
                               }
                             }}
                             className={`${
-                              !item.send_status
+                              !item.sendStatus
                                 ? "bg-green-soft-kwn"
                                 : "bg-white"
                             } cursor-pointer border border-border rounded-md p-1 `}
                           >
-                            {!item.send_status ? (
+                            {!item.sendStatus ? (
                               <IconBrandWhatsapp size={18} />
                             ) : (
                               <IconSend2 size={18} />
@@ -465,7 +511,7 @@ export default function TamuPage() {
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>
-                              {item.send_status
+                              {item.sendStatus
                                 ? "Undangan sudah dikirim"
                                 : "Kirim Undangan melalui Whatsapp"}
                             </p>
@@ -482,7 +528,7 @@ export default function TamuPage() {
                           setSelectedItem(item);
                           setName(item.name);
                           setPhone(item.phone);
-                          setMaxInvite(item.max_invite.toString());
+                          setMaxInvite(item.maxInvite.toString());
                         }}
                         items={["Hapus", "Edit"]}
                       />
@@ -501,7 +547,7 @@ export default function TamuPage() {
             page={page}
             setPage={setPage}
             totalPage={undanganTamu?.total_page}
-            totalData={undanganTamu?.count}
+            totalData={undanganTamu?.total_data}
             pageSize={limit}
             setPageSize={setLimit}
             totalDataPerPage={tableData.length}
@@ -534,20 +580,32 @@ export default function TamuPage() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="phone">No. Whatsapp</Label>
+                <Label htmlFor="phone">
+                  No. Whatsapp
+                  {selectedItem?.isRead && (
+                    <span className="ml-1 text-xs text-muted-foreground">(tidak dapat diubah)</span>
+                  )}
+                </Label>
                 <Input
                   id="phone"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
                   placeholder="No. Whatsapp"
                   className="w-full"
+                  disabled={!!selectedItem?.isRead}
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="max_invite">Jumlah Tamu</Label>
+                <Label htmlFor="max_invite">
+                  Jumlah Tamu
+                  {selectedItem?.isConfirm && (
+                    <span className="ml-1 text-xs text-muted-foreground">(tidak dapat diubah)</span>
+                  )}
+                </Label>
                 <Select
                   value={max_invite}
                   onValueChange={(value) => setMaxInvite(value)}
+                  disabled={!!selectedItem?.isConfirm}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Jumlah Tamu" />

@@ -15,7 +15,7 @@ import "swiper/css/navigation";
 
 interface Theme {
   thumbnail: string;
-  component_name: string;
+  componentName: string;
 }
 
 export default function Themes() {
@@ -60,7 +60,7 @@ export default function Themes() {
         >
           {themes?.map((theme: Theme, index: number) => (
             <div className="w-full md:w-1/6" key={index}>
-              <Link href={`/${theme?.component_name.toLowerCase()}/demo`}>
+              <Link href={`/${theme?.componentName.toLowerCase()}/demo`}>
                 <div className="relative group">
                   <Image
                     src={theme?.thumbnail}
@@ -113,7 +113,7 @@ export default function Themes() {
                     />
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-center">
                       <Link
-                        href={`/${theme?.component_name.toLowerCase()}/demo`}
+                        href={`/${theme?.componentName.toLowerCase()}/demo`}
                       >
                         <Button>Lihat Undangan</Button>
                       </Link>

@@ -1,0 +1,38 @@
+meta {
+  name: List Tamu by Undangan
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/api/tamu/undangan/:undanganId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+params:query {
+  page: 1
+  limit: 10
+  search:
+  sortBy: createdAt
+  order: desc
+  sendStatus:
+  isRead:
+  isConfirm:
+}
+
+docs {
+  # List Tamu by Undangan
+
+  Daftar tamu undangan dengan pagination dan filter.
+
+  | Param      | Description                         |
+  |------------|-------------------------------------|
+  | sendStatus | Filter status kirim WhatsApp        |
+  | isRead     | Filter sudah dibuka atau belum      |
+  | isConfirm  | Filter sudah konfirmasi kehadiran   |
+}

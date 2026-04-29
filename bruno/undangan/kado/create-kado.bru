@@ -1,0 +1,39 @@
+meta {
+  name: Create Kado (Wishlist)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/undangan/:id/kado
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "title": "Rice Cooker",
+    "description": "Rice cooker kapasitas 1.8L",
+    "price": 350000,
+    "linkProduct": "https://tokopedia.com/product/...",
+    "thumbnail": "https://res.cloudinary.com/example/kado.jpg"
+  }
+}
+
+docs {
+  # Create Kado (Wishlist)
+
+  Tambah item wishlist baru.
+
+  | Field       | Type   | Required |
+  |-------------|--------|----------|
+  | title       | string | Ya       |
+  | description | string | Ya       |
+  | price       | number | Ya       |
+  | linkProduct | string | Ya       |
+  | thumbnail   | string | Tidak    |
+}

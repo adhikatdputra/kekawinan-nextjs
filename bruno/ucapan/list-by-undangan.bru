@@ -1,0 +1,29 @@
+meta {
+  name: List Ucapan by Undangan
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/api/ucapan/undangan/:undanganId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+params:query {
+  page: 1
+  limit: 10
+  search:
+  sortBy: createdAt
+  order: desc
+}
+
+docs {
+  # List Ucapan by Undangan
+
+  Daftar ucapan/doa untuk undangan tertentu (paginated).
+}

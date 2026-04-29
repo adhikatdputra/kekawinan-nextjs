@@ -4,8 +4,8 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import undanganUserApi from "@/frontend/api/undangan-user";
 import { UndanganView } from "@/components/pages/undangan/view";
+import { fetchUndanganBySlug } from "@/lib/fetch-undangan";
 
 type Props = {
   params: Promise<{
@@ -19,26 +19,17 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const { slug } = await params;
-
-  const queryClient = new QueryClient();
-  const data = await queryClient.fetchQuery({
-    queryKey: ["undangan-user-page", slug],
-    queryFn: () => undanganUserApi.getUndangan(slug),
-  });
-  // Ambil metadata sebelumnya dari parent
+  const data = await fetchUndanganBySlug(slug);
   const previousImages = (await parent).openGraph?.images || [];
+  const title = `Kekawinan ${data?.data?.content?.title ?? ""}`.trim();
   return {
-    title: `Kekawinan ${data?.data?.undangan_content?.title ?? ""}`.trim(),
-    description: `Undangan Pernikahan dari ${
-      data?.data?.undangan_content?.title ?? ""
-    }`,
+    title,
+    description: `Undangan Pernikahan dari ${data?.data?.content?.title ?? ""}`,
     openGraph: {
-      title: `Kekawinan ${data?.data?.undangan_content?.title ?? ""}`.trim(),
-      description: `Undangan Pernikahan dari ${
-        data?.data?.undangan_content?.title ?? ""
-      }`,
+      title,
+      description: `Undangan Pernikahan dari ${data?.data?.content?.title ?? ""}`,
       images: [
-        data?.data?.undangan_content?.img_thumbnail ?? "",
+        ...(data?.data?.content?.imgThumbnail ? [data.data.content.imgThumbnail] : []),
         ...previousImages,
       ],
     },
@@ -52,7 +43,7 @@ export default async function UndanganPage({ params }: Props) {
 
   await queryClient.prefetchQuery({
     queryKey: ["undangan-user-page", slug],
-    queryFn: () => undanganUserApi.getUndangan(slug),
+    queryFn: () => fetchUndanganBySlug(slug),
   });
 
   return (

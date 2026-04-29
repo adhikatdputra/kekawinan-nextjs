@@ -1,0 +1,41 @@
+meta {
+  name: Admin - Create User
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/admin/users
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "email": "user@example.com",
+    "fullname": "Nama Lengkap",
+    "password": "Password123!",
+    "level": "user",
+    "phone": "08123456789",
+    "dob": "1990-01-01"
+  }
+}
+
+docs {
+  # Admin - Create User
+
+  Buat pengguna baru. Hanya admin/superadmin.
+
+  | Field    | Type   | Required | Description                    |
+  |----------|--------|----------|--------------------------------|
+  | email    | string | Ya       | Harus unik                     |
+  | fullname | string | Ya       |                                |
+  | password | string | Ya       | Min 8 karakter, harus ada huruf besar/kecil/angka/simbol |
+  | level    | string | Ya       | user / admin / superadmin      |
+  | phone    | string | Tidak    |                                |
+  | dob      | string | Tidak    | ISO date                       |
+}

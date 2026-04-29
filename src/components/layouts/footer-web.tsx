@@ -17,7 +17,7 @@ export default function FooterWeb() {
           <hr />
           <div className="cpright">
             © 2022 - {new Date().getFullYear()} Kekawinan.com - Create with 💕 by
-            Partnerinaja.com
+            CTRL Spark
           </div>
         </div>
       </div>

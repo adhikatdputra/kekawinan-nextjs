@@ -118,13 +118,13 @@ export default function OverviewPage() {
   };
 
   const handleUpdateIsShowUcapan = (item: UndanganUcapan) => {
-    const getShow = !item.is_show;
-    const isShow = getShow ? "1" : "0";
+    const getShow = !item.isShow;
+    const isShow = getShow ? 1 : 0;
 
     updateIsShowUcapan(
       {
         id: item.id as string,
-        data: { is_show: isShow },
+        data: { isShow: isShow },
       },
       {
         onSuccess: () => {
@@ -135,14 +135,13 @@ export default function OverviewPage() {
   };
 
   const handleUpdateUcapan = () => {
-    const formData = new FormData();
-    formData.append("message", message);
-    formData.append("name", selectedItem?.name as string);
-    formData.append("undangan_id", id);
     updateUcapan(
       {
         id: selectedItem?.id as string,
-        data: formData,
+        data: {
+          message,
+          name: selectedItem?.name as string,
+        },
       },
       {
         onSuccess: () => {
@@ -273,7 +272,7 @@ export default function OverviewPage() {
             {isLoading ? (
               <IconLoader2 size={16} className="animate-spin pb-1" />
             ) : (
-              undanganUcapan?.count
+              undanganUcapan?.total_data
             )}{" "}
             Doa & Ucapan
           </div>
@@ -291,28 +290,32 @@ export default function OverviewPage() {
           <TableHeader>
             <TableRow>
               <TableHead className="w-[20%]">Nama Tamu</TableHead>
-              <TableHead className="w-[55%]">Ucapan & Doa</TableHead>
+              <TableHead className="w-[45%]">Ucapan & Doa</TableHead>
+              <TableHead className="w-[10%]">Undangan</TableHead>
               <TableHead className="w-[15%]">Kehadiran</TableHead>
               <TableHead className="text-right w-[10%]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TablePending colSpan={4} />
+              <TablePending colSpan={5} />
             ) : tableData.length > 0 ? (
               tableData.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell className="w-[20%]">{item.name}</TableCell>
-                  <TableCell className="w-[55%] whitespace-break-spaces">
+                  <TableCell className="w-[45%] whitespace-break-spaces">
                     <div
                       dangerouslySetInnerHTML={{ __html: item.message }}
                     ></div>
+                  </TableCell>
+                  <TableCell className="w-[10%]">
+                    {item.maxInvite ? `${item.maxInvite} Orang` : "-"}
                   </TableCell>
                   <TableCell className="w-[15%]">
                     <p>
                       {item.attend == "Yes" ? "Hadir" : "Tidak Hadir ❌"}{" "}
                       {item.attend == "Yes" && (
-                        <span>- {item.attend_total} Orang</span>
+                        <span>- {item.attendTotal} Orang</span>
                       )}
                     </p>
                   </TableCell>
@@ -325,10 +328,10 @@ export default function OverviewPage() {
                               handleUpdateIsShowUcapan(item);
                             }}
                             className={`${
-                              item.is_show ? "bg-green-soft-kwn" : "bg-red-400"
+                              item.isShow ? "bg-green-soft-kwn" : "bg-red-400"
                             } cursor-pointer border border-border rounded-md p-1 `}
                           >
-                            {item.is_show ? (
+                            {item.isShow ? (
                               <IconEye size={18} />
                             ) : (
                               <IconEyeOff size={18} />
@@ -336,7 +339,7 @@ export default function OverviewPage() {
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>
-                              {item.is_show
+                              {item.isShow
                                 ? "Ucapan ditampilkan"
                                 : "Ucapan disembunyikan"}
                             </p>
@@ -360,7 +363,7 @@ export default function OverviewPage() {
                 </TableRow>
               ))
             ) : (
-              <TableNoData colSpan={4} />
+              <TableNoData colSpan={5} />
             )}
           </TableBody>
         </Table>
@@ -370,7 +373,7 @@ export default function OverviewPage() {
             page={page}
             setPage={setPage}
             totalPage={undanganUcapan?.total_page}
-            totalData={undanganUcapan?.count}
+            totalData={undanganUcapan?.total_data}
             pageSize={limit}
             setPageSize={setLimit}
             totalDataPerPage={tableData.length}

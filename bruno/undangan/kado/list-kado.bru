@@ -1,0 +1,29 @@
+meta {
+  name: List Kado (Wishlist)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/undangan/:id/kado
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+params:query {
+  page: 1
+  limit: 10
+  search:
+  sortBy: createdAt
+  order: desc
+}
+
+docs {
+  # List Kado (Wishlist)
+
+  Daftar item wishlist/kado undangan dengan pagination.
+}

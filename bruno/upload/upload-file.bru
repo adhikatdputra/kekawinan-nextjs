@@ -1,0 +1,45 @@
+meta {
+  name: Upload File
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/upload
+  body: multipart-form
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  file: @file()
+  folder: undangan
+}
+
+docs {
+  # Upload File
+
+  Upload file gambar atau audio ke Cloudinary.
+
+  ## Form Data
+
+  | Field  | Type   | Required | Description                                |
+  |--------|--------|----------|--------------------------------------------|
+  | file   | file   | Ya       | File gambar (JPEG/PNG/GIF/WEBP, maks 1MB) atau audio (MP3/OGG/WAV/AAC, maks 10MB) |
+  | folder | string | Tidak    | Subfolder di Cloudinary                    |
+
+  ## Response Success (200)
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "url": "https://res.cloudinary.com/...",
+      "publicId": "folder/filename"
+    }
+  }
+  ```
+}

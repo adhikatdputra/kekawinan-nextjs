@@ -31,7 +31,7 @@ export default function GiftView({ slug }: { slug: string }) {
   });
 
   const { isPending: isLoadingGiftList, mutate: mutateGiftList } = useMutation({
-    mutationFn: (undangan_id: string) => giftApi.getAll(undangan_id),
+    mutationFn: (undangan_id: string) => giftApi.getPublic(undangan_id),
     onSuccess: (data) => {
       setGiftList(data.data.data);
     },
@@ -124,7 +124,7 @@ export default function GiftView({ slug }: { slug: string }) {
                 }}
                 viewport={{ once: false }}
               >
-                {undanganData?.undangan_content?.title}
+                {undanganData?.content?.title}
               </motion.h1>
               <p>
                 Berikan kenangan manis melalui hadiah pilihan untuk memulai
@@ -205,7 +205,7 @@ function GiftCard({ gift }: { gift: Gift }) {
   return (
     <div
       className={`p-3  rounded-lg shadow-xl flex gap-4 items-center ${
-        gift.is_confirm ? "bg-gray-200" : "bg-white"
+        gift.isConfirm ? "bg-gray-200" : "bg-white"
       }`}
     >
       <div className="w-[130px]">
@@ -215,7 +215,7 @@ function GiftCard({ gift }: { gift: Gift }) {
           width={1000}
           height={1000}
           className={`object-cover aspect-square rounded-lg ${
-            gift.is_confirm ? "grayscale" : ""
+            gift.isConfirm ? "grayscale" : ""
           }`}
         />
       </div>
@@ -224,10 +224,10 @@ function GiftCard({ gift }: { gift: Gift }) {
         <div className="font-bold">{formatNumber(Number(gift.price))}</div>
         <div
           className={`underline  text-sm font-medium mt-1 ${
-            gift.is_confirm ? "text-gray-500" : "text-green-kwn"
+            gift.isConfirm ? "text-gray-500" : "text-green-kwn"
           }`}
         >
-          {gift.is_confirm ? "Sudah Hadiahkan" : "Hadiahkan Sekarang"}
+          {gift.isConfirm ? "Sudah Hadiahkan" : "Hadiahkan Sekarang"}
         </div>
       </div>
     </div>

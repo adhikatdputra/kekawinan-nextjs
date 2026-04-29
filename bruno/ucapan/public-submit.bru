@@ -1,0 +1,37 @@
+meta {
+  name: Public - Submit Ucapan
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{base_url}}/api/ucapan/public/submit
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "undanganId": "undangan_id_here",
+    "tamuId": "tamu_id_here",
+    "name": "Budi Hartono",
+    "message": "Selamat menempuh hidup baru! Semoga bahagia selalu.",
+    "attend": "Yes",
+    "attendTotal": 2
+  }
+}
+
+docs {
+  # Public - Submit Ucapan
+
+  Tamu mengirim ucapan dan konfirmasi kehadiran dari halaman publik. Tidak memerlukan autentikasi.
+
+  | Field       | Type   | Required | Description                      |
+  |-------------|--------|----------|----------------------------------|
+  | undanganId  | string | Ya       | ID undangan                      |
+  | tamuId      | string | Tidak    | ID tamu (jika punya link personal)|
+  | name        | string | Ya       | Nama (maks 100 karakter)         |
+  | message     | string | Ya       | Ucapan (maks 500 karakter)       |
+  | attend      | string | Ya       | "Yes" atau "No"                  |
+  | attendTotal | number | Tidak    | Jumlah yang hadir                |
+}

@@ -1,0 +1,17 @@
+meta {
+  name: Public - Get Tamu (RSVP)
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{base_url}}/api/tamu/public/:id
+  body: none
+  auth: none
+}
+
+docs {
+  # Public - Get Tamu (RSVP)
+
+  Ambil data tamu untuk halaman RSVP publik. Menandai undangan sebagai dibaca. Tidak memerlukan autentikasi.
+}

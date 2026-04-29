@@ -17,17 +17,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const covid_list = [
-  {
-    name: "Tidak",
-    value: 0,
-  },
-  {
-    name: "Ya",
-    value: 1,
-  },
-];
-
 const religion_version_list = [
   {
     name: "Islam",
@@ -40,7 +29,6 @@ export default function SettingPage() {
   const id = params.id as string;
 
   // Form Data
-  const [is_covid, setIsCovid] = useState<number>(0);
   const [religion_version, setReligionVersion] = useState<string>("ISLAM");
 
   const { data: undanganContent, refetch } = useQuery({
@@ -50,11 +38,8 @@ export default function SettingPage() {
   });
 
   const { mutate: updateUndanganContent, isPending: isUpdating } = useMutation({
-    mutationFn: (formData: FormData) =>
-      undanganContentApi.updateUndanganContent(
-        undanganContent?.id as string,
-        formData
-      ),
+    mutationFn: (body: object) =>
+      undanganContentApi.updateUndanganContent(id, body),
     onSuccess: (data) => {
       const response = data.data;
       if (response.success) {
@@ -70,16 +55,12 @@ export default function SettingPage() {
   });
 
   const handleUpdateUndanganContent = () => {
-    const formData = new FormData();
-    formData.append("is_covid", is_covid.toString());
-    formData.append("religion_version", religion_version);
-    updateUndanganContent(formData);
+    updateUndanganContent({ religionVersion: religion_version });
   };
 
   useEffect(() => {
     if (undanganContent) {
-      setIsCovid(undanganContent.is_covid);
-      setReligionVersion(undanganContent.religion_version);
+      setReligionVersion(undanganContent.religionVersion);
     }
   }, [undanganContent]);
 
@@ -106,30 +87,6 @@ export default function SettingPage() {
           </Select>
           <p className="text-sm text-muted-foreground">
             Mohon maaf saat ini baru tersedia versi Islam
-          </p>
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="covid_section">
-            Section Menerapkan Protokol Covid
-          </Label>
-          <Select
-            value={is_covid.toString()}
-            onValueChange={(value) => setIsCovid(Number(value))}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Pilih Status" />
-            </SelectTrigger>
-            <SelectContent>
-              {covid_list.map((item) => (
-                <SelectItem key={item.value} value={item.value.toString()}>
-                  {item.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <p className="text-sm text-muted-foreground">
-            Jika pilih Ya, maka akan menampilkan section menerapkan protokol
-            covid
           </p>
         </div>
       </div>

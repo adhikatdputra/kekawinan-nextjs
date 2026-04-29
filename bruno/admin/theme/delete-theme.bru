@@ -1,0 +1,21 @@
+meta {
+  name: Admin - Delete Theme
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{base_url}}/api/admin/theme/:id
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Admin - Delete Theme
+
+  Hapus tema berdasarkan ID. Hanya admin/superadmin.
+}

@@ -1,0 +1,21 @@
+meta {
+  name: Get Gallery Item
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/api/undangan/:id/gallery/:galleryId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Get Gallery Item
+
+  Ambil detail foto galeri berdasarkan ID.
+}

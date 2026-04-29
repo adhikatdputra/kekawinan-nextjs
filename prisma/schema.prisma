@@ -1,0 +1,264 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── Users ────────────────────────────────────────────────────────────────────
+
+model User {
+  id             String    @id @db.VarChar(255)
+  fullname       String?   @db.VarChar(255)
+  email          String    @unique @db.VarChar(255)
+  password       String    @db.VarChar(255)
+  level          String    @db.VarChar(20)           // "user" | "admin" | "superadmin"
+  phone          String?   @db.VarChar(50)
+  dob            DateTime?
+  status         String    @default("ACTIVE") @db.VarChar(50)
+  isMember       Int       @default(0)
+  expiredMember  DateTime?
+  lastLogin      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  undangan       Undangan[]
+  subscribers    UserSubscriber[]
+  resetPasswords ResetPassword[]
+
+  @@map("tbl_users")
+}
+
+// ─── Theme ────────────────────────────────────────────────────────────────────
+
+model Theme {
+  id            String   @id @db.VarChar(64)
+  name          String?  @db.VarChar(255)
+  thumbnail     String?  @db.Text
+  componentName String?  @db.Text
+  linkUrl       String?  @db.Text
+  credit        Int      @default(0)
+  promo         Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  undangan      Undangan[]
+
+  @@map("tbl_theme")
+}
+
+// ─── Undangan ─────────────────────────────────────────────────────────────────
+
+model Undangan {
+  id         String    @id @db.VarChar(64)
+  userId     String    @db.VarChar(255)
+  permalink  String    @unique @db.VarChar(500)
+  name       String?   @db.VarChar(255)
+  status     String    @default("ACTIVE") @db.VarChar(50)
+  expired    DateTime?
+  themeId    String?   @db.VarChar(64)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme      Theme?            @relation(fields: [themeId], references: [id])
+  tamu       Tamu[]
+  ucapan     Ucapan[]
+  content    UndanganContent?
+  gifts      UndanganGift[]
+  gallery    UndanganGallery[]
+  kado       Kado[]
+
+  @@map("tbl_undangan")
+}
+
+// ─── Tamu (Guests) ────────────────────────────────────────────────────────────
+
+model Tamu {
+  id          String   @id @db.VarChar(64)
+  undanganId  String   @db.VarChar(64)
+  name        String?  @db.VarChar(255)
+  phone       String?  @db.VarChar(50)
+  sendStatus  Int      @default(0)        // 0 = belum dikirim, 1 = sudah dikirim
+  isRead      Int      @default(0)        // 0 = belum dibuka, 1 = sudah dibuka
+  isConfirm   Int      @default(0)        // 0 = belum konfirm, 1 = sudah konfirm
+  maxInvite   Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  undangan    Undangan @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+
+  @@map("tbl_tamu")
+}
+
+// ─── Ucapan (Wishes) ──────────────────────────────────────────────────────────
+
+model Ucapan {
+  id           String   @id @db.VarChar(64)
+  undanganId   String   @db.VarChar(64)
+  name         String?  @db.VarChar(255)
+  message      String?  @db.Text
+  attend          String?  @db.VarChar(50)
+  attendTotal     Int?
+  notAttendTotal  Int?
+  maxInvite       Int?
+  isShow          Int      @default(1)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  undangan     Undangan @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+
+  @@map("tbl_ucapan")
+}
+
+// ─── Undangan Content ─────────────────────────────────────────────────────────
+
+model UndanganContent {
+  id               String    @id @db.VarChar(64)
+  undanganId       String    @unique @db.VarChar(64)
+  title            String?   @db.VarChar(255)
+  nameMale         String?   @db.VarChar(255)
+  nameFemale       String?   @db.VarChar(255)
+  dateWedding      DateTime?
+  motherFemale     String?   @db.VarChar(255)
+  fatherFemale     String?   @db.VarChar(255)
+  motherMale       String?   @db.VarChar(255)
+  fatherMale       String?   @db.VarChar(255)
+  maleNo           String?   @db.VarChar(30)
+  femaleNo         String?   @db.VarChar(30)
+  akadTime         String?   @db.VarChar(255)
+  akadPlace        String?   @db.Text
+  resepsiTime      String?   @db.VarChar(255)
+  resepsiPlace     String?   @db.Text
+  gmaps            String?   @db.Text
+  streamLink       String?   @db.Text
+  imgBg            String?   @db.Text
+  imgMale          String?   @db.Text
+  imgFemale        String?   @db.Text
+  imgThumbnail     String?   @db.Text
+  music            String?   @db.Text
+  isCovid          Int?
+  religionVersion  String    @default("ISLAM") @db.VarChar(24)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  undangan         Undangan  @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+
+  @@map("tbl_undangan_content")
+}
+
+// ─── Undangan Gift (Rekening) ─────────────────────────────────────────────────
+
+model UndanganGift {
+  id          String   @id @db.VarChar(64)
+  undanganId  String   @db.VarChar(64)
+  bankName    String?  @db.VarChar(255)
+  name        String?  @db.VarChar(255)
+  bankNumber  String?  @db.VarChar(50)
+  nameAddress String?  @db.VarChar(255)
+  phone       String?  @db.VarChar(50)
+  address     String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  undangan    Undangan @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+
+  @@map("tbl_undangan_gift")
+}
+
+// ─── Undangan Gallery ─────────────────────────────────────────────────────────
+
+model UndanganGallery {
+  id          String   @id @db.VarChar(64)
+  undanganId  String   @db.VarChar(64)
+  image       String?  @db.Text
+  rank        Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  undangan    Undangan @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+
+  @@map("tbl_undangan_gallery")
+}
+
+// ─── Kado (Wishlist) ──────────────────────────────────────────────────────────
+
+model Kado {
+  id           String   @id @db.VarChar(64)
+  undanganId   String   @db.VarChar(64)
+  title        String?  @db.VarChar(255)
+  description  String?  @db.Text
+  price        String?  @db.VarChar(255)
+  thumbnail    String?  @db.Text
+  linkProduct  String?  @db.Text
+  name         String?  @db.VarChar(255)
+  phone        String?  @db.VarChar(255)
+  isConfirm    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  undangan     Undangan @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+
+  @@map("tbl_kado")
+}
+
+// ─── User Subscriber ──────────────────────────────────────────────────────────
+
+model UserSubscriber {
+  id              String    @id @db.VarChar(64)
+  userId          String    @db.VarChar(255)
+  purchaseDate    DateTime?
+  paymentMethod   String?   @db.VarChar(255)
+  purchaseStatus  String?   @db.VarChar(50)
+  image           String?   @db.Text
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("tbl_user_subscriber")
+}
+
+// ─── Reset Password ───────────────────────────────────────────────────────────
+
+model ResetPassword {
+  id        String    @id @db.VarChar(64)
+  userId    String    @db.VarChar(255)
+  expiredAt DateTime?
+  token     String?   @db.Text
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("tbl_reset_password")
+}
+
+// ─── Bank (Master Data) ───────────────────────────────────────────────────────
+
+model Bank {
+  id        String   @id @db.VarChar(64)
+  name      String   @db.VarChar(255)
+  code      String   @unique @db.VarChar(50)
+  icon      String?  @db.Text
+  color     String?  @db.VarChar(50)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tbl_bank")
+}
+
+// ─── Images ───────────────────────────────────────────────────────────────────
+
+model Image {
+  contentId String   @id @db.VarChar(255)
+  setting   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tbl_images")
+}

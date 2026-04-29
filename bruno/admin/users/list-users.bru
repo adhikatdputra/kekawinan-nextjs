@@ -1,0 +1,34 @@
+meta {
+  name: Admin - List Users
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/admin/users
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+params:query {
+  page: 1
+  limit: 10
+  search:
+  sortBy: createdAt
+  order: desc
+  level:
+}
+
+docs {
+  # Admin - List Users
+
+  Daftar semua pengguna dengan pagination. Hanya admin/superadmin.
+
+  | Param  | Description                        |
+  |--------|------------------------------------|
+  | level  | Filter: user / admin / superadmin  |
+}

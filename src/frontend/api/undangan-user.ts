@@ -2,21 +2,21 @@ import axios from "@/lib/axios";
 
 const undanganUserApi = {
   getUndangan: async (slug: string) => {
-    const res = await axios.get(`/undangan/${slug}`);
+    const res = await axios.get(`/undangan/public/${slug}`);
     return res.data;
   },
   getUndanganDetail: (slug: string) => {
-    return axios.get(`/undangan-detail/${slug}`);
+    return axios.get(`/undangan/public/detail/${slug}`);
   },
   getTamu: async (id_tamu: string) => {
-    const res = await axios.get(`/undangan/tamu/${id_tamu}`);
+    const res = await axios.get(`/tamu/public/${id_tamu}`);
     return res.data;
   },
-  createUcapan: (formData: FormData) => {
-    return axios.post(`/undangan/ucapan/submit`, formData);
+  createUcapan: (formData: object) => {
+    return axios.post(`/ucapan/public/submit`, formData);
   },
   changeStatusUcapan: (id_tamu: string) => {
-    return axios.put(`/undangan/tamu/${id_tamu}`);
+    return axios.put(`/tamu/public/${id_tamu}`);
   },
 };
 

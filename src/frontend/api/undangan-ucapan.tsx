@@ -2,26 +2,21 @@ import axios from "@/lib/axios";
 import { Params } from "../interface/undangan";
 
 const undanganUcapanApi = {
-  getData: (id: string, params: Params) => {
-    return axios.get(`/users/ucapan/slug/${id}`, { params });
+  getData: (undanganId: string, params: Params) => {
+    return axios.get(`/ucapan/undangan/${undanganId}`, { params });
   },
-  update: (id: string, formData: FormData) => {
-    return axios.put(`/users/ucapan/${id}`, formData);
+  getStats: (undanganId: string) => {
+    return axios.get(`/ucapan/undangan/${undanganId}/stats`);
+  },
+  update: (id: string, formData: object) => {
+    return axios.put(`/ucapan/${id}`, formData);
   },
   remove: (id: string) => {
-    return axios.delete(`/users/ucapan/${id}`);
+    return axios.delete(`/ucapan/${id}`);
   },
-  getAttend: (id: string) => {
-    return axios.get(`/users/ucapan/attend/${id}`);
-  },
-  getNoAttend: (id: string) => {
-    return axios.get(`/users/ucapan/no-attend/${id}`);
-  },
-  getAttendanceSummary: (id: string) => {
-    return axios.get(`/users/ucapan/attendance-summary/${id}`);
-  },
-  changeShow: (id: string, data: { is_show: string }) => {
-    return axios.put(`/users/ucapan/show/${id}`, data);
+  // Toggle visibility on the public invitation page (0 = hidden, 1 = visible)
+  changeShow: (id: string, data: { isShow: number }) => {
+    return axios.patch(`/ucapan/${id}/show`, data);
   },
 };
 

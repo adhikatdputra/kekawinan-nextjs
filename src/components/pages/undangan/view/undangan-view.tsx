@@ -25,7 +25,7 @@ interface ThemeComponentProps {
   onSubmitUcapan: (data: {
     name: string;
     attend: string;
-    attend_total: string;
+    attendTotal: string;
     message: string;
   }) => void;
   giftLength: number;
@@ -56,10 +56,14 @@ export default function UndanganView({
     select: (data) => data.data as UndanganDetail,
   });
 
-  const { data: tamu, refetch: refetchTamu } = useQuery({
+  const isDemo = id_tamu === "demo";
+
+  const { data: tamu, refetch: refetchTamu, isError: isTamuError } = useQuery({
     queryKey: ["undangan-user-tamu", id_tamu],
     queryFn: () => undanganUserApi.getTamu(id_tamu),
     select: (data) => data.data,
+    enabled: !isDemo,
+    retry: false,
   });
 
   const { mutate: submitUcapan, isPending: isSubmitting } = useMutation({
@@ -76,7 +80,7 @@ export default function UndanganView({
   const {
     mutate: mutateGiftList,
   } = useMutation({
-    mutationFn: (undangan_id: string) => giftApi.getAll(undangan_id),
+    mutationFn: (undangan_id: string) => giftApi.getPublic(undangan_id),
     onSuccess: (data) => {
       setGiftList(data.data.data);
     },
@@ -85,18 +89,20 @@ export default function UndanganView({
   const onSubmitUcapan = (data: {
     name: string;
     attend: string;
-    attend_total: string;
+    attendTotal: string;
     message: string;
   }) => {
-    if (id_tamu != "demo") {
-      const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("attend", data.attend);
-      formData.append("attend_total", data.attend_total || tamu?.max_invite);
-      formData.append("message", data.message);
-      formData.append("undangan_id", undanganData?.id ?? "");
+    if (!isDemo) {
+      const payload = {
+        name: data.name,
+        attend: data.attend,
+        attendTotal: data.attendTotal || tamu?.maxInvite,
+        message: data.message,
+        undanganId: undanganData?.id ?? "",
+        tamuId: id_tamu,
+      };
 
-      submitUcapan(formData, {
+      submitUcapan(payload, {
         onSuccess: (data) => {
           const res = data.data;
           if (res.success) {
@@ -117,7 +123,7 @@ export default function UndanganView({
       {
         name: data.name,
         attend: data.attend,
-        attend_total: parseInt(data.attend_total),
+        attendTotal: parseInt(data.attendTotal),
         message: data.message,
       },
       ...ucapan,
@@ -171,7 +177,7 @@ export default function UndanganView({
 
   useEffect(() => {
     const loadTheme = async () => {
-      const name = undanganData?.theme?.component_name;
+      const name = undanganData?.theme?.componentName;
       if (!name) {
         setThemeComponent(null);
         return;
@@ -191,7 +197,7 @@ export default function UndanganView({
       }
     };
 
-    setMusic(undanganData?.undangan_content?.music ?? null);
+    setMusic(undanganData?.content?.music ?? null);
     setUcapan(undanganData?.ucapan ?? []);
     if (undanganData?.id) {
       mutateGiftList(undanganData.id);
@@ -211,6 +217,14 @@ export default function UndanganView({
       <NotFound
         title="Waduh, undanganmu nggak ada!"
         description="Mungkin kamu salah klik link ini, atau link ini sudah tidak ada."
+      />
+    );
+
+  if (!isDemo && isTamuError)
+    return (
+      <NotFound
+        title="Link undangan tidak valid!"
+        description="Link undangan ini tidak ditemukan atau sudah tidak berlaku."
       />
     );
 

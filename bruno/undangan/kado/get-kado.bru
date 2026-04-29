@@ -1,0 +1,21 @@
+meta {
+  name: Get Kado Item
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/api/undangan/:id/kado/:kadoId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Get Kado Item
+
+  Ambil detail item wishlist berdasarkan ID.
+}

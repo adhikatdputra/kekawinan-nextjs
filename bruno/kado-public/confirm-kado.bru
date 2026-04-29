@@ -1,0 +1,29 @@
+meta {
+  name: Public - Confirm Kado
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{base_url}}/api/kado/public/confirm/:kadoId
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Budi Hartono",
+    "phone": "08123456789"
+  }
+}
+
+docs {
+  # Public - Confirm Kado
+
+  Tamu mengkonfirmasi akan membawa/mengirim item kado. Hanya bisa dilakukan sekali. Tidak memerlukan autentikasi.
+
+  | Field | Type   | Required | Description              |
+  |-------|--------|----------|--------------------------|
+  | name  | string | Ya       | Nama tamu (maks 100 karakter) |
+  | phone | string | Ya       | Nomor telepon tamu       |
+}

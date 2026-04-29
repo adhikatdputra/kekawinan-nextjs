@@ -1,0 +1,41 @@
+meta {
+  name: Admin - Create Theme
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/admin/theme
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Elegant Rose",
+    "componentName": "ElegantRose",
+    "linkUrl": "https://example.com/preview",
+    "thumbnail": "https://res.cloudinary.com/example/thumb.jpg",
+    "credit": "Designer Name",
+    "promo": false
+  }
+}
+
+docs {
+  # Admin - Create Theme
+
+  Tambah tema baru. Hanya admin/superadmin.
+
+  | Field         | Type    | Required |
+  |---------------|---------|----------|
+  | name          | string  | Ya       |
+  | componentName | string  | Ya       |
+  | linkUrl       | string  | Ya       |
+  | thumbnail     | string  | Tidak    |
+  | credit        | string  | Tidak    |
+  | promo         | boolean | Tidak    |
+}

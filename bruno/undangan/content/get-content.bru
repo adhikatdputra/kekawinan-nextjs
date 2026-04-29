@@ -1,0 +1,21 @@
+meta {
+  name: Get Content
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/undangan/:id/content
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Get Content
+
+  Ambil konten detail undangan (info mempelai, waktu/lokasi akad & resepsi, dll).
+}

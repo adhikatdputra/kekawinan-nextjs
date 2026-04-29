@@ -1,0 +1,31 @@
+meta {
+  name: Toggle Ucapan Visibility
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{base_url}}/api/ucapan/:id/show
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "isShow": 1
+  }
+}
+
+docs {
+  # Toggle Ucapan Visibility
+
+  Tampilkan/sembunyikan ucapan di halaman publik undangan.
+
+  | Field  | Type   | Required | Description       |
+  |--------|--------|----------|-------------------|
+  | isShow | number | Ya       | 1 = tampil, 0 = sembunyikan |
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ArrowLeftToLine, LayoutDashboard, UserRoundPlus, SwatchBook } from "lucide-react";
+import { ArrowLeftToLine, LayoutDashboard, UserRoundPlus, SwatchBook, Landmark } from "lucide-react";
 import useSession from "@/frontend/hook/useSession";
 import Link from "next/link";
 
@@ -47,6 +47,14 @@ export function AppSidebar() {
     },
   ];
 
+  const masterDataItems = [
+    {
+      title: "Bank",
+      url: `/admin/master-data/bank`,
+      icon: Landmark,
+    },
+  ];
+
   return (
     <Sidebar className="py-2">
       <SidebarHeader className="px-4">
@@ -63,6 +71,28 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    className={cn(
+                      pathname === item.url && "bg-gray-200 hover:bg-gray-200"
+                    )}
+                  >
+                    <Link href={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Master Data</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {masterDataItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild

@@ -71,7 +71,7 @@ export const useAuth = () => {
 
   const isAdmin = () => {
     const user = getUser();
-    return user?.level === "admin";
+    return user?.level === "admin" || user?.level === "superadmin";
   };
 
   const getUserName = () => {

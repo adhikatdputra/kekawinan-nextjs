@@ -1,0 +1,21 @@
+meta {
+  name: Delete Kado Item
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{base_url}}/api/undangan/:id/kado/:kadoId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Delete Kado Item
+
+  Hapus item wishlist berdasarkan ID.
+}
