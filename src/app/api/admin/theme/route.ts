@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
         linkUrl: linkUrl.trim(),
         thumbnail: thumbnail || null,
         credit: credit !== undefined ? Number(credit) : 0,
-        promo: promo !== undefined ? Number(promo) : 0,
+        promo: promo !== undefined && promo !== null ? Number(promo) : null,
         isActive: true,
       },
     })

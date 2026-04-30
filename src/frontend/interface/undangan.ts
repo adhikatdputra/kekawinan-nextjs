@@ -3,6 +3,11 @@ export interface UndanganBody {
   name: string;
   expired?: string;
   themeId?: string;
+  creditId?: string;
+}
+
+export interface UserCreditBalance {
+  balance: number;
 }
 
 export interface Undangan {
@@ -24,7 +29,7 @@ export interface Theme {
   componentName: string;
   linkUrl: string;
   credit: number;
-  promo: number;
+  promo: number | null;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
