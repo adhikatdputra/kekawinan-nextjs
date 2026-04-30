@@ -1,10 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
-import themeApi from "../api/admin/theme";
+import themeApi, { ThemeBody } from "../api/admin/theme";
 import { toast } from "react-hot-toast";
 
 export default function AdminThemeStore() {
   const update = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: FormData }) =>
+    mutationFn: ({ id, data }: { id: string; data: ThemeBody }) =>
       themeApi.update(id, data),
     onSuccess: (data) => {
       const response = data.data;
@@ -20,7 +20,7 @@ export default function AdminThemeStore() {
   });
 
   const create = useMutation({
-    mutationFn: (formData: FormData) => themeApi.create(formData),
+    mutationFn: (body: ThemeBody) => themeApi.create(body),
     onSuccess: (data) => {
       const response = data.data;
       if (response.success) {

@@ -10,8 +10,10 @@ import {
   IconUsers,
   IconEdit,
   IconTrash,
-  IconRosetteDiscountCheckFilled,
   IconGift,
+  IconTicket,
+  IconRosetteDiscountCheckFilled,
+  IconCoin,
 } from "@tabler/icons-react";
 import PendingNoData from "@/components/ui/custom/pending-no-data";
 import PendingData from "@/components/ui/custom/pending-data";
@@ -52,13 +54,14 @@ import { Separator } from "@/components/ui/separator";
 
 import { useQuery, useMutation } from "@tanstack/react-query";
 import undanganApi from "@/frontend/api/undangan";
+import creditsApi from "@/frontend/api/credits";
+import redeemApi from "@/frontend/api/redeem";
 import themeApi from "@/frontend/api/theme";
-import { Undangan, Theme, UndanganBody } from "@/frontend/interface/undangan";
-import { Loader2 } from "lucide-react";
+import { Undangan, UserCreditBalance, Theme, UndanganBody } from "@/frontend/interface/undangan";
+import { Loader2, ShoppingBag } from "lucide-react";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
-
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -66,42 +69,65 @@ import "swiper/css/pagination";
 export default function UndanganListPage() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isOpenTrakteer, setIsOpenTrakteer] = useState(false);
+
   const [isOpen, setIsOpen] = useState(false);
-  const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Undangan | null>(null);
-  const [selectedTheme, setSelectedTheme] = useState<string | undefined>("");
+  const [selectedTheme, setSelectedTheme] = useState<Theme | null>(null);
   const [name, setName] = useState("");
   const [permalink, setPermalink] = useState("");
-  const { getUser, getUserName } = useAuth();
 
-  const {
-    data: undangan,
-    isLoading: isLoadingUndangan,
-    refetch: refetchUndangan,
-  } = useQuery({
+  const [isOpenDelete, setIsOpenDelete] = useState(false);
+  const [isOpenRedeem, setIsOpenRedeem] = useState(false);
+  const [redeemCode, setRedeemCode] = useState("");
+
+  const { getUser, getUserName } = useAuth();
+  const isAdmin = getUser()?.level === "admin" || getUser()?.level === "superadmin";
+
+  // ── Queries ──────────────────────────────────────────────────────────────────
+
+  const { data: undangan, isLoading: isLoadingUndangan, refetch: refetchUndangan } = useQuery({
     queryKey: ["undangan-me", getUser()?.id],
     queryFn: () => undanganApi.getMyUndangan(),
-    select: (data) => data.data.data.rows,
+    select: (data) => data.data.data.rows as Undangan[],
   });
 
-  const { data: theme, isLoading: isLoadingTheme } = useQuery({
-    queryKey: ["themes"],
-    queryFn: () => themeApi.getTheme(),
-    select: (data) => data.data.data?.rows,
+  const { data: creditData, isLoading: isLoadingCredits, refetch: refetchCredits } = useQuery({
+    queryKey: ["my-credits", getUser()?.id],
+    queryFn: () => creditsApi.getMyCredits(),
+    select: (data) => data.data.data as UserCreditBalance,
+    enabled: !isAdmin,
   });
+
+  const { data: themes, isLoading: isLoadingTheme } = useQuery({
+    queryKey: ["themes-public"],
+    queryFn: () => themeApi.getTheme(),
+    select: (data) => data.data.data?.rows as Theme[],
+  });
+
+  // ── Derived values ────────────────────────────────────────────────────────────
+
+  const balance = creditData?.balance ?? 0;
+
+  // Harga efektif tema yang dipilih
+  const effectiveCost = selectedTheme
+    ? (selectedTheme.promo !== null && selectedTheme.promo !== undefined ? selectedTheme.promo : selectedTheme.credit)
+    : 0;
+
+  const canAfford = balance >= effectiveCost;
+
+  // ── Mutations ─────────────────────────────────────────────────────────────────
 
   const { mutate: updateUndangan, isPending: isPendingUpdate } = useMutation({
     mutationFn: ({ id, data }: { id: string; data: UndanganBody }) =>
       undanganApi.updateUndangan(id, data),
     onSuccess: (data) => {
-      const response = data.data;
-      if (response.success) {
+      if (data.data.success) {
         setIsOpen(false);
         setSelectedItem(null);
         toast.success("Undangan berhasil diubah");
         refetchUndangan();
       } else {
-        toast.error(response.message);
+        toast.error(data.data.message);
       }
     },
   });
@@ -109,15 +135,16 @@ export default function UndanganListPage() {
   const { mutate: createUndangan, isPending: isPendingCreate } = useMutation({
     mutationFn: (data: UndanganBody) => undanganApi.createUndangan(data),
     onSuccess: (data) => {
-      const response = data.data;
-      if (response.success) {
+      if (data.data.success) {
         setIsOpen(false);
         setSelectedItem(null);
+        setSelectedTheme(null);
         toast.success("Undangan berhasil dibuat");
         setIsOpenTrakteer(true);
         refetchUndangan();
+        refetchCredits();
       } else {
-        toast.error(response.message);
+        toast.error(data.data.message);
       }
     },
   });
@@ -126,63 +153,86 @@ export default function UndanganListPage() {
     mutationFn: (id: string) => undanganApi.deleteUndangan(id),
   });
 
-  const isExpired = (expired: string) => {
-    const today = new Date();
-    const expiredDate = new Date(expired);
-    return expiredDate < today;
+  const { mutate: doRedeem, isPending: isPendingRedeem } = useMutation({
+    mutationFn: (code: string) => redeemApi.redeemCode(code),
+    onSuccess: (data) => {
+      if (data.data.success) {
+        toast.success(data.data.message);
+        setIsOpenRedeem(false);
+        setRedeemCode("");
+        refetchCredits();
+      } else {
+        toast.error(data.data.message);
+      }
+    },
+    onError: (err: { response?: { data?: { message?: string } } }) => {
+      toast.error(err?.response?.data?.message ?? "Kode tidak valid");
+    },
+  });
+
+  // ── Helpers ───────────────────────────────────────────────────────────────────
+
+  const isExpired = (expired: string) => new Date(expired) < new Date();
+
+  const updatePermalink = (input: string) =>
+    setPermalink(input.replace(/\s+/g, "-").replace(/[^\w-]+/g, "").toLowerCase());
+
+  const openCreate = () => {
+    setSelectedItem(null);
+    setSelectedTheme(null);
+    setName("");
+    setPermalink("");
+    setIsOpen(true);
   };
 
-  const handleDeleteUndangan = () => {
-    if (selectedItem?.id) {
-      deleteUndangan(selectedItem.id, {
-        onSuccess: () => {
-          setIsOpenDelete(false);
-          setSelectedItem(null);
-          toast.success("Undangan berhasil dihapus");
-          refetchUndangan();
-        },
-      });
-    }
+  const openEdit = (item: Undangan) => {
+    setSelectedItem(item);
+    setSelectedTheme(null);
+    setName(item.name ?? "");
+    setPermalink(item.permalink);
+    setIsOpen(true);
   };
 
-  const updatePermalink = (input: string) => {
-    const inputValue = input;
-    const modifiedValue = inputValue
-      .replace(/\s+/g, "-")
-      .replace(/[^\w-]+/g, "")
-      .toLowerCase();
-
-    setPermalink(modifiedValue);
+  const handleCancel = () => {
+    setIsOpen(false);
+    setSelectedItem(null);
+    setSelectedTheme(null);
+    setName("");
+    setPermalink("");
   };
 
   const handleSubmit = () => {
     if (selectedItem) {
       updateUndangan({ id: selectedItem.id, data: { name, permalink } });
     } else {
-      createUndangan({ name, permalink, themeId: selectedTheme });
+      createUndangan({ name, permalink, themeId: selectedTheme?.id });
     }
-    setSelectedItem(null);
-    setName("");
-    setPermalink("");
-    setSelectedTheme("");
   };
 
-  const handleCancel = () => {
-    setIsOpen(false);
-    setSelectedItem(null);
-    setName("");
-    setPermalink("");
-    setSelectedTheme("");
+  const handleDeleteUndangan = () => {
+    if (!selectedItem?.id) return;
+    deleteUndangan(selectedItem.id, {
+      onSuccess: () => {
+        setIsOpenDelete(false);
+        setSelectedItem(null);
+        toast.success("Undangan berhasil dihapus");
+        refetchUndangan();
+      },
+    });
   };
 
   useSession();
+  useEffect(() => { setIsLoaded(true); }, []);
 
-  useEffect(() => {
-    setIsLoaded(true);
-  }, []);
+  const canCreate = selectedItem
+    ? !!name && !!permalink
+    : isAdmin
+    ? !!name && !!permalink
+    : !!name && !!permalink && !!selectedTheme && canAfford;
 
   return (
     <>
+      {/* Hero */}
       <div className="bg-[url('/images/bg-main.jpg')] bg-cover bg-center h-[400px] flex items-end">
         <div className="container py-8 md:py-12">
           {isLoaded && (
@@ -190,161 +240,186 @@ export default function UndanganListPage() {
               <h1 className="text-black text-3xl md:text-5xl font-bold">
                 Halo... <br /> {getUserName()}
               </h1>
-              {(getUser()?.level === "admin" ||
-                (getUser()?.level !== "admin" && undangan?.length < 2)) && (
-                <div className="mt-6">
-                  <Button size="lg" onClick={() => setIsOpen(true)}>
-                    <IconPlus size={20} />
-                    Buat Undangan
-                  </Button>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      </div>
-      <div className="py-12 max-w-[900px] mx-auto">
-        <div className="container flex flex-col gap-6 md:gap-8">
-          <h2 className="text-2xl font-bold">Daftar Undangan</h2>
-          {isLoadingUndangan ? (
-            <PendingData />
-          ) : (
-            <>
-              {undangan?.length === 0 ? (
-                <PendingNoData
-                  message="Maaf, kamu belum memiliki undangan"
-                  slot={
-                    (getUser()?.level === "admin" ||
-                      (getUser()?.level !== "admin" &&
-                        undangan?.length < 2)) && (
-                      <Button onClick={() => setIsOpen(true)}>
+              <div className="mt-6 flex gap-3 flex-wrap items-center">
+                {!isAdmin && (
+                  <>
+                    <Button variant="outline" size="lg" onClick={() => setIsOpenRedeem(true)}>
+                      <IconTicket size={20} />
+                      Tukar Kode
+                    </Button>
+                    {balance > 0 && (
+                      <Button size="lg" onClick={openCreate}>
                         <IconPlus size={20} />
                         Buat Undangan
                       </Button>
-                    )
-                  }
-                />
-              ) : (
-                <div className="flex flex-col gap-6">
-                  {undangan?.map((item: Undangan) => (
-                    <div
-                      key={item.id}
-                      className="bg-white rounded-2xl shadow-xl p-4 border border-border hover:shadow-xl hover:bg-green-soft-kwn/40 transition-all duration-300"
-                    >
-                      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-                        <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-12">
-                          <Badge asChild className="bg-green-kwn text-white">
-                            <Link
-                              href={`/${item.permalink}/demo`}
-                              target="_blank"
-                            >
-                              Lihat
-                            </Link>
-                          </Badge>
-                          <div>
-                            <div className="text-base">{item.name}</div>
-                            {isExpired(item.expired) && (
-                              <Badge asChild className="bg-red-600 text-white">
-                                Expired
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Tooltip>
-                            <TooltipTrigger className="bg-green-kwn text-white p-1 rounded-sm">
-                              <Link href={`/user/undangan/${item.id}/overview`}>
-                                <IconAdjustments size={18} />
-                              </Link>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Atur konten undangan kamu</p>
-                            </TooltipContent>
-                          </Tooltip>
-                          <Tooltip>
-                            <TooltipTrigger className="bg-purple-600 text-white p-1 rounded-sm">
-                              <Link
-                                href={`/user/undangan/${item.id}/kado-pernikahan`}
-                              >
-                                <IconGift size={18} />
-                              </Link>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Atur kado pernikahan</p>
-                            </TooltipContent>
-                          </Tooltip>
-                          <Tooltip>
-                            <TooltipTrigger className="bg-blue-600 text-white p-1 rounded-sm">
-                              <Link
-                                href={`/user/undangan/${item.id}/tamu-undangan`}
-                              >
-                                <IconUsers size={18} />
-                              </Link>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Tambah daftar tamu undangan</p>
-                            </TooltipContent>
-                          </Tooltip>
-                          <Tooltip>
-                            <TooltipTrigger className="bg-yellow-600 text-white p-1 rounded-sm">
-                              <IconEdit
-                                size={18}
-                                onClick={() => {
-                                  setSelectedItem(item);
-                                  setName(item.name);
-                                  setPermalink(item.permalink);
-                                  setSelectedTheme(item.themeId);
-                                  setIsOpen(true);
-                                }}
-                              />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Edit undangan kamu</p>
-                            </TooltipContent>
-                          </Tooltip>
-                          <Tooltip>
-                            <TooltipTrigger className="bg-red-700 text-white p-1 rounded-sm">
-                              <IconTrash
-                                size={18}
-                                onClick={() => {
-                                  setSelectedItem(item);
-                                  setIsOpenDelete(true);
-                                }}
-                              />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Hapus undangan</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    )}
+                  </>
+                )}
+                {isAdmin && (
+                  <Button size="lg" onClick={openCreate}>
+                    <IconPlus size={20} />
+                    Buat Undangan
+                  </Button>
+                )}
+              </div>
             </>
           )}
         </div>
       </div>
 
-      {/* Dialog Create / Edit Undangan */}
+      <div className="py-12 max-w-[900px] mx-auto">
+        <div className="container flex flex-col gap-10">
+
+          {/* ── Credit Balance ──────────────────────────────────────────────── */}
+          {!isAdmin && (
+            <div className="flex flex-col gap-4">
+              <h2 className="text-2xl font-bold">Credit Kamu</h2>
+              {isLoadingCredits ? (
+                <PendingData />
+              ) : balance > 0 ? (
+                <div className="flex items-center gap-4 p-5 bg-white rounded-2xl border border-border shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-green-soft-kwn flex items-center justify-center">
+                      <IconCoin size={24} className="text-green-kwn" />
+                    </div>
+                    <div>
+                      <p className="text-3xl font-bold text-green-kwn leading-none">{balance}</p>
+                      <p className="text-sm text-muted-foreground mt-0.5">credit tersedia</p>
+                    </div>
+                  </div>
+                  <div className="ml-auto flex gap-2">
+                    <Button variant="outline" onClick={() => setIsOpenRedeem(true)}>
+                      <IconTicket size={16} />
+                      Tukar Kode
+                    </Button>
+                    <Button onClick={openCreate}>
+                      <IconPlus size={16} />
+                      Buat Undangan
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-4 py-10 border border-dashed border-border rounded-2xl text-center">
+                  <ShoppingBag className="w-10 h-10 text-muted-foreground" />
+                  <div>
+                    <p className="font-semibold">Belum punya credit</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Beli di Shopee, lalu tukar kode yang kamu dapat di sini.
+                    </p>
+                  </div>
+                  <Button onClick={() => setIsOpenRedeem(true)}>
+                    <IconTicket size={16} />
+                    Tukar Kode
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── Daftar Undangan ─────────────────────────────────────────────── */}
+          <div className="flex flex-col gap-4">
+            <h2 className="text-2xl font-bold">Daftar Undangan</h2>
+            {isLoadingUndangan ? (
+              <PendingData />
+            ) : (undangan?.length ?? 0) === 0 ? (
+              <PendingNoData message="Kamu belum memiliki undangan" slot={null} />
+            ) : (
+              <div className="flex flex-col gap-6">
+                {undangan?.map((item: Undangan) => (
+                  <div key={item.id} className="bg-white rounded-2xl shadow-xl p-4 border border-border hover:shadow-xl hover:bg-green-soft-kwn/40 transition-all duration-300">
+                    <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                      <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-12">
+                        <Badge asChild className="bg-green-kwn text-white">
+                          <Link href={`/${item.permalink}/demo`} target="_blank">Lihat</Link>
+                        </Badge>
+                        <div>
+                          <div className="text-base">{item.name}</div>
+                          {isExpired(item.expired ?? "") && (
+                            <Badge className="bg-red-600 text-white">Expired</Badge>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Tooltip>
+                          <TooltipTrigger className="bg-green-kwn text-white p-1 rounded-sm">
+                            <Link href={`/user/undangan/${item.id}/overview`}><IconAdjustments size={18} /></Link>
+                          </TooltipTrigger>
+                          <TooltipContent><p>Atur konten undangan kamu</p></TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger className="bg-purple-600 text-white p-1 rounded-sm">
+                            <Link href={`/user/undangan/${item.id}/kado-pernikahan`}><IconGift size={18} /></Link>
+                          </TooltipTrigger>
+                          <TooltipContent><p>Atur kado pernikahan</p></TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger className="bg-blue-600 text-white p-1 rounded-sm">
+                            <Link href={`/user/undangan/${item.id}/tamu-undangan`}><IconUsers size={18} /></Link>
+                          </TooltipTrigger>
+                          <TooltipContent><p>Tambah daftar tamu undangan</p></TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger className="bg-yellow-600 text-white p-1 rounded-sm">
+                            <IconEdit size={18} onClick={() => openEdit(item)} />
+                          </TooltipTrigger>
+                          <TooltipContent><p>Edit undangan kamu</p></TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger className="bg-red-700 text-white p-1 rounded-sm">
+                            <IconTrash size={18} onClick={() => { setSelectedItem(item); setIsOpenDelete(true); }} />
+                          </TooltipTrigger>
+                          <TooltipContent><p>Hapus undangan</p></TooltipContent>
+                        </Tooltip>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Dialog: Tukar Kode ──────────────────────────────────────────────── */}
+      <Dialog open={isOpenRedeem} onOpenChange={(open) => { setIsOpenRedeem(open); if (!open) setRedeemCode(""); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Tukar Kode Redeem</DialogTitle>
+            <DialogDescription>Masukkan kode yang kamu terima setelah pembelian di Shopee.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3">
+            <Label>Kode Redeem</Label>
+            <Input
+              placeholder="KKW-GRAND-A1B2C3"
+              value={redeemCode}
+              onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
+              className="font-mono tracking-widest"
+            />
+          </div>
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={() => { setIsOpenRedeem(false); setRedeemCode(""); }}>Batal</Button>
+            <Button onClick={() => doRedeem(redeemCode)} disabled={isPendingRedeem || !redeemCode.trim()}>
+              {isPendingRedeem ? <><Loader2 className="w-4 h-4 animate-spin" /><span>Menukar...</span></> : "Tukar"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Dialog: Buat / Edit Undangan ────────────────────────────────────── */}
       <Dialog open={isOpen} onOpenChange={handleCancel}>
         <form>
           <DialogContent className="sm:max-w-[750px] lg:max-w-[550px]">
             <DialogHeader>
-              <DialogTitle>
-                {selectedItem ? "Edit" : "Buat"} Undangan
-              </DialogTitle>
+              <DialogTitle>{selectedItem ? "Edit" : "Buat"} Undangan</DialogTitle>
               <Separator className="my-2" />
-              <DialogDescription></DialogDescription>
+              <DialogDescription />
             </DialogHeader>
             <div className="grid gap-4">
               <div className="grid gap-3">
                 <Label htmlFor="name">Nama Undangan</Label>
                 <Input
                   id="name"
-                  name="name"
-                  placeholder="Masukan Nama Undangan"
+                  placeholder="Masukkan nama undangan"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -353,69 +428,64 @@ export default function UndanganListPage() {
                 <Label htmlFor="permalink">Permalink</Label>
                 <Input
                   id="permalink"
-                  name="permalink"
-                  placeholder="Masukan Permalink Undangan"
+                  placeholder="romeo-juliet"
                   value={permalink}
                   onChange={(e) => updatePermalink(e.target.value)}
                 />
-                <span className="text-sm font-semibold text-green-kwn">
-                  Contoh: romeo-juliet
-                </span>
-
+                <span className="text-sm font-semibold text-green-kwn">Contoh: romeo-juliet</span>
                 <div className="mt-2 px-4 py-3 rounded-md bg-green-soft-kwn text-sm">
                   <p>https://kekawinan.com/{permalink}</p>
                 </div>
               </div>
-              {!selectedItem && (
+
+              {/* Theme picker — hanya saat buat baru (bukan edit) */}
+              {!selectedItem && !isLoadingTheme && (themes?.length ?? 0) > 0 && (
                 <>
                   <Separator className="my-2" />
                   <div className="grid gap-3">
-                    <Label htmlFor="name">Pilih Tema</Label>
-                    {!isLoadingTheme && theme?.length > 0 && (
-                      <Swiper
-                        loop={false}
-                        modules={[Navigation, Pagination]}
-                        spaceBetween={24}
-                        slidesPerView={1.5}
-                        centeredSlides={true}
-                        breakpoints={{
-                          768: {
-                            slidesPerView: 3,
-                            centeredSlides: false,
-                          },
-                          1024: {
-                            slidesPerView: 3,
-                            centeredSlides: false,
-                          },
-                        }}
-                        navigation={true}
-                        pagination={{
-                          clickable: true,
-                        }}
-                        className="w-full"
-                        style={
-                          {
-                            "--swiper-navigation-color": "#4A763E",
-                            "--swiper-navigation-size": "32px",
-                            "--swiper-pagination-color": "#4A763E",
-                            "--swiper-pagination-bullet-size": "5px",
-                            paddingBottom: "30px",
-                          } as React.CSSProperties
-                        }
-                      >
-                        {theme?.map((item: Theme) => (
+                    <div className="flex items-center justify-between">
+                      <Label>Pilih Tema</Label>
+                      {!isAdmin && (
+                        <span className="text-xs text-muted-foreground">
+                          Credit kamu:{" "}
+                          <span className="font-semibold text-green-kwn">{balance}</span>
+                        </span>
+                      )}
+                    </div>
+                    <Swiper
+                      loop={false}
+                      modules={[Navigation, Pagination]}
+                      spaceBetween={24}
+                      slidesPerView={1.5}
+                      centeredSlides={true}
+                      breakpoints={{
+                        768: { slidesPerView: 3, centeredSlides: false },
+                        1024: { slidesPerView: 3, centeredSlides: false },
+                      }}
+                      navigation={true}
+                      pagination={{ clickable: true }}
+                      className="w-full"
+                      style={{
+                        "--swiper-navigation-color": "#4A763E",
+                        "--swiper-navigation-size": "32px",
+                        "--swiper-pagination-color": "#4A763E",
+                        "--swiper-pagination-bullet-size": "5px",
+                        paddingBottom: "30px",
+                      } as React.CSSProperties}
+                    >
+                      {themes?.map((item: Theme) => {
+                        const cost = item.promo !== null && item.promo !== undefined ? item.promo : item.credit;
+                        const affordable = isAdmin || balance >= cost;
+                        const isSelected = selectedTheme?.id === item.id;
+
+                        return (
                           <SwiperSlide key={item.id} className="w-full">
                             <button
-                              onClick={() => setSelectedTheme(item.id)}
-                              className="group relative"
+                              type="button"
+                              onClick={() => affordable && setSelectedTheme(item)}
+                              className={`group relative w-full ${!affordable ? "opacity-50 cursor-not-allowed" : ""}`}
                             >
-                              <div
-                                className={`relative rounded-md overflow-hidden ${
-                                  selectedTheme === item.id
-                                    ? "border-2 border-green-kwn"
-                                    : ""
-                                }`}
-                              >
+                              <div className={`relative rounded-md overflow-hidden ${isSelected ? "border-2 border-green-kwn" : ""}`}>
                                 <Image
                                   src={item.thumbnail}
                                   alt={item.name}
@@ -423,33 +493,53 @@ export default function UndanganListPage() {
                                   height={500}
                                   className="w-full"
                                 />
-                                <div
-                                  className={`absolute top-4 right-4 ${
-                                    selectedTheme === item.id
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-2 rounded-full bg-green-kwn px-2 py-1 text-white text-sm">
-                                    <IconRosetteDiscountCheckFilled
-                                      size={16}
-                                      className="text-white"
-                                    />{" "}
-                                    <span>Dipilih</span>
-                                  </div>
+                                {/* Badge harga credit */}
+                                <div className="absolute top-2 left-2">
+                                  {item.promo !== null && item.promo !== undefined ? (
+                                    <div className="flex flex-col gap-0.5">
+                                      <span className="text-xs bg-red-500 text-white px-1.5 py-0.5 rounded font-medium">
+                                        {item.promo === 0 ? "GRATIS" : `${item.promo} credit`}
+                                      </span>
+                                      <span className="text-xs bg-black/60 text-white/70 px-1.5 py-0.5 rounded line-through">
+                                        {item.credit} credit
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <span className={`text-xs bg-black/60 text-white px-1.5 py-0.5 rounded font-medium ${item.credit === 0 ? "bg-red-500" : "bg-green-kwn"}`}>
+                                      {item.credit === 0 ? "GRATIS" : `${item.credit} credit`}
+                                    </span>
+                                  )}
                                 </div>
-                                <div className="absolute bottom-0 left-0 right-0 p-2 bg-black text-white text-sm flex items-center justify-center  opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                  <Link
-                                    href={`/${item.componentName.toLowerCase()}/demo`}
-                                  >
-                                    Preview
-                                  </Link>
+                                {/* Badge dipilih */}
+                                {isSelected && (
+                                  <div className="absolute top-2 right-2">
+                                    <div className="flex items-center gap-1 rounded-full bg-green-kwn px-2 py-1 text-white text-xs">
+                                      <IconRosetteDiscountCheckFilled size={14} />
+                                      <span>Dipilih</span>
+                                    </div>
+                                  </div>
+                                )}
+                                <div className="absolute bottom-0 left-0 right-0 p-2 bg-black text-white text-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                  <Link href={`/${item.componentName?.toLowerCase()}/demo`}>Preview</Link>
                                 </div>
                               </div>
                             </button>
                           </SwiperSlide>
-                        ))}
-                      </Swiper>
+                        );
+                      })}
+                    </Swiper>
+
+                    {/* Peringatan tidak cukup credit */}
+                    {!isAdmin && selectedTheme && !canAfford && (
+                      <p className="text-xs text-red-500">
+                        Credit tidak cukup. Tema ini butuh {effectiveCost} credit, kamu punya {balance}.
+                      </p>
+                    )}
+                    {!isAdmin && selectedTheme && canAfford && (
+                      <p className="text-xs text-muted-foreground">
+                        Sisa credit setelah buat undangan:{" "}
+                        <span className="font-semibold text-foreground">{balance - effectiveCost}</span>
+                      </p>
                     )}
                   </div>
                 </>
@@ -458,97 +548,49 @@ export default function UndanganListPage() {
             <Separator className="my-2" />
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="outline" onClick={handleCancel}>
-                  Batal
-                </Button>
+                <Button variant="outline" onClick={handleCancel}>Batal</Button>
               </DialogClose>
-              {selectedItem ? (
-                <Button
-                  type="submit"
-                  disabled={!name || !permalink}
-                  onClick={handleSubmit}
-                >
-                  {isPendingUpdate ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    "Simpan"
-                  )}
-                </Button>
-              ) : (
-                <Button
-                  type="submit"
-                  disabled={!name || !permalink || !selectedTheme}
-                  onClick={handleSubmit}
-                >
-                  {isPendingCreate ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    "Buat Undangan"
-                  )}
-                </Button>
-              )}
+              <Button
+                type="submit"
+                disabled={!canCreate || isPendingCreate || isPendingUpdate}
+                onClick={handleSubmit}
+              >
+                {isPendingCreate || isPendingUpdate
+                  ? <><Loader2 className="w-4 h-4 animate-spin" /><span>Menyimpan...</span></>
+                  : selectedItem ? "Simpan" : "Buat Undangan"}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </form>
       </Dialog>
 
-      {/* Dialog Delete Undangan */}
+      {/* ── Dialog: Hapus ───────────────────────────────────────────────────── */}
       <AlertDialog open={isOpenDelete} onOpenChange={setIsOpenDelete}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl font-bold">
-              Hapus Undangan
-            </AlertDialogTitle>
+            <AlertDialogTitle className="text-xl font-bold">Hapus Undangan</AlertDialogTitle>
             <AlertDialogDescription className="text-lg text-black font-normal">
               Apakah kamu yakin ingin menghapus undangan{" "}
               <span className="font-semibold">{selectedItem?.name}</span>?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => {
-                setIsOpenDelete(false);
-                setSelectedItem(null);
-              }}
-            >
-              Batal
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteUndangan}
-              disabled={isPendingDelete}
-            >
-              {isPendingDelete ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                "Ya, Hapus"
-              )}
-              Ya, Hapus
+            <AlertDialogCancel onClick={() => { setIsOpenDelete(false); setSelectedItem(null); }}>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteUndangan} disabled={isPendingDelete}>
+              {isPendingDelete ? <Loader2 className="w-4 h-4 animate-spin" /> : "Ya, Hapus"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Dialog Trakteer */}
-      <Dialog
-        open={isOpenTrakteer}
-        onOpenChange={() => {
-          setIsOpenTrakteer(false);
-          window.open("https://trakteer.id/CTRL Spark/tip", "_blank");
-        }}
-      >
+      {/* ── Dialog: Trakteer ────────────────────────────────────────────────── */}
+      <Dialog open={isOpenTrakteer} onOpenChange={() => { setIsOpenTrakteer(false); window.open("https://trakteer.id/CTRL Spark/tip", "_blank"); }}>
         <DialogContent showCloseButton={false}>
-          <DialogHeader>
-            <DialogTitle></DialogTitle>
-            <DialogDescription></DialogDescription>
-          </DialogHeader>
+          <DialogHeader><DialogTitle /><DialogDescription /></DialogHeader>
           <div className="md:px-8">
             <div className="text-center pb-5">
-              <div className="text-3xl font-bold text-black">
-                Selamat kamu berhasil membuat undangan!
-              </div>
-              <p className="pt-2">
-                Yuk terus support kami agar dapat terus mengembangkan sistem ini
-              </p>
+              <div className="text-3xl font-bold text-black">Selamat kamu berhasil membuat undangan!</div>
+              <p className="pt-2">Yuk terus support kami agar dapat terus mengembangkan sistem ini</p>
             </div>
             <Link
               href="https://trakteer.id/CTRL Spark/tip"
@@ -556,13 +598,7 @@ export default function UndanganListPage() {
               className="flex items-center justify-center gap-2 bg-red-700 text-white px-4 py-2 rounded-full"
               onClick={() => setIsOpenTrakteer(false)}
             >
-              <Image
-                src="https://cdn.trakteer.id/images/embed/trbtn-icon.png"
-                alt=""
-                width={100}
-                height={100}
-                className="w-[16px]"
-              />
+              <Image src="https://cdn.trakteer.id/images/embed/trbtn-icon.png" alt="" width={100} height={100} className="w-[16px]" />
               <span>Dukung kami di Trakteer</span>
             </Link>
           </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ArrowLeftToLine, LayoutDashboard, UserRoundPlus, SwatchBook, Landmark } from "lucide-react";
+import { ArrowLeftToLine, LayoutDashboard, UserRoundPlus, SwatchBook, Landmark, Ticket, Settings } from "lucide-react";
 import useSession from "@/frontend/hook/useSession";
 import Link from "next/link";
 
@@ -39,6 +39,16 @@ export function AppSidebar() {
       title: "Tema Undangan",
       url: `/admin/theme`,
       icon: SwatchBook,
+    },
+    {
+      title: "Kode Redeem",
+      url: `/admin/redeem-codes`,
+      icon: Ticket,
+    },
+    {
+      title: "Settings",
+      url: `/admin/settings`,
+      icon: Settings,
     },
     {
       title: "Kembali",

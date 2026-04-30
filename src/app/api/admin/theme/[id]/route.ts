@@ -42,8 +42,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
     if ('componentName' in body) data.componentName = body.componentName?.trim() ?? null
     if ('linkUrl' in body) data.linkUrl = body.linkUrl?.trim() ?? null
     if ('thumbnail' in body) data.thumbnail = body.thumbnail || null
-    if ('credit' in body) data.credit = body.credit !== undefined ? Number(body.credit) : null
-    if ('promo' in body) data.promo = body.promo !== undefined ? Number(body.promo) : null
+    if ('credit' in body && body.credit !== undefined && body.credit !== null) data.credit = Number(body.credit)
+    if ('promo' in body) data.promo = (body.promo !== undefined && body.promo !== null) ? Number(body.promo) : null
     if ('isActive' in body) {
       if (typeof body.isActive !== 'boolean') return badRequest('isActive must be a boolean')
       data.isActive = body.isActive
@@ -52,7 +52,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
     const updated = await prisma.theme.update({ where: { id }, data })
 
     return ok({ ...updated, thumbnail: resolveMediaUrl(updated.thumbnail) }, 'Theme updated successfully')
-  } catch {
+  } catch (err) {
+    console.error('[PUT /admin/theme]', err)
     return serverError()
   }
 }

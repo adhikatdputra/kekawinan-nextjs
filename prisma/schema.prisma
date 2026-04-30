@@ -28,6 +28,7 @@ model User {
   undangan       Undangan[]
   subscribers    UserSubscriber[]
   resetPasswords ResetPassword[]
+  userCredits    UserCredit[]
 
   @@map("tbl_users")
 }
@@ -41,12 +42,12 @@ model Theme {
   componentName String?  @db.Text
   linkUrl       String?  @db.Text
   credit        Int      @default(0)
-  promo         Int      @default(0)
+  promo         Int?
   isActive      Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  undangan      Undangan[]
+  undangan        Undangan[]
 
   @@map("tbl_theme")
 }
@@ -54,24 +55,26 @@ model Theme {
 // ─── Undangan ─────────────────────────────────────────────────────────────────
 
 model Undangan {
-  id         String    @id @db.VarChar(64)
-  userId     String    @db.VarChar(255)
-  permalink  String    @unique @db.VarChar(500)
-  name       String?   @db.VarChar(255)
-  status     String    @default("ACTIVE") @db.VarChar(50)
-  expired    DateTime?
-  themeId    String?   @db.VarChar(64)
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id          String      @id @db.VarChar(64)
+  userId      String      @db.VarChar(255)
+  permalink   String      @unique @db.VarChar(500)
+  name        String?     @db.VarChar(255)
+  status      String      @default("ACTIVE") @db.VarChar(50)
+  expired     DateTime?
+  themeId     String?     @db.VarChar(64)
+  packageType PackageType @default(AKAD)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
-  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  theme      Theme?            @relation(fields: [themeId], references: [id])
-  tamu       Tamu[]
-  ucapan     Ucapan[]
-  content    UndanganContent?
-  gifts      UndanganGift[]
-  gallery    UndanganGallery[]
-  kado       Kado[]
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme       Theme?            @relation(fields: [themeId], references: [id])
+  tamu        Tamu[]
+  ucapan      Ucapan[]
+  content     UndanganContent?
+  gifts       UndanganGift[]
+  gallery     UndanganGallery[]
+  kado        Kado[]
+  userCredits UserCredit[]
 
   @@map("tbl_undangan")
 }
@@ -236,6 +239,89 @@ model ResetPassword {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("tbl_reset_password")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum PackageType {
+  AKAD
+  RESEPSI
+  GRAND
+}
+
+enum RedeemCodeStatus {
+  UNUSED
+  USED
+  EXPIRED
+}
+
+enum UserCreditStatus {
+  AVAILABLE
+  USED
+}
+
+// ─── Settings ─────────────────────────────────────────────────────────────────
+
+model Setting {
+  key         String   @id @db.VarChar(100)
+  value       String   @db.Text
+  description String?  @db.Text
+  updatedBy   String?  @db.VarChar(255)
+  updatedAt   DateTime @updatedAt
+
+  @@map("tbl_settings")
+}
+
+model SettingLog {
+  id         Int      @id @default(autoincrement())
+  settingKey String   @db.VarChar(100)
+  oldValue   String?  @db.Text
+  newValue   String   @db.Text
+  changedBy  String   @db.VarChar(255)
+  changedAt  DateTime @default(now())
+
+  @@map("tbl_settings_log")
+}
+
+// ─── Redemption Codes ─────────────────────────────────────────────────────────
+
+model RedemptionCode {
+  id              String           @id @db.VarChar(64)
+  code            String           @unique @db.VarChar(50)
+  packageType     PackageType
+  totalCredit     Int              @default(1)
+  remainingCredit Int              @default(1)
+  usedBy          String?          @db.VarChar(255)
+  usedAt          DateTime?
+  expiredAt       DateTime?
+  status          RedeemCodeStatus @default(UNUSED)
+  note            String?          @db.Text
+  generatedBy     String           @db.VarChar(255)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  userCredits     UserCredit[]
+
+  @@map("tbl_redemption_codes")
+}
+
+// ─── User Credits ─────────────────────────────────────────────────────────────
+
+model UserCredit {
+  id               String           @id @db.VarChar(64)
+  userId           String           @db.VarChar(255)
+  packageType      PackageType
+  status           UserCreditStatus @default(AVAILABLE)
+  redemptionCodeId String           @db.VarChar(64)
+  usedForUndangan  String?          @db.VarChar(64)
+  usedAt           DateTime?
+  redeemedAt       DateTime         @default(now())
+
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  redemptionCode   RedemptionCode   @relation(fields: [redemptionCodeId], references: [id])
+  undangan         Undangan?        @relation(fields: [usedForUndangan], references: [id])
+
+  @@map("tbl_user_credits")
 }
 
 // ─── Bank (Master Data) ───────────────────────────────────────────────────────
