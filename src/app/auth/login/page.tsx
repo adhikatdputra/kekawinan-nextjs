@@ -87,6 +87,11 @@ export default function LoginPage() {
                   )}
                 </div>
               </div>
+              <div className="flex justify-end -mt-2">
+                <Link href="/auth/forgot-password" className="text-sm text-green-kwn hover:underline">
+                  Lupa password?
+                </Link>
+              </div>
               <div className="flex justify-center">
                 <Button
                   className="min-w-[200px] h-11"

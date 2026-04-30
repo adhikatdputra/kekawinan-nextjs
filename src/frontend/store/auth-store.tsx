@@ -20,11 +20,11 @@ export default function AuthStore() {
         setAuth(user, expiresIn);
         router.push("/user/undangan-list");
       } else {
-        toast.error("Login gagal harap cek kembali email dan password");
+        toast.error("Email/Password anda salah, silahkan coba lagi atau lupa password");
       }
     },
     onError: () => {
-      toast.error("Login gagal harap cek kembali email dan password");
+      toast.error("Email/Password anda salah, silahkan coba lagi atau lupa password");
     },
   });
 

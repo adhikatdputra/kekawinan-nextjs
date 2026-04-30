@@ -113,27 +113,32 @@ export async function POST(request: NextRequest) {
     // Harga efektif: gunakan promo jika ada (null = tidak ada promo), fallback ke credit
     const cost = theme.promo !== null ? theme.promo : theme.credit
 
-    if (cost <= 0) return badRequest('Tema belum memiliki harga credit')
+    // cost null artinya tema belum punya harga (bukan gratis)
+    if (cost === null || cost === undefined) return badRequest('Tema belum memiliki harga credit')
 
-    // Ambil sejumlah `cost` credit AVAILABLE milik user
-    const availableCredits = await prisma.userCredit.findMany({
-      where: { userId, status: 'AVAILABLE' },
-      take: cost,
-      orderBy: { redeemedAt: 'asc' }, // FIFO — pakai yang paling lama dulu
-    })
+    // Tema gratis (cost = 0): tidak perlu potong credit
+    let availableCredits: { id: string; packageType: string }[] = []
+    if (cost > 0) {
+      availableCredits = await prisma.userCredit.findMany({
+        where: { userId, status: 'AVAILABLE' },
+        take: cost,
+        orderBy: { redeemedAt: 'asc' }, // FIFO — pakai yang paling lama dulu
+        select: { id: true, packageType: true },
+      })
 
-    if (availableCredits.length < cost) {
-      return forbidden(
-        `Credit tidak cukup. Tema ini membutuhkan ${cost} credit, kamu hanya punya ${availableCredits.length}.`,
-      )
+      if (availableCredits.length < cost) {
+        return forbidden(
+          `Credit tidak cukup. Tema ini membutuhkan ${cost} credit, kamu hanya punya ${availableCredits.length}.`,
+        )
+      }
     }
 
-    // Ambil packageType dari credit pertama yang akan dipakai
-    const packageType = availableCredits[0].packageType
+    // packageType dari credit pertama; fallback GRAND untuk tema gratis
+    const packageType = (availableCredits[0]?.packageType ?? 'GRAND') as 'AKAD' | 'RESEPSI' | 'GRAND'
 
     const creditIds = availableCredits.map((c) => c.id)
 
-    const [undangan] = await prisma.$transaction([
+    const baseOps = [
       prisma.undangan.create({
         data: {
           id: undanganId,
@@ -147,15 +152,18 @@ export async function POST(request: NextRequest) {
       }),
       prisma.undanganContent.create({ data: { id: nanoid(), undanganId } }),
       prisma.undanganGift.create({ data: { id: nanoid(), undanganId } }),
-      prisma.userCredit.updateMany({
-        where: { id: { in: creditIds } },
-        data: {
-          status: 'USED',
-          usedForUndangan: undanganId,
-          usedAt: new Date(),
-        },
-      }),
-    ])
+    ] as const
+
+    // Hanya potong credit jika tema berbayar
+    const [undangan] = creditIds.length > 0
+      ? await prisma.$transaction([
+          ...baseOps,
+          prisma.userCredit.updateMany({
+            where: { id: { in: creditIds } },
+            data: { status: 'USED', usedForUndangan: undanganId, usedAt: new Date() },
+          }),
+        ])
+      : await prisma.$transaction([...baseOps])
 
     return created(undangan, 'Undangan created')
   } catch {

@@ -24,3 +24,19 @@ export const register = {
     canonical: "https://www.kekawinan.com/auth/register",
   },
 };
+
+export const forgotPassword = {
+  title: "Lupa Password | Kekawinan",
+  description: "Reset password akun Kekawinan kamu.",
+  alternates: {
+    canonical: "https://www.kekawinan.com/auth/forgot-password",
+  },
+};
+
+export const resetPassword = {
+  title: "Reset Password | Kekawinan",
+  description: "Buat password baru untuk akun Kekawinan kamu.",
+  alternates: {
+    canonical: "https://www.kekawinan.com/auth/reset-password",
+  },
+};
