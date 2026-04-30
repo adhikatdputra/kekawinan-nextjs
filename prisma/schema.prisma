@@ -33,6 +33,18 @@ model User {
   @@map("tbl_users")
 }
 
+// ─── Theme Component (Master Data) ───────────────────────────────────────────
+
+model ThemeComponent {
+  id          String   @id @db.VarChar(64)
+  name        String   @unique @db.VarChar(100)
+  description String?  @db.VarChar(255)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("tbl_theme_components")
+}
+
 // ─── Theme ────────────────────────────────────────────────────────────────────
 
 model Theme {
