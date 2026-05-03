@@ -382,11 +382,11 @@ export default function UndanganListPage() {
                       key={item.id}
                       className={`bg-white rounded-2xl border border-border border-l-4 ${roleConfig.accent} shadow-sm hover:shadow-md hover:bg-green-soft-kwn/20 transition-all duration-200 p-4`}
                     >
-                      <div className="flex items-center justify-between gap-4">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                         {/* Left: name + meta */}
                         <div className="flex flex-col gap-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-semibold text-base truncate">{item.name}</span>
+                            <span className="font-semibold text-base">{item.name}</span>
                             {isExpired(item.expired ?? "") && (
                               <span className="text-xs bg-red-100 text-red-600 border border-red-200 px-2 py-0.5 rounded-full">Expired</span>
                             )}
@@ -405,8 +405,11 @@ export default function UndanganListPage() {
                           </div>
                         </div>
 
+                        {/* Divider — mobile only */}
+                        <div className="border-t border-border sm:hidden" />
+
                         {/* Right: actions */}
-                        <div className="flex items-center gap-1 shrink-0">
+                        <div className="flex items-center gap-1 shrink-0 flex-wrap">
                           {/* Preview link */}
                           <Tooltip>
                             <TooltipTrigger asChild>
