@@ -20,6 +20,9 @@ export interface Undangan {
   themeId: string;
   createdAt: string;
   updatedAt: string;
+  // Collaborator info (set when this undangan comes from a collaboration)
+  collaboratorRole?: "OWNER" | "MEMBER" | "CREW";
+  invitedByName?: string | null;
 }
 
 export interface Theme {

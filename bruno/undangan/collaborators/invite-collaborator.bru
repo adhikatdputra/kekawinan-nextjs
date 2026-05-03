@@ -1,0 +1,63 @@
+meta {
+  name: Invite Collaborator
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/undangan/:id/collaborators
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+params:path {
+  id: undangan_id_here
+}
+
+body:json {
+  {
+    "email": "friend@email.com",
+    "role": "MEMBER"
+  }
+}
+
+docs {
+  # Invite Collaborator
+
+  Undang kolaborator baru ke undangan.
+
+  **Akses:** Owner saja.
+
+  ## Request Body
+
+  | Field | Type   | Required | Keterangan                    |
+  |-------|--------|----------|-------------------------------|
+  | email | string | Ya       | Email yang akan diundang      |
+  | role  | string | Ya       | `MEMBER` atau `CREW`          |
+
+  ## Logic
+
+  1. Validasi role hanya `MEMBER` atau `CREW`.
+  2. Cek caller adalah Owner undangan.
+  3. Cek email bukan email Owner sendiri.
+  4. Jika email sudah ada di kolaborator → update role saja (tidak duplikat).
+  5. Cek apakah email sudah terdaftar di `tbl_users`.
+  6. Insert ke `tbl_undangan_collaborators` dengan status `ACTIVE` (terdaftar) atau `PENDING` (belum terdaftar).
+  7. Kirim email notifikasi sesuai kondisi.
+
+  ## Response
+
+  ```json
+  {
+    "id": "abc123",
+    "email": "friend@email.com",
+    "role": "MEMBER",
+    "status": "ACTIVE",
+    "isRegistered": true
+  }
+  ```
+}

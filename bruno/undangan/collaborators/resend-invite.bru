@@ -1,0 +1,30 @@
+meta {
+  name: Resend Invite Email
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{base_url}}/api/undangan/:id/collaborators/:collabId/resend
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+params:path {
+  id: undangan_id_here
+  collabId: collab_id_here
+}
+
+docs {
+  # Resend Invite Email
+
+  Kirim ulang email undangan ke kolaborator berstatus **PENDING** (belum punya akun).
+
+  **Akses:** Owner saja.
+
+  Hanya bisa dipakai untuk kolaborator dengan `status: "PENDING"`. Jika status sudah `ACTIVE`, endpoint ini akan mengembalikan error 400.
+}

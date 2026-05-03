@@ -12,6 +12,7 @@ import {
   Gift,
   ArrowLeftToLine,
   CakeSlice,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import useSession from "@/frontend/hook/useSession";
@@ -36,12 +37,14 @@ import { useQuery } from "@tanstack/react-query";
 import undanganApi from "@/frontend/api/undangan";
 import { formatDate } from "@/helper/date";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/frontend/composable/useAuth";
 
 export function AppSidebar() {
   useSession();
   const params = useParams();
   const pathname = usePathname();
   const id = params.id as string;
+  const { getUser } = useAuth();
 
   const menuItems = [
     {
@@ -109,6 +112,8 @@ export function AppSidebar() {
     select: (data) => data.data.data,
   });
 
+  const isOwner = undangan?.userId === getUser()?.id;
+
   return (
     <Sidebar className="py-2">
       <SidebarHeader className="px-4">
@@ -161,6 +166,22 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              {isOwner && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    className={cn(
+                      pathname === `/user/undangan/${id}/kolaborator` &&
+                        "bg-gray-200 hover:bg-gray-200"
+                    )}
+                  >
+                    <Link href={`/user/undangan/${id}/kolaborator`}>
+                      <Users />
+                      <span>Kolaborator</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

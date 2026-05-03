@@ -48,6 +48,12 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    // Activate any pending collaborator invites for this email
+    await prisma.undanganCollaborator.updateMany({
+      where: { email, status: 'PENDING' },
+      data: { userId: user.id, status: 'ACTIVE', joinedAt: new Date() },
+    })
+
     return created(user, 'Register success')
   } catch {
     return serverError()

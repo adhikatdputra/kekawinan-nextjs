@@ -25,10 +25,12 @@ model User {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  undangan       Undangan[]
-  subscribers    UserSubscriber[]
-  resetPasswords ResetPassword[]
-  userCredits    UserCredit[]
+  undangan               Undangan[]
+  subscribers            UserSubscriber[]
+  resetPasswords         ResetPassword[]
+  userCredits            UserCredit[]
+  collaboratorInvited    UndanganCollaborator[] @relation("CollaboratorUser")
+  collaboratorInvites    UndanganCollaborator[] @relation("CollaboratorInviter")
 
   @@map("tbl_users")
 }
@@ -78,15 +80,16 @@ model Undangan {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
-  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  theme       Theme?            @relation(fields: [themeId], references: [id])
-  tamu        Tamu[]
-  ucapan      Ucapan[]
-  content     UndanganContent?
-  gifts       UndanganGift[]
-  gallery     UndanganGallery[]
-  kado        Kado[]
-  userCredits UserCredit[]
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme         Theme?            @relation(fields: [themeId], references: [id])
+  tamu          Tamu[]
+  ucapan        Ucapan[]
+  content       UndanganContent?
+  gifts         UndanganGift[]
+  gallery       UndanganGallery[]
+  kado          Kado[]
+  userCredits   UserCredit[]
+  collaborators UndanganCollaborator[]
 
   @@map("tbl_undangan")
 }
@@ -348,6 +351,28 @@ model Bank {
   updatedAt DateTime @updatedAt
 
   @@map("tbl_bank")
+}
+
+// ─── Undangan Collaborators ───────────────────────────────────────────────────
+
+model UndanganCollaborator {
+  id          String    @id @db.VarChar(64)
+  undanganId  String    @db.VarChar(64)
+  userId      String?   @db.VarChar(255)
+  email       String    @db.VarChar(255)
+  role        String    @db.VarChar(20)    // "MEMBER" | "CREW"
+  status      String    @default("PENDING") @db.VarChar(20) // "PENDING" | "ACTIVE"
+  invitedBy   String    @db.VarChar(255)
+  joinedAt    DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  undangan    Undangan  @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+  user        User?     @relation("CollaboratorUser", fields: [userId], references: [id], onDelete: SetNull)
+  inviter     User      @relation("CollaboratorInviter", fields: [invitedBy], references: [id])
+
+  @@unique([undanganId, email])
+  @@map("tbl_undangan_collaborators")
 }
 
 // ─── Images ───────────────────────────────────────────────────────────────────

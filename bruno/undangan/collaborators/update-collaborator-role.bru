@@ -1,0 +1,40 @@
+meta {
+  name: Update Collaborator Role
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{base_url}}/api/undangan/:id/collaborators/:collabId
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+params:path {
+  id: undangan_id_here
+  collabId: collab_id_here
+}
+
+body:json {
+  {
+    "role": "CREW"
+  }
+}
+
+docs {
+  # Update Collaborator Role
+
+  Ubah role kolaborator (MEMBER ↔ CREW).
+
+  **Akses:** Owner saja.
+
+  ## Request Body
+
+  | Field | Type   | Required | Keterangan           |
+  |-------|--------|----------|----------------------|
+  | role  | string | Ya       | `MEMBER` atau `CREW` |
+}
