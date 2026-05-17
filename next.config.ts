@@ -1,7 +1,18 @@
 import type { NextConfig } from "next";
 
+const isDev = process.env.VERCEL_ENV === "preview";
+
 const nextConfig: NextConfig = {
   /* config options here */
+  async headers() {
+    if (!isDev) return [];
+    return [
+      {
+        source: "/(.*)",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       { protocol: "http", hostname: "localhost" },
