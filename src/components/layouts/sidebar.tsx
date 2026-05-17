@@ -13,6 +13,7 @@ import {
   ArrowLeftToLine,
   CakeSlice,
   Users,
+  Heart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import useSession from "@/frontend/hook/useSession";
@@ -98,6 +99,11 @@ export function AppSidebar() {
       title: "Galeri Foto",
       url: `/user/undangan/${id}/galeri-foto`,
       icon: Images,
+    },
+    {
+      title: "Love Story",
+      url: `/user/undangan/${id}/love-story`,
+      icon: Heart,
     },
     {
       title: "Setting",

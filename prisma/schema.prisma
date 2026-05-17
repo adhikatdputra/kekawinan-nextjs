@@ -91,6 +91,7 @@ model Undangan {
   kado          Kado[]
   userCredits   UserCredit[]
   collaborators UndanganCollaborator[]
+  loveStories   LoveStory[]
 
   @@map("tbl_undangan")
 }
@@ -355,6 +356,24 @@ model Bank {
   updatedAt DateTime @updatedAt
 
   @@map("tbl_bank")
+}
+
+// ─── Love Story ───────────────────────────────────────────────────────────────
+
+model LoveStory {
+  id         String   @id @db.VarChar(64)
+  undanganId String   @db.VarChar(64)
+  image      String?  @db.Text
+  waktu      String?  @db.VarChar(255)
+  lokasi     String?  @db.VarChar(255)
+  story      String   @db.Text
+  rank       Int      @default(1)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  undangan   Undangan @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+
+  @@map("tbl_love_story")
 }
 
 // ─── Undangan Collaborators ───────────────────────────────────────────────────

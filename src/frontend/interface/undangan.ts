@@ -55,6 +55,7 @@ export interface UndanganDetail {
   gallery: UndanganGaleri[];
   ucapan: UndanganUcapan[];
   theme: Theme | null;
+  loveStories: LoveStory[];
 }
 
 export interface UndanganContent {
@@ -167,6 +168,18 @@ export interface UndanganTamu {
   maxInvite: number;
   attendedAt: string | null;
   confirmedBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LoveStory {
+  id: string;
+  undanganId: string;
+  image: string | null;
+  waktu: string | null;
+  lokasi: string | null;
+  story: string;
+  rank: number;
   createdAt: string;
   updatedAt: string;
 }

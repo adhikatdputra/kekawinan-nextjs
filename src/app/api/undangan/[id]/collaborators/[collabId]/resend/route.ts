@@ -39,7 +39,8 @@ export async function POST(request: NextRequest, { params }: Params) {
     })
 
     return ok(null, 'Email undangan berhasil dikirim ulang')
-  } catch {
+  } catch (err) {
+    console.error('[resend collaborator]', err)
     return serverError()
   }
 }

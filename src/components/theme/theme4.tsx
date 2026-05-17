@@ -12,6 +12,7 @@ import { IconDeviceTvOld, IconLeaf, IconMapPin } from "@tabler/icons-react";
 
 import DialogGift from "@/components/card/dialog-gift";
 import Galeri from "@/components/card/galeri";
+import LoveStoryTimeline from "@/components/card/love-story-timeline";
 import { FloatingMusicGift } from "../card/floating-music-gift";
 import { FloatingQrButton } from "@/components/card/floating-qr-button";
 
@@ -539,6 +540,14 @@ export default function Theme7({
           </motion.div>
         </div>
       </div>
+      {/* Love Story */}
+      <LoveStoryTimeline
+        loveStories={undanganData.loveStories ?? []}
+        bgImage={undangan?.content?.imgBg}
+        accentColor="bg-theme4-primary"
+        headingColor="text-white"
+        textColor="text-white"
+      />
       {/* Galeri */}
       <div className="py-16 bg-[url('/images/theme2/bg1.png')] bg-cover bg-center">
         <motion.div

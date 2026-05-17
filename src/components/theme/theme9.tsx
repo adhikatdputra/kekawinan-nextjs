@@ -16,6 +16,7 @@ import {
 
 import DialogGift from "@/components/card/dialog-gift";
 import Galeri from "@/components/card/galeri";
+import LoveStoryTimeline from "@/components/card/love-story-timeline";
 import { FloatingMusicGift } from "../card/floating-music-gift";
 import { FloatingQrButton } from "@/components/card/floating-qr-button";
 
@@ -516,6 +517,14 @@ export default function Theme9({
           </motion.div>
         </div>
       </div>
+      {/* Love Story */}
+      <LoveStoryTimeline
+        loveStories={undanganData.loveStories ?? []}
+        bgImage={undangan?.content?.imgBg}
+        accentColor="bg-theme9-primary"
+        headingColor="text-theme9-secondary"
+        textColor="text-white"
+      />
       {/* Galeri */}
       <div className="py-16 bg-[#040032]">
         <motion.div
