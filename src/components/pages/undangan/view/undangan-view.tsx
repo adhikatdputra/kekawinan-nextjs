@@ -131,7 +131,7 @@ export default function UndanganView({
   };
 
   const handlePlayMusic = () => {
-    console.log("isPlayMusicBefore", isPlayMusic);
+    // console.log("isPlayMusicBefore", isPlayMusic);
     const a = document.getElementById("music") as HTMLAudioElement;
     if (isPlayMusic) {
       a.pause();

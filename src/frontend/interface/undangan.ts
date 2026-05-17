@@ -44,6 +44,7 @@ export interface UndanganDetail {
   status: string;
   expired: string;
   themeId: string;
+  packageType: 'AKAD' | 'RESEPSI' | 'GRAND';
   createdAt: string;
   updatedAt: string;
   content: UndanganContent | null;
@@ -161,6 +162,8 @@ export interface UndanganTamu {
   isRead: number;
   isConfirm: number;
   maxInvite: number;
+  attendedAt: string | null;
+  confirmedBy: string | null;
   createdAt: string;
   updatedAt: string;
 }

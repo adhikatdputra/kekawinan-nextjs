@@ -19,21 +19,23 @@ export async function GET(request: NextRequest, { params }: Params) {
       return forbidden('Access denied')
     }
 
-    const result = await prisma.tamu.aggregate({
-      where: { undanganId },
-      _sum: {
-        sendStatus: true,
-        isRead: true,
-        isConfirm: true,
-      },
-      _count: { id: true },
-    })
+    const [result, totalAttended] = await Promise.all([
+      prisma.tamu.aggregate({
+        where: { undanganId },
+        _sum: { sendStatus: true, isRead: true, isConfirm: true },
+        _count: { id: true },
+      }),
+      prisma.tamu.count({
+        where: { undanganId, attendedAt: { not: null } },
+      }),
+    ])
 
     return ok({
       total_tamu: result._count.id,
       total_send: result._sum.sendStatus ?? 0,
       total_read: result._sum.isRead ?? 0,
       total_confirm: result._sum.isConfirm ?? 0,
+      total_attended: totalAttended,
     }, 'Get stats success')
   } catch {
     return serverError()

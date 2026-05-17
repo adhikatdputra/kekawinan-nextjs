@@ -20,6 +20,15 @@ const undanganTamuApi = {
   sendWhatsapp: (id: string) => {
     return axios.put(`/tamu/${id}/send`);
   },
+  getStatus: (tamuId: string) => {
+    return axios.get(`/tamu/${tamuId}/status`)
+  },
+  confirmAttendance: (slug: string, tamuId: string) => {
+    return axios.post(`/undangan/${slug}/attendance`, { tamuId })
+  },
+  downloadQR: (slug: string) => {
+    return axios.get(`/undangan/${slug}/qr-download`, { responseType: 'blob' })
+  },
 };
 
 export default undanganTamuApi;

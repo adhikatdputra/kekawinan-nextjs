@@ -25,10 +25,13 @@ model User {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  undangan       Undangan[]
-  subscribers    UserSubscriber[]
-  resetPasswords ResetPassword[]
-  userCredits    UserCredit[]
+  undangan               Undangan[]
+  subscribers            UserSubscriber[]
+  resetPasswords         ResetPassword[]
+  userCredits            UserCredit[]
+  collaboratorInvited    UndanganCollaborator[] @relation("CollaboratorUser")
+  collaboratorInvites    UndanganCollaborator[] @relation("CollaboratorInviter")
+  attendanceConfirmed    Tamu[]                 @relation("AttendanceConfirmedBy")
 
   @@map("tbl_users")
 }
@@ -82,18 +85,21 @@ model Undangan {
 // ─── Tamu (Guests) ────────────────────────────────────────────────────────────
 
 model Tamu {
-  id          String   @id @db.VarChar(64)
-  undanganId  String   @db.VarChar(64)
-  name        String?  @db.VarChar(255)
-  phone       String?  @db.VarChar(50)
-  sendStatus  Int      @default(0)        // 0 = belum dikirim, 1 = sudah dikirim
-  isRead      Int      @default(0)        // 0 = belum dibuka, 1 = sudah dibuka
-  isConfirm   Int      @default(0)        // 0 = belum konfirm, 1 = sudah konfirm
-  maxInvite   Int?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String    @id @db.VarChar(64)
+  undanganId   String    @db.VarChar(64)
+  name         String?   @db.VarChar(255)
+  phone        String?   @db.VarChar(50)
+  sendStatus   Int       @default(0)        // 0 = belum dikirim, 1 = sudah dikirim
+  isRead       Int       @default(0)        // 0 = belum dibuka, 1 = sudah dibuka
+  isConfirm    Int       @default(0)        // 0 = belum konfirm, 1 = sudah konfirm
+  maxInvite    Int?
+  attendedAt   DateTime?                    // 🆕 timestamp kehadiran dikonfirmasi
+  confirmedBy  String?   @db.VarChar(255)  // 🆕 userId crew yang scan
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  undangan    Undangan @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+  undangan          Undangan @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+  confirmedByUser   User?    @relation("AttendanceConfirmedBy", fields: [confirmedBy], references: [id], onDelete: SetNull)
 
   @@map("tbl_tamu")
 }

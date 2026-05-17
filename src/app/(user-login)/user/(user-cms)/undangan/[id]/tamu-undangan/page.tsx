@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { Params, UndanganTamu } from "@/frontend/interface/undangan";
-import { IconSend2, IconPlus, IconBrandWhatsapp } from "@tabler/icons-react";
+import { IconSend2, IconPlus, IconBrandWhatsapp, IconQrcode, IconDownload } from "@tabler/icons-react";
 import MenuAction from "@/components/ui/custom/menu-action";
 import TablePending from "@/components/ui/custom/table-pending";
 import TableNoData from "@/components/ui/custom/table-no-data";
@@ -13,6 +13,8 @@ import { IconLoader2 } from "@tabler/icons-react";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
+import { QRCodeCanvas } from "qrcode.react";
+import { BASE_URL } from "@/lib/config";
 
 import {
   Select,
@@ -83,6 +85,9 @@ export default function TamuPage() {
   const [selectedItem, setSelectedItem] = useState<UndanganTamu | null>(null);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [qrTamu, setQrTamu] = useState<UndanganTamu | null>(null);
+  const [isDownloadingZip, setIsDownloadingZip] = useState(false);
+  const qrCanvasRef = useRef<HTMLDivElement>(null);
 
   const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(10);
@@ -241,6 +246,36 @@ export default function TamuPage() {
     );
   };
 
+  const handleDownloadQrPng = () => {
+    const canvas = qrCanvasRef.current?.querySelector("canvas");
+    if (!canvas || !qrTamu) return;
+    const url = canvas.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `qr-${(qrTamu.name ?? qrTamu.id).replace(/\s+/g, "-")}.png`;
+    a.click();
+  };
+
+  const handleDownloadAllQr = async () => {
+    const slug = undangan?.permalink;
+    if (!slug) return;
+    setIsDownloadingZip(true);
+    try {
+      const res = await undanganTamuApi.downloadQR(slug);
+      const blob = new Blob([res.data], { type: "application/zip" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `qr-tamu-${slug}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      // silent — user sudah tahu dari tidak ada respons
+    } finally {
+      setIsDownloadingZip(false);
+    }
+  };
+
   const debounceSetParamsTable = useRef(
     debounce((searchText: string) => {
       setPage(1);
@@ -317,7 +352,7 @@ export default function TamuPage() {
           tamu yang di undang
         </p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         <div className="bg-[url('/images/bg-fitur.png')] bg-cover bg-center rounded-2xl p-6 border border-gray-200 min-h-[180px] flex  items-end">
           <div>
             <h3 className="text-lg font-bold">Total Tamu Undangan</h3>
@@ -378,6 +413,21 @@ export default function TamuPage() {
             </div>
           </div>
         </div>
+        <div className="bg-[url('/images/bg-fitur.png')] bg-cover bg-center rounded-2xl p-6 border border-gray-200 min-h-[180px] flex items-end">
+          <div>
+            <h3 className="text-lg font-bold">Sudah Hadir (Absensi)</h3>
+            <div className="flex items-end gap-2 mt-4">
+              <h6 className="text-6xl font-bold">
+                {isLoadingTotalKirimWA ? (
+                  <IconLoader2 size={40} className="animate-spin pb-1" />
+                ) : (
+                  totalKirimWA?.total_attended || 0
+                )}
+              </h6>
+              <p className="text-muted-foreground pb-1">Tamu</p>
+            </div>
+          </div>
+        </div>
       </div>
       <div className="max-w-[700px] mx-auto w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -418,6 +468,18 @@ export default function TamuPage() {
       </div>
       <div className="border border-border p-6 rounded-2xl grid gap-4">
         <div className="flex flex-wrap gap-2 justify-end items-center">
+          <Button
+            variant="outline"
+            onClick={handleDownloadAllQr}
+            disabled={isDownloadingZip}
+          >
+            {isDownloadingZip ? (
+              <IconLoader2 size={16} className="animate-spin" />
+            ) : (
+              <IconDownload size={16} />
+            )}
+            Download Semua QR
+          </Button>
           <Button
             variant="outline"
             onClick={() => {
@@ -465,12 +527,13 @@ export default function TamuPage() {
               <TableHead>Total Tamu (Orang)</TableHead>
               <TableHead>Dilihat</TableHead>
               <TableHead>Konfirmasi</TableHead>
+              <TableHead>Hadir Pukul</TableHead>
               <TableHead className="text-right w-[10%]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TablePending colSpan={6} />
+              <TablePending colSpan={7} />
             ) : tableData.length > 0 ? (
               tableData.map((item) => (
                 <TableRow key={item.id}>
@@ -487,8 +550,30 @@ export default function TamuPage() {
                       {item.isConfirm ? "Sudah" : "Belum"}
                     </span>
                   </TableCell>
+                  <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                    {item.attendedAt
+                      ? new Date(item.attendedAt).toLocaleTimeString("id-ID", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          timeZoneName: "short",
+                        })
+                      : "-"}
+                  </TableCell>
                   <TableCell className="text-right w-[10%]">
                     <div className="flex gap-2 justify-end">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger
+                            onClick={() => setQrTamu(item)}
+                            className="cursor-pointer border border-border rounded-md p-1 bg-white"
+                          >
+                            <IconQrcode size={18} />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Lihat & Download QR</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger
@@ -537,7 +622,7 @@ export default function TamuPage() {
                 </TableRow>
               ))
             ) : (
-              <TableNoData colSpan={6} />
+              <TableNoData colSpan={7} />
             )}
           </TableBody>
         </Table>
@@ -647,6 +732,31 @@ export default function TamuPage() {
               </Button>
             </div>
           </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal QR per tamu */}
+      <Dialog open={!!qrTamu} onOpenChange={() => setQrTamu(null)}>
+        <DialogContent className="max-w-xs">
+          <DialogHeader>
+            <DialogTitle>QR Code Tamu</DialogTitle>
+            <DialogDescription>{qrTamu?.name}</DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-4 py-2">
+            <div ref={qrCanvasRef} className="p-3 bg-white rounded-xl border border-gray-200">
+              {qrTamu && undangan?.permalink && (
+                <QRCodeCanvas
+                  value={`${BASE_URL}/${undangan.permalink}/${qrTamu.id}`}
+                  size={200}
+                  level="M"
+                />
+              )}
+            </div>
+            <Button className="w-full" onClick={handleDownloadQrPng}>
+              <IconDownload size={16} />
+              Download PNG
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 

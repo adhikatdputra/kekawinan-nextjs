@@ -17,6 +17,7 @@ import {
 import DialogGift from "@/components/card/dialog-gift";
 import Galeri from "@/components/card/galeri";
 import { FloatingMusicGift } from "../card/floating-music-gift";
+import { FloatingQrButton } from "@/components/card/floating-qr-button";
 
 import CountdownTimer from "@/components/card/counting-down";
 import UcapanConfirm from "@/components/card/ucapan-confirm";
@@ -141,6 +142,14 @@ export default function Theme5({
             </Button>
           </div>
         </motion.div>
+        <FloatingQrButton
+          tamu={tamu}
+          tamuId={tamu?.id ?? ""}
+          slug={slug}
+          content={undangan?.content ?? null}
+          bgColor="bg-theme5-primary"
+          iconColor="text-white"
+        />
       </div>
     );
   }
