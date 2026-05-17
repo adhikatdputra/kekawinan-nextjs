@@ -112,7 +112,7 @@ export function AppSidebar() {
     select: (data) => data.data.data,
   });
 
-  const isOwner = undangan?.userId === getUser()?.id;
+  const isOwner = !!undangan && undangan.userId === getUser()?.id;
 
   return (
     <Sidebar className="py-2">

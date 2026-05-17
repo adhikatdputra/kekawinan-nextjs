@@ -20,7 +20,7 @@ export async function sendCollaboratorInviteRegistered(opts: {
 }) {
   const roleLabel = opts.role === 'MEMBER' ? 'Member' : 'Crew'
   await transporter.sendMail({
-    from: `"Kekawinan.com" <${process.env.SMTP_USER}>`,
+    from: `"Kekawinan.com" <${process.env.SMTP_SENDER}>`,
     to: opts.to,
     subject: `Kamu ditambahkan ke undangan ${opts.undanganName}`,
     html: `
@@ -43,7 +43,7 @@ export async function sendCollaboratorInvitePending(opts: {
 }) {
   const roleLabel = opts.role === 'MEMBER' ? 'Member' : 'Crew'
   await transporter.sendMail({
-    from: `"Kekawinan.com" <${process.env.SMTP_USER}>`,
+    from: `"Kekawinan.com" <${process.env.SMTP_SENDER}>`,
     to: opts.to,
     subject: `Kamu diundang untuk membantu undangan pernikahan`,
     html: `
@@ -59,7 +59,7 @@ export async function sendCollaboratorInvitePending(opts: {
 
 export async function sendResetPasswordEmail(to: string, resetLink: string) {
   await transporter.sendMail({
-    from: `"Support Kekawinan" <${process.env.SMTP_USER}>`,
+    from: `"Support Kekawinan" <${process.env.SMTP_SENDER}>`,
     to,
     subject: 'Password Reset Request',
     html: `
