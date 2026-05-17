@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ArrowLeftToLine, LayoutDashboard, UserRoundPlus, SwatchBook, Landmark, Ticket, Settings } from "lucide-react";
+import { ArrowLeftToLine, LayoutDashboard, UserRoundPlus, SwatchBook, Landmark, Ticket, Settings, Code2 } from "lucide-react";
 import useSession from "@/frontend/hook/useSession";
 import Link from "next/link";
 
@@ -62,6 +62,11 @@ export function AppSidebar() {
       title: "Bank",
       url: `/admin/master-data/bank`,
       icon: Landmark,
+    },
+    {
+      title: "Theme Components",
+      url: `/admin/master-data/theme-components`,
+      icon: Code2,
     },
   ];
 

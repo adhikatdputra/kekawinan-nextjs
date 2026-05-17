@@ -21,17 +21,13 @@ export async function POST(request: NextRequest) {
     if (redemptionCode.status === 'EXPIRED' || (redemptionCode.expiredAt !== null && redemptionCode.expiredAt < new Date())) {
       return badRequest('Kode sudah kadaluarsa')
     }
-    if (redemptionCode.status === 'USED' || redemptionCode.remainingCredit <= 0) {
-      return badRequest('Kode sudah tidak bisa digunakan')
+    // Kode single-use: begitu diklaim 1 user, langsung USED
+    // Juga cek usedBy untuk handle data lama yang usedBy-nya terisi tapi status belum USED
+    if (redemptionCode.status === 'USED' || redemptionCode.usedBy !== null) {
+      return badRequest('Kode sudah pernah digunakan')
     }
 
-    // Cek apakah user ini sudah pernah pakai kode yang sama
-    const alreadyUsed = await prisma.userCredit.findFirst({
-      where: { userId: auth.id, redemptionCodeId: redemptionCode.id },
-    })
-    if (alreadyUsed) return badRequest('Kamu sudah pernah menggunakan kode ini')
-
-    // Insert 1 row per credit unit
+    // Insert 1 row per credit unit — user mendapatkan SEMUA credit dari kode ini
     const creditRows = Array.from({ length: redemptionCode.totalCredit }, () => ({
       id: nanoid(),
       userId: auth.id,
@@ -40,16 +36,13 @@ export async function POST(request: NextRequest) {
       redemptionCodeId: redemptionCode.id,
     }))
 
-    const newRemainingCredit = redemptionCode.remainingCredit - 1
-    const newStatus = newRemainingCredit <= 0 ? 'USED' : 'UNUSED'
-
     await prisma.$transaction([
       prisma.userCredit.createMany({ data: creditRows }),
       prisma.redemptionCode.update({
         where: { id: redemptionCode.id },
         data: {
-          remainingCredit: newRemainingCredit,
-          status: newStatus,
+          remainingCredit: 0,
+          status: 'USED',
           usedBy: auth.id,
           usedAt: new Date(),
         },

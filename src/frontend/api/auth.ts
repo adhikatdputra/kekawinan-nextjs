@@ -11,6 +11,12 @@ const authApi = {
   getMe: async () => {
     return axios.get(`/users/profile`);
   },
+  forgotPassword: async (email: string) => {
+    return axios.post(`/auth/forget-password`, { email });
+  },
+  resetPassword: async (token: string, new_password: string) => {
+    return axios.post(`/auth/reset-password`, { token, new_password });
+  },
 };
 
 export default authApi;

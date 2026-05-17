@@ -1,0 +1,30 @@
+meta {
+  name: Delete Collaborator
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{base_url}}/api/undangan/:id/collaborators/:collabId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+params:path {
+  id: undangan_id_here
+  collabId: collab_id_here
+}
+
+docs {
+  # Delete Collaborator
+
+  Hapus (kick) kolaborator dari undangan.
+
+  **Akses:** Owner saja.
+
+  Record kolaborator akan dihapus permanen. Jika undangan dihapus, semua kolaboratornya otomatis ikut terhapus (`onDelete: Cascade`).
+}

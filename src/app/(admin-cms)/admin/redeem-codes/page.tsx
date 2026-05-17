@@ -51,7 +51,6 @@ interface RedeemCode {
   code: string;
   packageType: string;
   totalCredit: number;
-  remainingCredit: number;
   usedBy: string | null;
   usedAt: string | null;
   expiredAt: string;
@@ -59,6 +58,7 @@ interface RedeemCode {
   note: string | null;
   generatedBy: string;
   createdAt: string;
+  claimedByUser: { id: string; fullname: string | null; email: string } | null;
 }
 
 const PACKAGE_TYPES = ["AKAD", "RESEPSI", "GRAND"];
@@ -254,6 +254,7 @@ export default function RedeemCodesPage() {
               <TableHead>Paket</TableHead>
               <TableHead>Credit</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Diklaim Oleh</TableHead>
               <TableHead>Expired</TableHead>
               <TableHead>Catatan</TableHead>
               <TableHead className="text-right"></TableHead>
@@ -261,7 +262,7 @@ export default function RedeemCodesPage() {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TablePending colSpan={7} />
+              <TablePending colSpan={8} />
             ) : tableData.length > 0 ? (
               tableData.map((item) => (
                 <TableRow key={item.id}>
@@ -275,13 +276,27 @@ export default function RedeemCodesPage() {
                       {item.packageType}
                     </span>
                   </TableCell>
-                  <TableCell className="text-sm">
-                    {item.remainingCredit} / {item.totalCredit}
+                  <TableCell className="text-sm font-semibold">
+                    {item.totalCredit}
                   </TableCell>
                   <TableCell>
                     <span className={`text-xs font-medium px-2 py-0.5 rounded ${statusBadge[item.status] ?? ""}`}>
                       {item.status}
                     </span>
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {item.claimedByUser ? (
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-medium text-gray-800">
+                          {item.claimedByUser.fullname ?? item.claimedByUser.email}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {item.usedAt ? formatDate(item.usedAt) : ""}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground text-xs">Belum diklaim</span>
+                    )}
                   </TableCell>
                   <TableCell className="text-sm">{item.expiredAt ? formatDate(item.expiredAt) : <span className="text-muted-foreground text-xs">Tidak ada</span>}</TableCell>
                   <TableCell className="text-sm text-muted-foreground max-w-[150px] truncate">
@@ -303,7 +318,7 @@ export default function RedeemCodesPage() {
                 </TableRow>
               ))
             ) : (
-              <TableNoData colSpan={7} />
+              <TableNoData colSpan={8} />
             )}
           </TableBody>
         </Table>

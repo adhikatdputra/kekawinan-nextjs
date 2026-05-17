@@ -44,7 +44,40 @@ export async function GET(request: NextRequest) {
       prisma.redemptionCode.count({ where }),
     ])
 
-    return ok(paginate(rows, count, page, limit), 'Get redeem codes success')
+    // Fix data lama: kode yang sudah ada usedBy tapi status masih UNUSED → set USED
+    const staleIds = rows
+      .filter((r) => r.usedBy && r.status === 'UNUSED')
+      .map((r) => r.id)
+    if (staleIds.length > 0) {
+      await prisma.redemptionCode.updateMany({
+        where: { id: { in: staleIds } },
+        data: { status: 'USED', remainingCredit: 0 },
+      })
+      // Update local rows to reflect fix
+      rows.forEach((r) => {
+        if (staleIds.includes(r.id)) {
+          r.status = 'USED'
+          r.remainingCredit = 0
+        }
+      })
+    }
+
+    // Enrich with claimer user info
+    const usedByIds = rows.filter((r) => r.usedBy).map((r) => r.usedBy as string)
+    const claimers = usedByIds.length
+      ? await prisma.user.findMany({
+          where: { id: { in: usedByIds } },
+          select: { id: true, fullname: true, email: true },
+        })
+      : []
+    const claimerMap = Object.fromEntries(claimers.map((u) => [u.id, u]))
+
+    const enrichedRows = rows.map((r) => ({
+      ...r,
+      claimedByUser: r.usedBy ? (claimerMap[r.usedBy] ?? null) : null,
+    }))
+
+    return ok(paginate(enrichedRows, count, page, limit), 'Get redeem codes success')
   } catch {
     return serverError()
   }

@@ -26,10 +26,19 @@ export default function RegisterPage() {
     onSuccess: (data) => {
       const response = data.data;
       if (response.success) {
-        toast.success("Berhasil mendaftar");
+        toast.success("Berhasil mendaftar! Silahkan login.");
         router.push("/auth/login");
       } else {
         toast.error(response.message);
+      }
+    },
+    onError: (error: unknown) => {
+      const axiosError = error as { response?: { data?: { code?: number; message?: string } } };
+      const code = axiosError?.response?.data?.code;
+      if (code === 409) {
+        toast.error("Email sudah digunakan, silahkan gunakan email lain atau login");
+      } else {
+        toast.error("Pendaftaran gagal, silahkan coba lagi");
       }
     },
   });

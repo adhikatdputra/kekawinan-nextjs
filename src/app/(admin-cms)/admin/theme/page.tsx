@@ -44,11 +44,20 @@ import Pagination from "@/components/ui/custom/pagination";
 
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import themeApi from "@/frontend/api/admin/theme";
+import themeComponentsApi from "@/frontend/api/admin/theme-components";
 import uploadApi from "@/frontend/api/upload";
 import AdminThemeStore from "@/frontend/store/admin-theme-store";
 import { debounce } from "lodash";
-import { IconPlus } from "@tabler/icons-react";
+import { IconPlus, IconExternalLink } from "@tabler/icons-react";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import Link from "next/link";
 
 export default function ThemeAdminPage() {
   const { update, create, remove } = AdminThemeStore();
@@ -89,6 +98,12 @@ export default function ThemeAdminPage() {
     queryFn: () => themeApi.getAll(queryParams),
     select: (data) => data.data.data,
     placeholderData: keepPreviousData,
+  });
+
+  const { data: componentOptions } = useQuery({
+    queryKey: ["theme-components-select"],
+    queryFn: themeComponentsApi.getAll,
+    select: (res) => res.data.data as { id: string; name: string }[],
   });
 
   const resetForm = () => {
@@ -332,8 +347,46 @@ export default function ThemeAdminPage() {
             </div>
 
             <div className="grid gap-2">
-              <Label>Component Name <span className="text-red-500">*</span></Label>
-              <Input value={componentName} onChange={(e) => setComponentName(e.target.value)} />
+              <div className="flex items-center justify-between">
+                <Label>Component Name <span className="text-red-500">*</span></Label>
+                <Link
+                  href="/admin/master-data/theme-components"
+                  target="_blank"
+                  className="flex items-center gap-1 text-xs text-green-kwn hover:underline"
+                >
+                  <IconExternalLink size={12} />
+                  Kelola components
+                </Link>
+              </div>
+              {(componentOptions?.length ?? 0) > 0 ? (
+                <Select value={componentName} onValueChange={setComponentName}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih component..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {componentOptions!.map((c) => (
+                      <SelectItem key={c.id} value={c.name}>
+                        <code>{c.name}</code>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <div className="flex flex-col gap-1">
+                  <Input
+                    value={componentName}
+                    onChange={(e) => setComponentName(e.target.value)}
+                    placeholder="Belum ada component — ketik manual"
+                  />
+                  <p className="text-xs text-amber-600">
+                    Belum ada master data component.{" "}
+                    <Link href="/admin/master-data/theme-components" target="_blank" className="underline">
+                      Tambah di sini
+                    </Link>{" "}
+                    agar bisa dipilih dari dropdown.
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="grid gap-2">

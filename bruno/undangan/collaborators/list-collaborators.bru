@@ -1,0 +1,48 @@
+meta {
+  name: List Collaborators
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/undangan/:id/collaborators
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+params:path {
+  id: undangan_id_here
+}
+
+docs {
+  # List Collaborators
+
+  Ambil daftar kolaborator sebuah undangan.
+
+  **Akses:** Owner saja.
+
+  ## Response
+
+  ```json
+  [
+    {
+      "id": "abc123",
+      "undanganId": "und123",
+      "userId": "usr456",
+      "email": "rina@mail.com",
+      "role": "MEMBER",
+      "status": "ACTIVE",
+      "invitedBy": "usr001",
+      "joinedAt": "2026-05-01T10:00:00.000Z",
+      "createdAt": "2026-05-01T09:00:00.000Z",
+      "updatedAt": "2026-05-01T10:00:00.000Z",
+      "user": { "fullname": "Rina Dewi", "email": "rina@mail.com" },
+      "inviter": { "fullname": "Adhika" }
+    }
+  ]
+  ```
+}

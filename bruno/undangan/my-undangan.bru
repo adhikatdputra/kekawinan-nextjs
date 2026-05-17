@@ -25,5 +25,24 @@ params:query {
 docs {
   # My Undangan
 
-  Daftar undangan milik pengguna yang sedang login saja (paginated).
+  Daftar undangan milik pengguna yang sedang login (paginated).
+
+  Response menggabungkan dua sumber:
+  1. **Undangan milik sendiri** — `collaboratorRole: "OWNER"`, `invitedByName: null`
+  2. **Undangan kolaborasi** — undangan di mana user adalah kolaborator `ACTIVE`, lengkap dengan `collaboratorRole` (`MEMBER` / `CREW`) dan `invitedByName`
+
+  ## Response rows (tiap item)
+
+  | Field             | Type            | Keterangan                                      |
+  |-------------------|-----------------|-------------------------------------------------|
+  | id                | string          | ID undangan                                     |
+  | userId            | string          | ID pemilik (Owner) undangan                     |
+  | permalink         | string          | Slug URL undangan                               |
+  | name              | string          | Nama undangan                                   |
+  | status            | string          | Status undangan (`ACTIVE`, dll)                 |
+  | expired           | string          | Tanggal kadaluarsa                              |
+  | collaboratorRole  | string          | Role user di undangan ini: `OWNER` / `MEMBER` / `CREW` |
+  | invitedByName     | string \| null  | Nama Owner yang mengundang (null jika OWNER)    |
+  | content           | object          | `{ dateWedding }`                               |
+  | theme             | object          | `{ componentName }`                             |
 }

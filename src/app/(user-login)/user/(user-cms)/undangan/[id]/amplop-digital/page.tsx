@@ -240,7 +240,7 @@ export default function AmplopDigitalPage() {
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${
                           bank?.color ? `bg-${bank.color}-100 text-${bank.color}-700` : "bg-muted text-muted-foreground"
                         }`}>
-                          {gift.bankName.slice(0, 3).toUpperCase()}
+                          {gift.bankName?.slice(0, 3).toUpperCase() ?? "---"}
                         </div>
                       )}
                       <div className="min-w-0">

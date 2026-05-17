@@ -14,6 +14,13 @@ import {
   IconTicket,
   IconRosetteDiscountCheckFilled,
   IconCoin,
+  IconAlertTriangle,
+  IconX,
+  IconArrowRight,
+  IconCrown,
+  IconUserCheck,
+  IconTool,
+  IconExternalLink,
 } from "@tabler/icons-react";
 import PendingNoData from "@/components/ui/custom/pending-no-data";
 import PendingData from "@/components/ui/custom/pending-data";
@@ -57,6 +64,7 @@ import undanganApi from "@/frontend/api/undangan";
 import creditsApi from "@/frontend/api/credits";
 import redeemApi from "@/frontend/api/redeem";
 import themeApi from "@/frontend/api/theme";
+import authApi from "@/frontend/api/auth";
 import { Undangan, UserCreditBalance, Theme, UndanganBody } from "@/frontend/interface/undangan";
 import { Loader2, ShoppingBag } from "lucide-react";
 
@@ -79,6 +87,8 @@ export default function UndanganListPage() {
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [isOpenRedeem, setIsOpenRedeem] = useState(false);
   const [redeemCode, setRedeemCode] = useState("");
+  const [isOpenPhoneWarning, setIsOpenPhoneWarning] = useState(false);
+  const [isIssueDismissed, setIsIssueDismissed] = useState(false);
 
   const { getUser, getUserName } = useAuth();
   const isAdmin = getUser()?.level === "admin" || getUser()?.level === "superadmin";
@@ -104,8 +114,16 @@ export default function UndanganListPage() {
     select: (data) => data.data.data?.rows as Theme[],
   });
 
+  const { data: profileData } = useQuery({
+    queryKey: ["profile-me"],
+    queryFn: () => authApi.getMe(),
+    select: (data) => data.data.data as { phone: string | null; fullname: string | null },
+    enabled: !isAdmin,
+  });
+
   // ── Derived values ────────────────────────────────────────────────────────────
 
+  const hasPhone = !!(profileData?.phone);
   const balance = creditData?.balance ?? 0;
 
   // Harga efektif tema yang dipilih
@@ -178,6 +196,10 @@ export default function UndanganListPage() {
     setPermalink(input.replace(/\s+/g, "-").replace(/[^\w-]+/g, "").toLowerCase());
 
   const openCreate = () => {
+    if (!isAdmin && !hasPhone) {
+      setIsOpenPhoneWarning(true);
+      return;
+    }
     setSelectedItem(null);
     setSelectedTheme(null);
     setName("");
@@ -247,12 +269,10 @@ export default function UndanganListPage() {
                       <IconTicket size={20} />
                       Tukar Kode
                     </Button>
-                    {balance > 0 && (
-                      <Button size="lg" onClick={openCreate}>
-                        <IconPlus size={20} />
-                        Buat Undangan
-                      </Button>
-                    )}
+                    <Button size="lg" onClick={openCreate}>
+                      <IconPlus size={20} />
+                      Buat Undangan
+                    </Button>
                   </>
                 )}
                 {isAdmin && (
@@ -324,56 +344,141 @@ export default function UndanganListPage() {
             ) : (undangan?.length ?? 0) === 0 ? (
               <PendingNoData message="Kamu belum memiliki undangan" slot={null} />
             ) : (
-              <div className="flex flex-col gap-6">
-                {undangan?.map((item: Undangan) => (
-                  <div key={item.id} className="bg-white rounded-2xl shadow-xl p-4 border border-border hover:shadow-xl hover:bg-green-soft-kwn/40 transition-all duration-300">
-                    <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-                      <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-12">
-                        <Badge asChild className="bg-green-kwn text-white">
-                          <Link href={`/${item.permalink}/demo`} target="_blank">Lihat</Link>
-                        </Badge>
-                        <div>
-                          <div className="text-base">{item.name}</div>
-                          {isExpired(item.expired ?? "") && (
-                            <Badge className="bg-red-600 text-white">Expired</Badge>
+              <div className="flex flex-col gap-4">
+                {undangan?.map((item: Undangan) => {
+                  const role = item.collaboratorRole ?? "OWNER";
+                  const isOwner = role === "OWNER";
+
+                  const roleConfig = {
+                    OWNER: {
+                      label: "Owner",
+                      icon: IconCrown,
+                      chip: "bg-amber-100 text-amber-700 border border-amber-200",
+                      accent: "border-l-border",
+                    },
+                    MEMBER: {
+                      label: "Member",
+                      icon: IconUserCheck,
+                      chip: "bg-blue-50 text-blue-600 border border-blue-200",
+                      accent: "border-l-border",
+                    },
+                    CREW: {
+                      label: "Crew",
+                      icon: IconTool,
+                      chip: "bg-purple-50 text-purple-600 border border-purple-200",
+                      accent: "border-l-border",
+                    },
+                  }[role] ?? {
+                    label: role,
+                    icon: IconCrown,
+                    chip: "bg-gray-100 text-gray-600 border border-gray-200",
+                    accent: "border-l-border",
+                  };
+
+                  const RoleIcon = roleConfig.icon;
+
+                  return (
+                    <div
+                      key={item.id}
+                      className={`bg-white rounded-2xl border border-border border-l-4 ${roleConfig.accent} shadow-sm hover:shadow-md hover:bg-green-soft-kwn/20 transition-all duration-200 p-4`}
+                    >
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                        {/* Left: name + meta */}
+                        <div className="flex flex-col gap-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold text-base">{item.name}</span>
+                            {isExpired(item.expired ?? "") && (
+                              <span className="text-xs bg-red-100 text-red-600 border border-red-200 px-2 py-0.5 rounded-full">Expired</span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {/* Role chip */}
+                            <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${roleConfig.chip}`}>
+                              <RoleIcon size={11} />
+                              {roleConfig.label}
+                            </span>
+                            {!isOwner && item.invitedByName && (
+                              <span className="text-xs text-muted-foreground">
+                                · Diundang oleh <span className="font-medium">{item.invitedByName}</span>
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Divider — mobile only */}
+                        <div className="border-t border-border sm:hidden" />
+
+                        {/* Right: actions */}
+                        <div className="flex items-center gap-1 shrink-0 flex-wrap">
+                          {/* Preview link */}
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Link
+                                href={`/${item.permalink}/demo`}
+                                target="_blank"
+                                className="inline-flex items-center gap-1 text-xs font-medium text-green-kwn border border-green-kwn/40 hover:bg-green-kwn hover:text-white px-2 py-1 rounded-lg transition-colors"
+                              >
+                                <IconExternalLink size={13} />
+                                Preview
+                              </Link>
+                            </TooltipTrigger>
+                            <TooltipContent><p>Lihat undangan</p></TooltipContent>
+                          </Tooltip>
+
+                          {/* Divider */}
+                          <div className="w-px h-5 bg-border mx-1" />
+
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Link href={`/user/undangan/${item.id}/overview`} className="p-1.5 rounded-lg text-muted-foreground hover:bg-gray-100 hover:text-foreground transition-colors">
+                                <IconAdjustments size={17} />
+                              </Link>
+                            </TooltipTrigger>
+                            <TooltipContent><p>Dashboard undangan</p></TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Link href={`/user/undangan/${item.id}/tamu-undangan`} className="p-1.5 rounded-lg text-muted-foreground hover:bg-gray-100 hover:text-foreground transition-colors">
+                                <IconUsers size={17} />
+                              </Link>
+                            </TooltipTrigger>
+                            <TooltipContent><p>Tamu undangan</p></TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Link href={`/user/undangan/${item.id}/kado-pernikahan`} className="p-1.5 rounded-lg text-muted-foreground hover:bg-gray-100 hover:text-foreground transition-colors">
+                                <IconGift size={17} />
+                              </Link>
+                            </TooltipTrigger>
+                            <TooltipContent><p>Kado pernikahan</p></TooltipContent>
+                          </Tooltip>
+
+                          {isOwner && (
+                            <>
+                              <div className="w-px h-5 bg-border mx-1" />
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <button onClick={() => openEdit(item)} className="p-1.5 rounded-lg text-muted-foreground hover:bg-yellow-50 hover:text-yellow-700 transition-colors">
+                                    <IconEdit size={17} />
+                                  </button>
+                                </TooltipTrigger>
+                                <TooltipContent><p>Edit undangan</p></TooltipContent>
+                              </Tooltip>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <button onClick={() => { setSelectedItem(item); setIsOpenDelete(true); }} className="p-1.5 rounded-lg text-muted-foreground hover:bg-red-50 hover:text-red-600 transition-colors">
+                                    <IconTrash size={17} />
+                                  </button>
+                                </TooltipTrigger>
+                                <TooltipContent><p>Hapus undangan</p></TooltipContent>
+                              </Tooltip>
+                            </>
                           )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Tooltip>
-                          <TooltipTrigger className="bg-green-kwn text-white p-1 rounded-sm">
-                            <Link href={`/user/undangan/${item.id}/overview`}><IconAdjustments size={18} /></Link>
-                          </TooltipTrigger>
-                          <TooltipContent><p>Atur konten undangan kamu</p></TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger className="bg-purple-600 text-white p-1 rounded-sm">
-                            <Link href={`/user/undangan/${item.id}/kado-pernikahan`}><IconGift size={18} /></Link>
-                          </TooltipTrigger>
-                          <TooltipContent><p>Atur kado pernikahan</p></TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger className="bg-blue-600 text-white p-1 rounded-sm">
-                            <Link href={`/user/undangan/${item.id}/tamu-undangan`}><IconUsers size={18} /></Link>
-                          </TooltipTrigger>
-                          <TooltipContent><p>Tambah daftar tamu undangan</p></TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger className="bg-yellow-600 text-white p-1 rounded-sm">
-                            <IconEdit size={18} onClick={() => openEdit(item)} />
-                          </TooltipTrigger>
-                          <TooltipContent><p>Edit undangan kamu</p></TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger className="bg-red-700 text-white p-1 rounded-sm">
-                            <IconTrash size={18} onClick={() => { setSelectedItem(item); setIsOpenDelete(true); }} />
-                          </TooltipTrigger>
-                          <TooltipContent><p>Hapus undangan</p></TooltipContent>
-                        </Tooltip>
-                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -584,7 +689,7 @@ export default function UndanganListPage() {
       </AlertDialog>
 
       {/* ── Dialog: Trakteer ────────────────────────────────────────────────── */}
-      <Dialog open={isOpenTrakteer} onOpenChange={() => { setIsOpenTrakteer(false); window.open("https://trakteer.id/CTRL Spark/tip", "_blank"); }}>
+      <Dialog open={isOpenTrakteer} onOpenChange={() => { setIsOpenTrakteer(false); window.open("https://trakteer.id/partnerinaja/tip", "_blank"); }}>
         <DialogContent showCloseButton={false}>
           <DialogHeader><DialogTitle /><DialogDescription /></DialogHeader>
           <div className="md:px-8">
@@ -593,7 +698,7 @@ export default function UndanganListPage() {
               <p className="pt-2">Yuk terus support kami agar dapat terus mengembangkan sistem ini</p>
             </div>
             <Link
-              href="https://trakteer.id/CTRL Spark/tip"
+              href="https://trakteer.id/partnerinaja/tip"
               target="_blank"
               className="flex items-center justify-center gap-2 bg-red-700 text-white px-4 py-2 rounded-full"
               onClick={() => setIsOpenTrakteer(false)}
@@ -604,6 +709,59 @@ export default function UndanganListPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* ── Dialog: Peringatan Nomor HP ─────────────────────────────────────── */}
+      <Dialog open={isOpenPhoneWarning} onOpenChange={setIsOpenPhoneWarning}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-amber-600">
+              <IconAlertTriangle size={20} />
+              Lengkapi Profil Kamu
+            </DialogTitle>
+            <DialogDescription />
+          </DialogHeader>
+          <div className="flex flex-col gap-4 py-1">
+            <p className="text-sm text-gray-700 leading-relaxed">
+              Kamu belum mengisi <strong>nomor WhatsApp</strong> di profil kamu.
+              Nomor ini diperlukan agar tim Kekawinan bisa menghubungi kamu jika ada kendala terkait undanganmu.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Silahkan lengkapi profil kamu terlebih dahulu sebelum membuat undangan.
+            </p>
+          </div>
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" onClick={() => setIsOpenPhoneWarning(false)}>
+              Nanti
+            </Button>
+            <Link href="/user/profile">
+              <Button className="flex items-center gap-2">
+                Lengkapi Profil
+                <IconArrowRight size={16} />
+              </Button>
+            </Link>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Issue Badge ─────────────────────────────────────────────────────── */}
+      {isLoaded && !isAdmin && !hasPhone && !isIssueDismissed && (
+        <div className="fixed bottom-6 left-6 z-50">
+          <button
+            onClick={() => setIsOpenPhoneWarning(true)}
+            className="flex items-center gap-2 bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-full shadow-lg hover:bg-amber-600 transition-colors"
+          >
+            <IconAlertTriangle size={16} />
+            1 Issue
+          </button>
+          <button
+            onClick={() => setIsIssueDismissed(true)}
+            className="absolute -top-2 -right-2 w-5 h-5 bg-gray-700 text-white rounded-full flex items-center justify-center hover:bg-gray-900 transition-colors"
+            title="Tutup"
+          >
+            <IconX size={11} />
+          </button>
+        </div>
+      )}
     </>
   );
 }

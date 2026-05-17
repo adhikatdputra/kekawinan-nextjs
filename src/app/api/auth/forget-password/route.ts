@@ -30,7 +30,8 @@ export async function POST(request: NextRequest) {
         },
       })
 
-      const resetLink = `${process.env.NEXT_PUBLIC_API_URL}/reset-password?token=${resetEntry.token}`
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_API_URL?.replace(/\/api$/, '') || ''
+      const resetLink = `${siteUrl}/auth/reset-password?token=${resetEntry.token}`
       // Fire and forget — don't await so response is not delayed by SMTP
       sendResetPasswordEmail(user.email, resetLink).catch(console.error)
     }
