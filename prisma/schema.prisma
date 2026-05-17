@@ -71,13 +71,14 @@ model Undangan {
 
   user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   theme       Theme?            @relation(fields: [themeId], references: [id])
-  tamu        Tamu[]
-  ucapan      Ucapan[]
-  content     UndanganContent?
-  gifts       UndanganGift[]
-  gallery     UndanganGallery[]
-  kado        Kado[]
-  userCredits UserCredit[]
+  tamu          Tamu[]
+  ucapan        Ucapan[]
+  content       UndanganContent?
+  gifts         UndanganGift[]
+  gallery       UndanganGallery[]
+  kado          Kado[]
+  userCredits   UserCredit[]
+  collaborators UndanganCollaborator[]
 
   @@map("tbl_undangan")
 }
@@ -328,6 +329,28 @@ model UserCredit {
   undangan         Undangan?        @relation(fields: [usedForUndangan], references: [id])
 
   @@map("tbl_user_credits")
+}
+
+// ─── Undangan Collaborators ───────────────────────────────────────────────────
+
+model UndanganCollaborator {
+  id          String    @id @db.VarChar(64)
+  undanganId  String    @db.VarChar(64)
+  userId      String?   @db.VarChar(255)
+  email       String    @db.VarChar(255)
+  role        String    @db.VarChar(20)
+  status      String    @default("PENDING") @db.VarChar(20)
+  invitedBy   String    @db.VarChar(255)
+  joinedAt    DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  undangan    Undangan  @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+  user        User?     @relation("CollaboratorUser", fields: [userId], references: [id], onDelete: SetNull)
+  inviter     User      @relation("CollaboratorInviter", fields: [invitedBy], references: [id])
+
+  @@unique([undanganId, email])
+  @@map("tbl_undangan_collaborators")
 }
 
 // ─── Bank (Master Data) ───────────────────────────────────────────────────────
