@@ -640,6 +640,7 @@ export default function Theme7({
         setIsOpen={setIsOpenGift}
         giftLength={giftLength}
         slug={slug}
+            buttonBg="bg-theme4-primary"
       />
     </div>
   );

@@ -626,6 +626,7 @@ export default function Theme6({
         setIsOpen={setIsOpenGift}
         giftLength={giftLength}
         slug={slug}
+            buttonBg="bg-theme6-primary"
       />
     </div>
   );

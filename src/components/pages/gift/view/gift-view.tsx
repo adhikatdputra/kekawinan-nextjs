@@ -9,11 +9,11 @@ import { UndanganDetail, Gift } from "@/frontend/interface/undangan";
 import Loading from "@/components/layouts/loading";
 import { motion } from "motion/react";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { formatNumber } from "@/helper/number";
 import { Skeleton } from "@/components/ui/skeleton";
 import NotFound from "@/components/card/not-found";
+import { IconGift, IconCheck, IconArrowRight, IconSparkles } from "@tabler/icons-react";
 
 export default function GiftView({ slug }: { slug: string }) {
   const router = useRouter();
@@ -38,15 +38,11 @@ export default function GiftView({ slug }: { slug: string }) {
   });
 
   useEffect(() => {
-    if (isError) {
-      router.push("/");
-    }
+    if (isError) router.push("/");
   }, [isError]);
 
   useEffect(() => {
-    if (undanganData) {
-      mutateGiftList(undanganData.id);
-    }
+    if (undanganData) mutateGiftList(undanganData.id);
   }, [undanganData]);
 
   if (isLoading) return <Loading />;
@@ -62,139 +58,269 @@ export default function GiftView({ slug }: { slug: string }) {
   return (
     <>
       {!isOpenGiftList ? (
-        <div className="max-w-[450px] mx-auto overflow-x-hidden bg-[url('/images/bg-gift.webp')] bg-cover bg-center min-h-screen flex flex-col justify-center">
-          <div className="flex flex-col gap-6 items-center px-6 py-12 relative">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 1,
-                ease: "easeInOut",
-                delay: 0.2,
-              }}
-              viewport={{ once: false }}
-            >
-              <Image
-                src="/images/logo-black.svg"
-                alt="logo"
-                width={400}
-                height={400}
-                className="w-[180px]"
-              />
-            </motion.div>
-            <motion.div
-              className="w-full"
-              initial={{ opacity: 0, scale: 0.5, y: 30 }}
-              whileInView={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{
-                duration: 1,
-                ease: "easeInOut",
-                delay: 0.4,
-              }}
-              viewport={{ once: false }}
-            >
-              <Image
-                src="/images/pengantin.webp"
-                alt="logo"
-                width={1000}
-                height={1000}
-                className="w-[95%] mx-auto"
-              />
-            </motion.div>
-            <motion.div
-              className="text-black text-center flex flex-col gap-2"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 1,
-                ease: "easeInOut",
-                delay: 0.6,
-              }}
-              viewport={{ once: false }}
-            >
-              <h2 className="font-semibold text-xl">Pilihan Kado Spesial</h2>
-              <motion.h1
-                className="text-4xl font-semibold font-recoleta text-black"
-                initial={{ opacity: 0, scale: 0.6 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{
-                  duration: 1,
-                  ease: "easeInOut",
-                  delay: 0.8,
-                }}
-                viewport={{ once: false }}
-              >
-                {undanganData?.content?.title}
-              </motion.h1>
-              <p>
-                Berikan kenangan manis melalui hadiah pilihan untuk memulai
-                hidup baru bersama.
-              </p>
-            </motion.div>
-            <motion.div
-              className="w-full flex flex-col gap-3 mt-4"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 1,
-                ease: "easeInOut",
-                delay: 0.8,
-              }}
-              viewport={{ once: false }}
-            >
-              <Button
-                className="w-full"
-                size={"md"}
-                onClick={() => setIsOpenGiftList(true)}
-              >
-                Lihat Daftar Hadiah
-              </Button>
-              <Link href={`/${slug}/demo`}>
-                <Button
-                  variant={"outline"}
-                  className="w-full text-green-kwn"
-                  size={"md"}
-                >
-                  Nanti Aja Deh
-                </Button>
-              </Link>
-            </motion.div>
-          </div>
-        </div>
+        <GiftCover
+          undanganData={undanganData}
+          giftCount={giftList.length}
+          onOpen={() => setIsOpenGiftList(true)}
+          slug={slug}
+        />
       ) : (
         <GiftList
           slug={slug}
           giftList={giftList}
           isLoading={isLoadingGiftList}
+          undanganData={undanganData}
         />
       )}
     </>
   );
 }
 
+// ── Cover / Landing ─────────────────────────────────────────────────
+function GiftCover({
+  undanganData,
+  giftCount,
+  onOpen,
+  slug,
+}: {
+  undanganData: UndanganDetail;
+  giftCount: number;
+  onOpen: () => void;
+  slug: string;
+}) {
+  const thumbnail = undanganData?.content?.imgThumbnail || undanganData?.content?.imgBg;
+
+  return (
+    <div className="max-w-[450px] mx-auto min-h-screen flex flex-col bg-[#F0F7F3] overflow-hidden">
+      {/* Top bar */}
+      <div className="flex items-center justify-between px-5 pt-8 pb-2">
+        <Image
+          src="/images/logo-black.svg"
+          alt="Kekawinan"
+          width={400}
+          height={400}
+          className="w-[130px]"
+        />
+        {giftCount > 0 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5 }}
+            className="flex items-center gap-1.5 bg-green-kwn/10 rounded-full px-3 py-1.5"
+          >
+            <IconGift size={13} className="text-green-kwn" />
+            <span className="text-green-kwn text-xs font-semibold">
+              {giftCount} hadiah
+            </span>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Decorative chips row — above the shape grid */}
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+        className="flex items-center gap-2 px-6 mt-3"
+      >
+        <div className="bg-white rounded-2xl px-3 py-1.5 shadow-sm flex items-center gap-1.5">
+          <IconSparkles size={12} className="text-amber-400" />
+          <span className="text-[10px] font-semibold text-gray-600">Kado Pilihan</span>
+        </div>
+        <div className="bg-white rounded-2xl px-3 py-1.5 shadow-sm flex items-center gap-1.5">
+          <span className="text-sm leading-none">🎁</span>
+          <span className="text-[10px] font-semibold text-gray-600">Hadiahkan Cinta</span>
+        </div>
+      </motion.div>
+
+      {/* Shape grid hero (inspired by blob layout) */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.92 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+        className="px-5 mt-4"
+      >
+        <div className="grid grid-cols-3 gap-2.5">
+          {/* Row 1 */}
+          <div className="rounded-full bg-white shadow-sm aspect-square" />
+          <div className="rounded-[20px] bg-green-kwn/70 aspect-square" />
+          {/* Cross / plus shape via clip-path */}
+          <div className="aspect-square flex items-center justify-center">
+            <div
+              className="w-full h-full"
+              style={{
+                background: "#4CAF50",
+                clipPath: "polygon(35% 0%, 65% 0%, 65% 35%, 100% 35%, 100% 65%, 65% 65%, 65% 100%, 35% 100%, 35% 65%, 0% 65%, 0% 35%, 35% 35%)",
+              }}
+            />
+          </div>
+
+          {/* Row 2 */}
+          {/* Pentagon blob */}
+          <div
+            className="aspect-square"
+            style={{
+              background: "white",
+              clipPath: "polygon(50% 0%, 95% 25%, 82% 88%, 18% 88%, 5% 25%)",
+              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.06))",
+            }}
+          />
+          {/* Couple photo — center */}
+          <div className="aspect-square rounded-full overflow-hidden border-[3px] border-white shadow-md">
+            {thumbnail ? (
+              <Image
+                src={thumbnail}
+                alt="couple"
+                width={300}
+                height={300}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-green-kwn/20 flex items-center justify-center text-3xl">💍</div>
+            )}
+          </div>
+          {/* Large pill spanning — using a tall rounded rect */}
+          <div className="rounded-[20px] bg-[#2E7D32] aspect-square" />
+
+          {/* Row 3 */}
+          {/* Wide pill — spans 2 cols */}
+          <div className="col-span-2 h-12 rounded-full bg-green-kwn/50 self-center" />
+          {/* Flower / clover */}
+          <div className="aspect-square flex items-center justify-center">
+            <div
+              className="w-[85%] h-[85%]"
+              style={{
+                background: "white",
+                borderRadius: "50% 50% 50% 50% / 50% 50% 50% 50%",
+                boxShadow: "0 0 0 0 white, 12px 0 0 0 white, -12px 0 0 0 white, 0 12px 0 0 white, 0 -12px 0 0 white",
+                clipPath: "polygon(50% 15%, 85% 0%, 100% 35%, 85% 50%, 100% 65%, 85% 100%, 50% 85%, 15% 100%, 0% 65%, 15% 50%, 0% 35%, 15% 0%)",
+                filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.08))",
+              }}
+            />
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Text content */}
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.5 }}
+        className="text-center px-6 flex flex-col items-center gap-2 mt-6"
+      >
+        <p className="text-xs uppercase tracking-[0.2em] text-green-kwn font-semibold">
+          Registry Pernikahan
+        </p>
+        <h1 className="text-3xl font-bold font-recoleta text-gray-900 leading-tight">
+          {undanganData?.content?.title}
+        </h1>
+        <p className="text-gray-500 text-sm leading-relaxed mt-1 max-w-[300px]">
+          Wujudkan kebahagiaanmu dengan memilih hadiah bermakna yang akan
+          menemani perjalanan baru mereka.
+        </p>
+      </motion.div>
+
+      {/* CTA buttons */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8, duration: 0.6 }}
+        className="px-6 mt-6 flex flex-col gap-3 pb-10"
+      >
+        <button
+          onClick={onOpen}
+          className="w-full rounded-2xl font-bold text-white text-sm flex items-center justify-center gap-2"
+          style={{ height: "52px", background: "linear-gradient(135deg, #2E7D32, #4CAF50)", boxShadow: "0 4px 16px rgba(46,125,50,0.3)" }}
+        >
+          <IconGift size={16} />
+          Lihat Hadiah Mereka
+          <IconArrowRight size={15} />
+        </button>
+        <Link href={`/${slug}`}>
+          <button className="w-full h-12 rounded-2xl font-medium text-gray-400 text-sm bg-white border border-gray-100">
+            Kembali ke Undangan
+          </button>
+        </Link>
+      </motion.div>
+    </div>
+  );
+}
+
+// ── Gift List ────────────────────────────────────────────────────────
 function GiftList({
   slug,
   giftList,
   isLoading,
+  undanganData,
 }: {
   slug: string;
   giftList: Gift[];
   isLoading: boolean;
+  undanganData: UndanganDetail;
 }) {
+  const available = giftList.filter((g) => !g.isConfirm).length;
+  const taken = giftList.filter((g) => g.isConfirm).length;
+
   return (
-    <div className="max-w-[450px] mx-auto min-h-screen p-6 pt-3 flex flex-col relative bg-[#F9F9F9]">
-      <div className="sticky top-0 bg-white z-10 py-3 px-3">
-        <h2 className="font-semibold text-xl">Pilihan Kado Spesial</h2>
+    <div className="max-w-[450px] mx-auto min-h-screen flex flex-col bg-[#F0F7F3]">
+      {/* Sticky header */}
+      <div className="sticky top-0 z-20 bg-[#F0F7F3] px-5 pt-6 pb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Pilihan Kado</h2>
+            <p className="text-xs text-gray-400 mt-0.5">
+              {undanganData?.content?.title}
+            </p>
+          </div>
+          {!isLoading && (
+            <div className="flex gap-2">
+              <div className="bg-green-kwn/10 rounded-xl px-3 py-1.5 text-center">
+                <p className="text-green-kwn font-bold text-sm">{available}</p>
+                <p className="text-[9px] text-green-kwn/70">Tersedia</p>
+              </div>
+              {taken > 0 && (
+                <div className="bg-gray-100 rounded-xl px-3 py-1.5 text-center">
+                  <p className="text-gray-500 font-bold text-sm">{taken}</p>
+                  <p className="text-[9px] text-gray-400">Diambil</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Divider */}
+        <div className="h-px bg-black/5 mt-4" />
       </div>
-      <div className="flex flex-col gap-4">
+
+      {/* Product grid */}
+      <div className="px-5 pb-10">
         {isLoading ? (
-          <GiftLoading />
+          <div className="grid grid-cols-2 gap-3">
+            {Array(4).fill(null).map((_, i) => <GiftCardLoading key={i} />)}
+          </div>
+        ) : giftList.length === 0 ? (
+          <div className="text-center py-16 flex flex-col items-center gap-3">
+            <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center">
+              <IconGift size={28} className="text-gray-300" />
+            </div>
+            <p className="text-gray-400 text-sm">Belum ada hadiah yang ditambahkan</p>
+          </div>
         ) : (
-          giftList.map((gift) => (
-            <Link key={gift.id} href={`/${slug}/gift/${gift.id}`}>
-              <GiftCard gift={gift} />
-            </Link>
-          ))
+          <div className="grid grid-cols-2 gap-3 items-start">
+            {giftList.map((gift, i) => (
+              <motion.div
+                key={gift.id}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.06, duration: 0.4 }}
+                className="h-full"
+              >
+                <Link href={`/${slug}/gift/${gift.id}`} className="h-full block">
+                  <GiftCard gift={gift} />
+                </Link>
+              </motion.div>
+            ))}
+          </div>
         )}
       </div>
     </div>
@@ -202,50 +328,56 @@ function GiftList({
 }
 
 function GiftCard({ gift }: { gift: Gift }) {
+  const confirmed = !!gift.isConfirm;
+
   return (
-    <div
-      className={`p-3  rounded-lg shadow-xl flex gap-4 items-center ${
-        gift.isConfirm ? "bg-gray-200" : "bg-white"
-      }`}
-    >
-      <div className="w-[130px]">
+    <div className={`rounded-2xl overflow-hidden bg-white shadow-sm flex flex-col h-full ${confirmed ? "opacity-70" : ""}`}>
+      {/* Image — fixed aspect ratio */}
+      <div className="relative w-full aspect-square overflow-hidden shrink-0">
         <Image
           src={gift.thumbnail || ""}
-          alt="gift-card"
-          width={1000}
-          height={1000}
-          className={`object-cover aspect-square rounded-lg ${
-            gift.isConfirm ? "grayscale" : ""
-          }`}
+          alt={gift.title}
+          width={400}
+          height={400}
+          className={`w-full h-full object-cover ${confirmed ? "grayscale" : ""}`}
         />
+        {confirmed && (
+          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+            <div className="bg-white rounded-full w-10 h-10 flex items-center justify-center shadow">
+              <IconCheck size={18} className="text-green-kwn" />
+            </div>
+          </div>
+        )}
       </div>
-      <div className="flex flex-col gap-1 w-[calc(100%-130px)] text-left">
-        <h6 className="font-medium line-clamp-2">{gift.title}</h6>
-        <div className="font-bold">{formatNumber(Number(gift.price))}</div>
-        <div
-          className={`underline  text-sm font-medium mt-1 ${
-            gift.isConfirm ? "text-gray-500" : "text-green-kwn"
-          }`}
-        >
-          {gift.isConfirm ? "Sudah Hadiahkan" : "Hadiahkan Sekarang"}
+
+      {/* Info — fills remaining height so all cards align at bottom */}
+      <div className="p-3 flex flex-col flex-1">
+        {/* Fixed 2-line title area */}
+        <p className="text-xs font-semibold text-gray-800 leading-snug line-clamp-2 h-[32px] overflow-hidden">
+          {gift.title}
+        </p>
+        {/* Price + CTA pushed to bottom */}
+        <div className="mt-auto pt-2 flex flex-col gap-1">
+          <p className="text-sm font-bold text-green-kwn">
+            {formatNumber(Number(gift.price))}
+          </p>
+          <p className={`text-[10px] font-semibold ${confirmed ? "text-gray-400" : "text-green-kwn"}`}>
+            {confirmed ? "✓ Sudah dihadiahkan" : "Hadiahkan →"}
+          </p>
         </div>
       </div>
     </div>
   );
 }
 
-function GiftLoading() {
+function GiftCardLoading() {
   return (
-    <div
-      className={`p-3  rounded-lg shadow-xl flex gap-4 items-center bg-white`}
-    >
-      <div className="w-[130px]">
-        <Skeleton className="w-full h-[130px] rounded-lg" />
-      </div>
-      <div className="flex flex-col gap-1 w-[calc(100%-130px)] text-left">
-        <Skeleton className="w-full h-[20px] rounded-lg" />
-        <Skeleton className="w-full h-[20px] rounded-lg" />
-        <Skeleton className="w-full h-[20px] rounded-lg mt-1" />
+    <div className="rounded-2xl overflow-hidden bg-white shadow-sm">
+      <Skeleton className="w-full aspect-square" />
+      <div className="p-3 flex flex-col gap-2">
+        <Skeleton className="h-3 w-full rounded" />
+        <Skeleton className="h-3 w-2/3 rounded" />
+        <Skeleton className="h-4 w-1/2 rounded mt-1" />
       </div>
     </div>
   );

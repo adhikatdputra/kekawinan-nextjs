@@ -683,6 +683,7 @@ export default function Theme3({
         setIsOpen={setIsOpenGift}
         giftLength={giftLength}
         slug={slug}
+            buttonBg="bg-theme3-primary"
       />
     </div>
   );

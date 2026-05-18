@@ -667,6 +667,7 @@ export default function Theme5({
         setIsOpen={setIsOpenGift}
         giftLength={giftLength}
         slug={slug}
+            buttonBg="bg-theme7-primary"
       />
     </div>
   );

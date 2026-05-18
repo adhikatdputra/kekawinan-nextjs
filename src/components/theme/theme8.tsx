@@ -700,6 +700,7 @@ export default function Theme8({
         setIsOpen={setIsOpenGift}
         giftLength={giftLength}
         slug={slug}
+            buttonBg="bg-theme8-primary"
       />
     </div>
   );

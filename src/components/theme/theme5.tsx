@@ -693,6 +693,7 @@ export default function Theme5({
         setIsOpen={setIsOpenGift}
         giftLength={giftLength}
         slug={slug}
+            buttonBg="bg-theme5-primary"
       />
     </div>
   );

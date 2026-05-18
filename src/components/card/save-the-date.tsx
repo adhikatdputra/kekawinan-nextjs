@@ -12,14 +12,22 @@ interface TimeLeft {
 
 interface SaveTheDateProps {
   targetDate: string;
+  /** Tailwind text color class, e.g. "text-theme10-primary" */
   primaryColor?: string;
+  /** Tailwind text color class for headings, e.g. "text-theme10-secondary" */
   secondaryColor?: string;
+  /** Tailwind bg classes for the card, e.g. "bg-white/80 backdrop-blur-sm" */
+  cardBg?: string;
+  /** Tailwind bg class for the accent bar and unit dividers, e.g. "bg-theme10-primary" */
+  accentBg?: string;
 }
 
 export default function SaveTheDate({
   targetDate: targetDateString,
   primaryColor = "text-theme10-primary",
   secondaryColor = "text-theme10-secondary",
+  cardBg = "bg-white/80 backdrop-blur-sm shadow-sm",
+  accentBg = "bg-theme10-primary",
 }: SaveTheDateProps) {
   const targetDate = new Date(targetDateString);
 
@@ -62,7 +70,7 @@ export default function SaveTheDate({
         <p className={`text-xl font-recoleta-alt font-semibold ${secondaryColor}`}>
           🎉 Happy Wedding Day!
         </p>
-        <p className="text-sm text-theme10-secondary/60 mt-1">
+        <p className={`text-sm mt-1 opacity-60 ${secondaryColor}`}>
           Semoga bahagia selalu!
         </p>
       </div>
@@ -71,20 +79,17 @@ export default function SaveTheDate({
 
   return (
     <div className="relative">
-      {/* Main card */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-3xl mx-4 shadow-sm overflow-hidden">
+      <div className={`rounded-3xl mx-4 overflow-hidden ${cardBg}`}>
         {/* Top accent bar */}
-        <div className="h-1 w-full bg-gradient-to-r from-transparent via-theme10-primary to-transparent" />
+        <div className={`h-0.5 w-full ${accentBg} opacity-60`} />
 
         <div className="px-6 py-8 flex flex-col items-center gap-6">
           {/* Heading */}
           <div className="text-center">
-            <p className={`text-xs uppercase tracking-[0.25em] font-medium ${secondaryColor} opacity-60 mb-1`}>
+            <p className={`text-xs uppercase tracking-[0.25em] font-medium ${secondaryColor} opacity-50 mb-1`}>
               Menuju Hari Bahagia
             </p>
-            <h2
-              className={`text-4xl font-bold font-recoleta-alt ${secondaryColor} leading-tight`}
-            >
+            <h2 className={`text-4xl font-bold font-recoleta-alt ${secondaryColor} leading-tight`}>
               Save the Date
             </h2>
             <p className={`text-sm mt-1 font-medium ${primaryColor}`}>
@@ -94,18 +99,18 @@ export default function SaveTheDate({
 
           {/* Countdown units */}
           <div className="flex w-full items-end justify-center gap-0">
-            <CountUnit value={pad(time.days)} label="Hari" primaryColor={primaryColor} secondaryColor={secondaryColor} />
+            <CountUnit value={pad(time.days)} label="Hari" primaryColor={primaryColor} secondaryColor={secondaryColor} accentBg={accentBg} />
             <Separator primaryColor={primaryColor} />
-            <CountUnit value={pad(time.hours)} label="Jam" primaryColor={primaryColor} secondaryColor={secondaryColor} />
+            <CountUnit value={pad(time.hours)} label="Jam" primaryColor={primaryColor} secondaryColor={secondaryColor} accentBg={accentBg} />
             <Separator primaryColor={primaryColor} />
-            <CountUnit value={pad(time.minutes)} label="Menit" primaryColor={primaryColor} secondaryColor={secondaryColor} />
+            <CountUnit value={pad(time.minutes)} label="Menit" primaryColor={primaryColor} secondaryColor={secondaryColor} accentBg={accentBg} />
             <Separator primaryColor={primaryColor} />
-            <CountUnit value={pad(time.seconds)} label="Detik" primaryColor={primaryColor} secondaryColor={secondaryColor} isLast />
+            <CountUnit value={pad(time.seconds)} label="Detik" primaryColor={primaryColor} secondaryColor={secondaryColor} accentBg={accentBg} />
           </div>
         </div>
 
         {/* Bottom accent bar */}
-        <div className="h-1 w-full bg-gradient-to-r from-transparent via-theme10-primary to-transparent" />
+        <div className={`h-0.5 w-full ${accentBg} opacity-60`} />
       </div>
     </div>
   );
@@ -116,23 +121,21 @@ function CountUnit({
   label,
   primaryColor,
   secondaryColor,
-  isLast = false,
+  accentBg,
 }: {
   value: string;
   label: string;
   primaryColor: string;
   secondaryColor: string;
-  isLast?: boolean;
+  accentBg: string;
 }) {
   return (
-    <div className={`flex flex-col items-center flex-1 ${isLast ? "" : ""}`}>
-      <span
-        className={`text-4xl font-bold font-recoleta-alt tabular-nums leading-none ${primaryColor}`}
-      >
+    <div className="flex flex-col items-center flex-1">
+      <span className={`text-4xl font-bold font-recoleta-alt tabular-nums leading-none ${primaryColor}`}>
         {value}
       </span>
-      <div className="w-8 h-px bg-theme10-primary/30 my-2" />
-      <span className={`text-[10px] uppercase tracking-widest font-medium ${secondaryColor} opacity-60`}>
+      <div className={`w-8 h-px ${accentBg} opacity-30 my-2`} />
+      <span className={`text-[10px] uppercase tracking-widest font-medium ${secondaryColor} opacity-50`}>
         {label}
       </span>
     </div>

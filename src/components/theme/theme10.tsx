@@ -660,6 +660,7 @@ export default function Theme10({
         setIsOpen={setIsOpenGift}
         giftLength={giftLength}
         slug={slug}
+            buttonBg="bg-theme10-primary"
       />
     </div>
   );
