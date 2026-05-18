@@ -4,15 +4,16 @@ import ReactQueryProvider from "@/lib/tanstack";
 import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import { home } from "@/frontend/constants/meta";
+const isPreview = process.env.VERCEL_ENV === "preview";
+
 export const metadata: Metadata = {
   title: home.title,
   description: home.description,
   alternates: home.alternates,
   publisher: "CTRL Spark",
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: isPreview
+    ? { index: false, follow: false }
+    : { index: true, follow: true },
   icons: {
     icon: "/favicon.ico", // pastikan file ini ada di folder /public
     shortcut: "/favicon.ico", // opsional

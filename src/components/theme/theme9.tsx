@@ -465,10 +465,7 @@ export default function Theme9({
             }}
             viewport={{ once: false }}
           >
-            <Link
-              href={undangan?.content?.gmaps ?? ""}
-              target="_blank"
-            >
+            <Link href={undangan?.content?.gmaps ?? ""} target="_blank">
               <Button className="bg-theme9-primary hover:bg-theme9-primary text-white hover:text-white font-semibold">
                 <IconMapPin size={16} />
                 <span>Lihat di Google Maps</span>
@@ -489,10 +486,7 @@ export default function Theme9({
               <p className="text-sm text-white font-semibold text-center pb-3">
                 Virtual Akad session:
               </p>
-              <Link
-                href={undangan?.content?.streamLink ?? ""}
-                target="_blank"
-              >
+              <Link href={undangan?.content?.streamLink ?? ""} target="_blank">
                 <Button className="bg-theme9-primary hover:bg-theme9-primary text-white hover:text-white font-semibold">
                   <IconDeviceTvOld size={16} />
                   <span>Live Streaming</span>
@@ -542,11 +536,7 @@ export default function Theme9({
             Galeri Kami
           </h2>
         </motion.div>
-        <Galeri
-          galeri={undanganData.gallery}
-          view={1.5}
-          color="#FFFFFF"
-        />
+        <Galeri galeri={undanganData.gallery} view={1.5} color="#FFFFFF" />
       </div>
       {/* Reservasi Ucapan Doa */}
       <UcapanConfirm
