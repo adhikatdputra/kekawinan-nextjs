@@ -198,11 +198,6 @@ export default function Theme15({
           >
             {undanganData?.content?.title}
           </h1>
-          {undanganData?.content?.hashtag && (
-            <p className="text-sm mt-2" style={{ color: DARK_TEAL, fontStyle: "italic" }}>
-              #{undanganData.content.hashtag}
-            </p>
-          )}
           <p className="text-xs mt-1 tracking-widest" style={{ color: "rgba(255,255,255,0.6)" }}>
             {formatDateId(undanganData?.content?.dateWedding ?? "")}
           </p>
