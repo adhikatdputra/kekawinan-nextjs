@@ -50,7 +50,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     const { email, role } = body
 
     if (!email || !role) return badRequest('Email dan role wajib diisi')
-    if (!['MEMBER', 'CREW'].includes(role)) return badRequest('Role harus MEMBER atau CREW')
+    if (!['MEMBER', 'CREW', 'OWNER'].includes(role)) return badRequest('Role harus MEMBER, CREW, atau OWNER')
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return badRequest('Format email tidak valid')
 
     const undangan = await prisma.undangan.findUnique({

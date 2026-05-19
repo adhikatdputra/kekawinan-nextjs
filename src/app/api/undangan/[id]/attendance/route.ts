@@ -25,18 +25,17 @@ export async function POST(request: NextRequest, { params }: Params) {
     })
     if (!undangan) return notFound('Undangan tidak ditemukan')
 
-    // Validasi caller adalah Owner atau Crew ACTIVE di undangan ini
+    // Validasi caller adalah Owner, Member, atau Crew ACTIVE di undangan ini
     const isOwner = undangan.userId === auth.id
     if (!isOwner) {
-      const crew = await prisma.undanganCollaborator.findFirst({
+      const collab = await prisma.undanganCollaborator.findFirst({
         where: {
           undanganId: undangan.id,
           userId: auth.id,
-          role: 'CREW',
           status: 'ACTIVE',
         },
       })
-      if (!crew) return forbidden('Hanya Owner atau Crew yang dapat mengkonfirmasi kehadiran')
+      if (!collab) return forbidden('Hanya Owner, Member, atau Crew yang dapat mengkonfirmasi kehadiran')
     }
 
     // Cari tamu dan pastikan milik undangan ini

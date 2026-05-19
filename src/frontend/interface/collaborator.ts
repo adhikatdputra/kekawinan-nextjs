@@ -1,4 +1,4 @@
-export type CollaboratorRole = 'MEMBER' | 'CREW'
+export type CollaboratorRole = 'MEMBER' | 'CREW' | 'OWNER'
 export type CollaboratorStatus = 'PENDING' | 'ACTIVE'
 
 export interface Collaborator {

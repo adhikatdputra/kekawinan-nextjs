@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
 import { resolveMediaUrl } from '@/lib/helpers'
+import { isActiveCollaborator } from '@/lib/undangan-access'
 
 type Params = { params: Promise<{ id: string; storyId: string }> }
 
@@ -12,7 +13,7 @@ async function getOwnedStory(storyId: string, undanganId: string, userId: string
     include: { undangan: { select: { userId: true } } },
   })
   if (!item || item.undanganId !== undanganId) return { item: null, error: notFound('Love story tidak ditemukan') }
-  if (!isAdminLevel(level) && item.undangan.userId !== userId) {
+  if (!isAdminLevel(level) && item.undangan.userId !== userId && !(await isActiveCollaborator(userId, item.undanganId))) {
     return { item: null, error: forbidden('Akses ditolak') }
   }
   return { item, error: null }

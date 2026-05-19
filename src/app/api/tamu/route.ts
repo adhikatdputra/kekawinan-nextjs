@@ -3,6 +3,7 @@ import { nanoid } from 'nanoid'
 import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { created, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
+import { isActiveCollaborator } from '@/lib/undangan-access'
 
 // POST /api/tamu — create tamu
 // Verifies that the undangan belongs to the authenticated user
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
     // Verify undangan ownership
     const undangan = await prisma.undangan.findUnique({ where: { id: undanganId } })
     if (!undangan) return notFound('Undangan not found')
-    if (!isAdminLevel(auth.level) && undangan.userId !== auth.id) {
+    if (!isAdminLevel(auth.level) && undangan.userId !== auth.id && !(await isActiveCollaborator(auth.id, undanganId))) {
       return forbidden('Access denied')
     }
 

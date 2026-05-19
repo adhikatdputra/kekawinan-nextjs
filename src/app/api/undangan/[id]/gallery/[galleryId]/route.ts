@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
 import { resolveMediaUrl } from '@/lib/helpers'
+import { isActiveCollaborator } from '@/lib/undangan-access'
 
 type Params = { params: Promise<{ id: string; galleryId: string }> }
 
@@ -13,7 +14,7 @@ async function getOwnedGalleryItem(galleryId: string, undanganId: string, userId
   })
   if (!item) return { item: null, error: notFound('Gallery item not found') }
   if (item.undanganId !== undanganId) return { item: null, error: notFound('Gallery item not found') }
-  if (!isAdminLevel(level) && item.undangan.userId !== userId) {
+  if (!isAdminLevel(level) && item.undangan.userId !== userId && !(await isActiveCollaborator(userId, item.undanganId))) {
     return { item: null, error: forbidden('Access denied') }
   }
   return { item, error: null }

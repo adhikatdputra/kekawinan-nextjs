@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
+import { isActiveCollaborator } from '@/lib/undangan-access'
 
 type Params = { params: Promise<{ id: string; giftId: string }> }
 
@@ -12,7 +13,7 @@ async function getOwnedGift(giftId: string, undanganId: string, userId: string, 
   })
   if (!gift) return { gift: null, error: notFound('Gift not found') }
   if (gift.undanganId !== undanganId) return { gift: null, error: notFound('Gift not found') }
-  if (!isAdminLevel(level) && gift.undangan.userId !== userId) {
+  if (!isAdminLevel(level) && gift.undangan.userId !== userId && !(await isActiveCollaborator(userId, gift.undanganId))) {
     return { gift: null, error: forbidden('Access denied') }
   }
   return { gift, error: null }

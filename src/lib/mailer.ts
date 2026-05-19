@@ -110,7 +110,7 @@ export async function sendCollaboratorInviteRegistered(opts: {
   role: string
   dashboardLink: string
 }) {
-  const roleLabel = opts.role === 'MEMBER' ? 'Member' : 'Crew'
+  const roleLabel = opts.role === 'OWNER' ? 'Owner' : opts.role === 'MEMBER' ? 'Member' : 'Crew'
   await transporter.sendMail({
     from: `"Kekawinan.com" <${process.env.SMTP_SENDER}>`,
     to: opts.to,
@@ -145,7 +145,7 @@ export async function sendCollaboratorInvitePending(opts: {
   role: string
   registerLink: string
 }) {
-  const roleLabel = opts.role === 'MEMBER' ? 'Member' : 'Crew'
+  const roleLabel = opts.role === 'OWNER' ? 'Owner' : opts.role === 'MEMBER' ? 'Member' : 'Crew'
   await transporter.sendMail({
     from: `"Kekawinan.com" <${process.env.SMTP_SENDER}>`,
     to: opts.to,

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
+import { isActiveCollaborator } from '@/lib/undangan-access'
 
 type Params = { params: Promise<{ id: string; storyId: string }> }
 
@@ -30,7 +31,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     if (currentIndex === -1) return notFound('Love story tidak ditemukan')
 
     const item = allItems[currentIndex]
-    if (!isAdminLevel(auth.level) && item.undangan.userId !== auth.id) {
+    if (!isAdminLevel(auth.level) && item.undangan.userId !== auth.id && !(await isActiveCollaborator(auth.id, id))) {
       return forbidden('Akses ditolak')
     }
 

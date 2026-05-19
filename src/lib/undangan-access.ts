@@ -36,3 +36,14 @@ export async function getUndanganAccess(
 
   return null
 }
+
+/**
+ * Returns true if the user is an ACTIVE collaborator (MEMBER or CREW) on the undangan.
+ */
+export async function isActiveCollaborator(userId: string, undanganId: string): Promise<boolean> {
+  const collab = await prisma.undanganCollaborator.findFirst({
+    where: { undanganId, userId, status: 'ACTIVE' },
+    select: { id: true },
+  })
+  return !!collab
+}

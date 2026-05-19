@@ -287,6 +287,12 @@ export default function KolaboratorPage() {
                   <SelectValue className="text-left" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="OWNER">
+                    <div>
+                      <div className="font-medium">Owner</div>
+                      <div className="text-xs text-muted-foreground">Akses penuh seperti pemilik undangan</div>
+                    </div>
+                  </SelectItem>
                   <SelectItem value="MEMBER">
                     <div>
                       <div className="font-medium">Member</div>
@@ -329,6 +335,7 @@ export default function KolaboratorPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="OWNER">Owner</SelectItem>
                 <SelectItem value="MEMBER">Member</SelectItem>
                 <SelectItem value="CREW">Crew</SelectItem>
               </SelectContent>
