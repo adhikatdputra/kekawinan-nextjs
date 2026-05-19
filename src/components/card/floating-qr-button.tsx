@@ -31,7 +31,8 @@ export function FloatingQrButton({
   iconColor = 'text-white',
 }: FloatingQrButtonProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [isConfirmed, setIsConfirmed] = useState(tamu?.isConfirm === 1)
+  // "physically attended" = scanned by crew (attendedAt is set), NOT just RSVP (isConfirm=1)
+  const [isConfirmed, setIsConfirmed] = useState(!!tamu?.attendedAt)
   const [attendedAt, setAttendedAt] = useState<string | null>(tamu?.attendedAt ?? null)
 
   const tamuUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/${slug}/${tamuId}`
@@ -39,9 +40,9 @@ export function FloatingQrButton({
 
   // Sync ulang jika tamu prop berubah (setelah data load)
   useEffect(() => {
-    setIsConfirmed(tamu?.isConfirm === 1)
+    setIsConfirmed(!!tamu?.attendedAt)
     setAttendedAt(tamu?.attendedAt ?? null)
-  }, [tamu?.isConfirm, tamu?.attendedAt])
+  }, [tamu?.attendedAt])
 
   // Polling setiap 5 detik jika belum dikonfirmasi
   useEffect(() => {
@@ -52,9 +53,9 @@ export function FloatingQrButton({
         const res = await fetch(`/api/tamu/${tamuId}/status`)
         if (!res.ok) return
         const json = await res.json()
-        if (json?.data?.isConfirm === 1) {
+        if (json?.data?.attendedAt) {
           setIsConfirmed(true)
-          setAttendedAt(json.data.attendedAt ?? null)
+          setAttendedAt(json.data.attendedAt)
           clearInterval(interval)
         }
       } catch {
