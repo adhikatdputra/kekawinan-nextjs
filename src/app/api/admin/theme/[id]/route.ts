@@ -48,6 +48,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
       if (typeof body.isActive !== 'boolean') return badRequest('isActive must be a boolean')
       data.isActive = body.isActive
     }
+    if ('isShowAdmin' in body) data.isShowAdmin = body.isShowAdmin === true
 
     const updated = await prisma.theme.update({ where: { id }, data })
 

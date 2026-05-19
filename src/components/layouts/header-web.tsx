@@ -14,6 +14,7 @@ import {
   IconChevronDown,
   IconLayoutDashboard,
   IconCreditCard,
+  IconShield,
 } from "@tabler/icons-react";
 import { useAuth } from "@/frontend/composable/useAuth";
 import useAuthStore from "@/frontend/store/auth-store";
@@ -42,7 +43,9 @@ function UserDropdown({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, getUser } = useAuth();
+  const userLevel = getUser()?.level;
+  const isAdmin = userLevel === "admin" || userLevel === "superadmin";
 
   const { data: creditData } = useQuery({
     queryKey: ["credits"],
@@ -104,6 +107,16 @@ function UserDropdown({
               {label}
             </Link>
           ))}
+          {isAdmin && (
+            <Link
+              href="/admin/users"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 px-4 py-2.5 text-sm text-green-700 hover:bg-green-soft-kwn hover:text-green-kwn transition-colors font-medium"
+            >
+              <IconShield size={16} />
+              Admin
+            </Link>
+          )}
           <div className="border-t border-gray-100 mt-1 pt-1">
             <button
               onClick={() => {

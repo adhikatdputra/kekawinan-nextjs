@@ -34,6 +34,7 @@ export interface Theme {
   credit: number;
   promo: number | null;
   isActive: boolean;
+  isShowAdmin?: boolean;
   createdAt: string;
   updatedAt: string;
   _count?: { undangan: number };

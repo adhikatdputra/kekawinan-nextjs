@@ -68,11 +68,9 @@ import authApi from "@/frontend/api/auth";
 import { Undangan, UserCreditBalance, Theme, UndanganBody } from "@/frontend/interface/undangan";
 import { Loader2, ShoppingBag } from "lucide-react";
 
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
+
+// Set to true when Shopee credit is ready to launch
+const isShowCredit = false;
 
 export default function UndanganListPage() {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -255,34 +253,50 @@ export default function UndanganListPage() {
   return (
     <>
       {/* Hero */}
-      <div className="bg-[url('/images/bg-main.jpg')] bg-cover bg-center h-[400px] flex items-end">
-        <div className="container py-8 md:py-12">
+      <div className="relative overflow-hidden bg-green-soft-kwn min-h-[350px] md:min-h-[400px] flex items-center pt-14">
+        {/* Dot pattern */}
+        <svg className="absolute inset-0 w-full h-full opacity-25 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="hero-dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+              <circle cx="2" cy="2" r="1.2" fill="#4A763E" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#hero-dots)" />
+        </svg>
+
+        {/* Right image */}
+        <div className="hidden md:block absolute right-0 top-0 bottom-0 w-[55%]">
+          <Image
+            src="/images/bg-main.jpg"
+            alt="Banner"
+            fill
+            className="object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-green-soft-kwn via-green-soft-kwn/40 to-transparent" />
+        </div>
+
+        {/* Content */}
+        <div className="container relative z-10 py-8 md:py-10">
           {isLoaded && (
-            <>
-              <h1 className="text-black text-3xl md:text-5xl font-bold">
-                Halo... <br /> {getUserName()}
+            <div className="max-w-lg">
+              <p className="text-green-kwn/80 text-sm font-medium mb-1">Selamat datang kembali 👋</p>
+              <h1 className="text-gray-900 text-3xl md:text-4xl font-bold leading-tight">
+                Halo, <span className="text-green-kwn">{getUserName()}</span>
               </h1>
+              <p className="mt-2 text-gray-500 text-sm">Buat dan kelola undangan pernikahanmu dengan mudah.</p>
               <div className="mt-6 flex gap-3 flex-wrap items-center">
-                {!isAdmin && (
-                  <>
-                    <Button variant="outline" size="lg" onClick={() => setIsOpenRedeem(true)}>
-                      <IconTicket size={20} />
-                      Tukar Kode
-                    </Button>
-                    <Button size="lg" onClick={openCreate}>
-                      <IconPlus size={20} />
-                      Buat Undangan
-                    </Button>
-                  </>
-                )}
-                {isAdmin && (
-                  <Button size="lg" onClick={openCreate}>
-                    <IconPlus size={20} />
-                    Buat Undangan
+                {isShowCredit && !isAdmin && (
+                  <Button variant="outline" size="lg" className="bg-white/80 border-green-kwn/30 hover:bg-white" onClick={() => setIsOpenRedeem(true)}>
+                    <IconTicket size={18} />
+                    Tukar Kode
                   </Button>
                 )}
+                <Button onClick={openCreate} className="bg-green-kwn hover:bg-green-kwn/90 text-white shadow-md">
+                  <IconPlus size={18} />
+                  Buat Undangan
+                </Button>
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>
@@ -291,7 +305,7 @@ export default function UndanganListPage() {
         <div className="container flex flex-col gap-10">
 
           {/* ── Credit Balance ──────────────────────────────────────────────── */}
-          {!isAdmin && (
+          {isShowCredit && !isAdmin && (
             <div className="flex flex-col gap-4">
               <h2 className="text-2xl font-bold">Credit Kamu</h2>
               {isLoadingCredits ? (
@@ -513,13 +527,13 @@ export default function UndanganListPage() {
       {/* ── Dialog: Buat / Edit Undangan ────────────────────────────────────── */}
       <Dialog open={isOpen} onOpenChange={handleCancel}>
         <form>
-          <DialogContent className="sm:max-w-[750px] lg:max-w-[550px]">
+          <DialogContent className="sm:max-w-[560px]">
             <DialogHeader>
               <DialogTitle>{selectedItem ? "Edit" : "Buat"} Undangan</DialogTitle>
               <Separator className="my-2" />
               <DialogDescription />
             </DialogHeader>
-            <div className="grid gap-4">
+            <div className="overflow-y-auto w-full max-h-[65vh] grid gap-4">
               <div className="grid gap-3">
                 <Label htmlFor="name">Nama Undangan</Label>
                 <Input
@@ -531,15 +545,24 @@ export default function UndanganListPage() {
               </div>
               <div className="grid gap-3">
                 <Label htmlFor="permalink">Permalink</Label>
-                <Input
-                  id="permalink"
-                  placeholder="romeo-juliet"
-                  value={permalink}
-                  onChange={(e) => updatePermalink(e.target.value)}
-                />
-                <span className="text-sm font-semibold text-green-kwn">Contoh: romeo-juliet</span>
-                <div className="mt-2 px-4 py-3 rounded-md bg-green-soft-kwn text-sm">
-                  <p>https://kekawinan.com/{permalink}</p>
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-border bg-white">
+                  {/* Browser dots */}
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="w-3 h-3 rounded-full bg-red-400" />
+                    <span className="w-3 h-3 rounded-full bg-yellow-400" />
+                    <span className="w-3 h-3 rounded-full bg-green-400" />
+                  </div>
+                  <div className="flex items-center gap-0 flex-1 min-w-0 text-sm">
+                    <span className="text-muted-foreground shrink-0">kekawinan.com/</span>
+                    <input
+                      id="permalink"
+                      type="text"
+                      placeholder="romeo-juliet"
+                      value={permalink}
+                      onChange={(e) => updatePermalink(e.target.value)}
+                      className="flex-1 min-w-0 bg-transparent outline-none font-semibold text-green-kwn placeholder:font-normal placeholder:text-muted-foreground/60"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -557,46 +580,26 @@ export default function UndanganListPage() {
                         </span>
                       )}
                     </div>
-                    <Swiper
-                      loop={false}
-                      modules={[Navigation, Pagination]}
-                      spaceBetween={24}
-                      slidesPerView={1.5}
-                      centeredSlides={true}
-                      breakpoints={{
-                        768: { slidesPerView: 3, centeredSlides: false },
-                        1024: { slidesPerView: 3, centeredSlides: false },
-                      }}
-                      navigation={true}
-                      pagination={{ clickable: true }}
-                      className="w-full"
-                      style={{
-                        "--swiper-navigation-color": "#4A763E",
-                        "--swiper-navigation-size": "32px",
-                        "--swiper-pagination-color": "#4A763E",
-                        "--swiper-pagination-bullet-size": "5px",
-                        paddingBottom: "30px",
-                      } as React.CSSProperties}
-                    >
+                    <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory -mx-1 px-1">
                       {themes?.map((item: Theme) => {
                         const cost = item.promo !== null && item.promo !== undefined ? item.promo : item.credit;
                         const affordable = isAdmin || balance >= cost;
                         const isSelected = selectedTheme?.id === item.id;
 
                         return (
-                          <SwiperSlide key={item.id} className="w-full">
+                          <div key={item.id} className="snap-start shrink-0 w-[44%] sm:w-[30%]">
                             <button
                               type="button"
                               onClick={() => affordable && setSelectedTheme(item)}
                               className={`group relative w-full ${!affordable ? "opacity-50 cursor-not-allowed" : ""}`}
                             >
-                              <div className={`relative rounded-md overflow-hidden ${isSelected ? "border-2 border-green-kwn" : ""}`}>
+                              <div className={`relative rounded-lg overflow-hidden ${isSelected ? "ring-2 ring-green-kwn ring-offset-1" : "border border-border"}`}>
                                 <Image
                                   src={item.thumbnail}
                                   alt={item.name}
-                                  width={500}
-                                  height={500}
-                                  className="w-full"
+                                  width={300}
+                                  height={400}
+                                  className="w-full h-auto object-cover"
                                 />
                                 {/* Badge harga credit */}
                                 <div className="absolute top-2 left-2">
@@ -610,7 +613,7 @@ export default function UndanganListPage() {
                                       </span>
                                     </div>
                                   ) : (
-                                    <span className={`text-xs bg-black/60 text-white px-1.5 py-0.5 rounded font-medium ${item.credit === 0 ? "bg-red-500" : "bg-green-kwn"}`}>
+                                    <span className={`text-xs text-white px-1.5 py-0.5 rounded font-medium ${item.credit === 0 ? "bg-red-500" : "bg-green-kwn"}`}>
                                       {item.credit === 0 ? "GRATIS" : `${item.credit} credit`}
                                     </span>
                                   )}
@@ -619,20 +622,20 @@ export default function UndanganListPage() {
                                 {isSelected && (
                                   <div className="absolute top-2 right-2">
                                     <div className="flex items-center gap-1 rounded-full bg-green-kwn px-2 py-1 text-white text-xs">
-                                      <IconRosetteDiscountCheckFilled size={14} />
+                                      <IconRosetteDiscountCheckFilled size={12} />
                                       <span>Dipilih</span>
                                     </div>
                                   </div>
                                 )}
-                                <div className="absolute bottom-0 left-0 right-0 p-2 bg-black text-white text-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                  <Link href={`/${item.componentName?.toLowerCase()}/demo`}>Preview</Link>
+                                <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/70 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                  <Link href={`/${item.componentName?.toLowerCase()}/demo`} target="_blank">Preview</Link>
                                 </div>
                               </div>
                             </button>
-                          </SwiperSlide>
+                          </div>
                         );
                       })}
-                    </Swiper>
+                    </div>
 
                     {/* Peringatan tidak cukup credit */}
                     {!isAdmin && selectedTheme && !canAfford && (

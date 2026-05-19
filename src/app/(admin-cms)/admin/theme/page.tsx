@@ -81,6 +81,7 @@ export default function ThemeAdminPage() {
   const [creditStr, setCreditStr] = useState("0");
   const [promoStr, setPromoStr] = useState(""); // empty = no promo, "0" = free
   const [isActive, setIsActive] = useState(true);
+  const [isShowAdmin, setIsShowAdmin] = useState(false);
 
   const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(10);
@@ -114,6 +115,7 @@ export default function ThemeAdminPage() {
     setCreditStr("0");
     setPromoStr("");
     setIsActive(true);
+    setIsShowAdmin(false);
   };
 
   const setDataEdit = (item: Theme) => {
@@ -124,6 +126,7 @@ export default function ThemeAdminPage() {
     setCreditStr(String(item.credit ?? 0));
     setPromoStr(item.promo !== null && item.promo !== undefined ? String(item.promo) : "");
     setIsActive(item.isActive ?? true);
+    setIsShowAdmin(item.isShowAdmin ?? false);
     setSelectedItem(item);
   };
 
@@ -165,6 +168,7 @@ export default function ThemeAdminPage() {
       credit: Number(creditStr) || 0,
       promo: promoStr === "" ? null : Number(promoStr),
       isActive,
+      isShowAdmin,
     };
 
     if (selectedItem) {
@@ -251,6 +255,7 @@ export default function ThemeAdminPage() {
               <TableHead className="w-[14%]">Harga (credit)</TableHead>
               <TableHead className="w-[14%]">Promo</TableHead>
               <TableHead className="w-[10%]">Status</TableHead>
+              <TableHead className="w-[12%]">Akses</TableHead>
               <TableHead className="w-[10%]">Digunakan</TableHead>
               <TableHead className="text-right w-[4%]"></TableHead>
             </TableRow>
@@ -295,6 +300,15 @@ export default function ThemeAdminPage() {
                     <span className={`text-xs font-medium px-2 py-0.5 rounded ${item.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
                       {item.isActive ? "Aktif" : "Nonaktif"}
                     </span>
+                  </TableCell>
+                  <TableCell>
+                    {item.isShowAdmin ? (
+                      <span className="text-xs font-medium px-2 py-0.5 rounded bg-purple-100 text-purple-700">
+                        Admin Only
+                      </span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">Publik</span>
+                    )}
                   </TableCell>
                   <TableCell className="text-sm">{item._count?.undangan ?? 0} undangan</TableCell>
                   <TableCell className="text-right">
@@ -443,6 +457,20 @@ export default function ThemeAdminPage() {
                 onCheckedChange={(v) => setIsActive(!!v)}
               />
               <Label htmlFor="isActive" className="cursor-pointer">Tema aktif (tampil ke user)</Label>
+            </div>
+
+            <div className="flex items-center gap-3 border-t pt-4">
+              <Checkbox
+                id="isShowAdmin"
+                checked={isShowAdmin}
+                onCheckedChange={(v) => setIsShowAdmin(!!v)}
+              />
+              <div>
+                <Label htmlFor="isShowAdmin" className="cursor-pointer">Hanya tampil ke Admin</Label>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Tema custom yang hanya bisa dilihat oleh admin/superadmin. Berguna untuk tema yang dibuat khusus untuk klien.
+                </p>
+              </div>
             </div>
           </div>
 

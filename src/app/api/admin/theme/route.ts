@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { name, componentName, linkUrl, thumbnail, credit, promo } = body
+    const { name, componentName, linkUrl, thumbnail, credit, promo, isShowAdmin } = body
 
     if (!name || !componentName || !linkUrl) {
       return badRequest('name, componentName, and linkUrl are required')
@@ -65,6 +65,7 @@ export async function POST(request: NextRequest) {
         credit: credit !== undefined ? Number(credit) : 0,
         promo: promo !== undefined && promo !== null ? Number(promo) : null,
         isActive: true,
+        isShowAdmin: isShowAdmin === true,
       },
     })
 

@@ -37,6 +37,9 @@ function formatDate(iso: string) {
   }).format(new Date(iso));
 }
 
+// Set to true when Shopee credit is ready to launch
+const isShowCredit = false;
+
 export default function CreditPage() {
   useSession();
   const { isAuthenticated } = useAuth();
@@ -84,54 +87,58 @@ export default function CreditPage() {
     <main className="min-h-screen bg-green-soft-kwn pt-24 pb-16">
       <div className="container max-w-3xl mx-auto flex flex-col gap-6">
 
-        {/* Balance Card */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm flex items-center justify-between">
-          <div>
-            <p className="text-sm text-gray-500 mb-1">Credit Kamu</p>
-            {isLoadingBalance ? (
-              <div className="h-9 w-16 bg-gray-100 rounded-lg animate-pulse" />
-            ) : (
-              <div className="flex items-center gap-2">
-                <IconCoin size={28} className="text-green-kwn" />
-                <span className="text-4xl font-bold text-green-kwn">{balance}</span>
+        {/* Balance Card + Redeem Code — hidden until Shopee credit is live */}
+        {isShowCredit && (
+          <>
+            <div className="bg-white rounded-3xl p-6 shadow-sm flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Credit Kamu</p>
+                {isLoadingBalance ? (
+                  <div className="h-9 w-16 bg-gray-100 rounded-lg animate-pulse" />
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <IconCoin size={28} className="text-green-kwn" />
+                    <span className="text-4xl font-bold text-green-kwn">{balance}</span>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-          <div className="text-right text-xs text-gray-400 max-w-[160px]">
-            1 credit digunakan untuk membuat 1 undangan
-          </div>
-        </div>
+              <div className="text-right text-xs text-gray-400 max-w-[160px]">
+                1 credit digunakan untuk membuat 1 undangan
+              </div>
+            </div>
 
-        {/* Redeem Code */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm flex flex-col gap-4">
-          <div className="flex items-center gap-2">
-            <IconTicket size={20} className="text-green-kwn" />
-            <h2 className="font-bold text-gray-800">Tukar Kode</h2>
-          </div>
-          <div className="flex gap-3">
-            <Input
-              placeholder="Masukkan kode redeem (contoh: KAWIN-XXXXX)"
-              value={redeemCode}
-              onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
-              onKeyDown={(e) => e.key === "Enter" && !redeem.isPending && handleRedeem()}
-              className="border-green-kwn rounded-full px-4 h-11 bg-white flex-1 uppercase tracking-wider"
-            />
-            <Button
-              onClick={handleRedeem}
-              disabled={redeem.isPending || !redeemCode.trim()}
-              className="rounded-full h-11 px-6 flex-shrink-0"
-            >
-              {redeem.isPending ? (
-                <IconLoader2 size={18} className="animate-spin" />
-              ) : (
-                "Tukar"
-              )}
-            </Button>
-          </div>
-          <p className="text-xs text-gray-400">
-            Masukkan kode yang kamu dapatkan dari Kekawinan untuk menambah credit.
-          </p>
-        </div>
+            {/* Redeem Code */}
+            <div className="bg-white rounded-3xl p-6 shadow-sm flex flex-col gap-4">
+              <div className="flex items-center gap-2">
+                <IconTicket size={20} className="text-green-kwn" />
+                <h2 className="font-bold text-gray-800">Tukar Kode</h2>
+              </div>
+              <div className="flex gap-3">
+                <Input
+                  placeholder="Masukkan kode redeem (contoh: KAWIN-XXXXX)"
+                  value={redeemCode}
+                  onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
+                  onKeyDown={(e) => e.key === "Enter" && !redeem.isPending && handleRedeem()}
+                  className="border-green-kwn rounded-full px-4 h-11 bg-white flex-1 uppercase tracking-wider"
+                />
+                <Button
+                  onClick={handleRedeem}
+                  disabled={redeem.isPending || !redeemCode.trim()}
+                  className="rounded-full h-11 px-6 flex-shrink-0"
+                >
+                  {redeem.isPending ? (
+                    <IconLoader2 size={18} className="animate-spin" />
+                  ) : (
+                    "Tukar"
+                  )}
+                </Button>
+              </div>
+              <p className="text-xs text-gray-400">
+                Masukkan kode yang kamu dapatkan dari Kekawinan untuk menambah credit.
+              </p>
+            </div>
+          </>
+        )}
 
         {/* History */}
         <div className="bg-white rounded-3xl p-6 shadow-sm flex flex-col gap-4">

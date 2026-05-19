@@ -9,6 +9,7 @@ export interface ThemeBody {
   credit?: number;
   promo?: number | null;
   isActive?: boolean;
+  isShowAdmin?: boolean;
 }
 
 const themeApi = {
