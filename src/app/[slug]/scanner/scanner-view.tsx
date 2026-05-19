@@ -35,6 +35,8 @@ export default function ScannerView({ slug }: { slug: string }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const readerRef = useRef<BrowserMultiFormatReader | null>(null)
   const scanningRef = useRef(false)
+  // Use a ref for state so the decode callback always reads the latest value
+  const stateRef = useRef<ScanState>('scanning')
 
   const [state, setState] = useState<ScanState>('scanning')
   const [scannedTamu, setScannedTamu] = useState<TamuData | null>(null)
@@ -42,6 +44,11 @@ export default function ScannerView({ slug }: { slug: string }) {
   const [errorMessage, setErrorMessage] = useState('')
   const [scanCount, setScanCount] = useState(0)
   const [isConfirming, setIsConfirming] = useState(false)
+
+  const setStateSync = (s: ScanState) => {
+    stateRef.current = s
+    setState(s)
+  }
 
   // Auth check
   useEffect(() => {
@@ -60,7 +67,11 @@ export default function ScannerView({ slug }: { slug: string }) {
   }, [])
 
   const startScanner = useCallback(async () => {
-    if (scanningRef.current || !videoRef.current) return
+    if (scanningRef.current) return
+    // Wait one frame for the video element to be in the DOM
+    await new Promise((r) => requestAnimationFrame(r))
+    if (!videoRef.current) return
+
     scanningRef.current = true
 
     try {
@@ -68,33 +79,32 @@ export default function ScannerView({ slug }: { slug: string }) {
       readerRef.current = reader
 
       await reader.decodeFromVideoDevice(undefined, videoRef.current, async (result, err) => {
-        if (!result || state !== 'scanning') return
+        // Use stateRef instead of closed-over state to always get latest value
+        if (!result || stateRef.current !== 'scanning') return
         if (err instanceof NotFoundException) return
 
         const text = result.getText()
 
-        // Parse tamuId dari URL: https://domain.com/slug/tamuId
         let tamuId: string | null = null
         try {
           const url = new URL(text)
           const parts = url.pathname.split('/').filter(Boolean)
-          // Expect: /slug/tamuId
           if (parts.length === 2 && parts[0] === slug) {
             tamuId = parts[1]
           }
         } catch {
-          // bukan URL valid
+          // not a valid URL
         }
 
         if (!tamuId) {
           stopScanner()
-          setState('error')
+          setStateSync('error')
           setErrorMessage('❌ QR tidak dikenali. Pastikan kamu scan QR dari undangan yang benar.')
           return
         }
 
         stopScanner()
-        setState('found')
+        setStateSync('found')
 
         try {
           const res = await axios.post(`/undangan/${slug}/attendance`, { tamuId })
@@ -103,7 +113,7 @@ export default function ScannerView({ slug }: { slug: string }) {
           setAlreadyConfirmed(data.alreadyConfirmed)
         } catch (err: unknown) {
           const status = (err as { response?: { status?: number } })?.response?.status
-          setState('error')
+          setStateSync('error')
           if (status === 403) {
             setErrorMessage('Kamu tidak memiliki akses ke scanner undangan ini.')
           } else if (status === 404) {
@@ -115,20 +125,21 @@ export default function ScannerView({ slug }: { slug: string }) {
       })
     } catch {
       scanningRef.current = false
-      setState('error')
+      setStateSync('error')
       setErrorMessage('⚠️ Kamera tidak dapat diakses. Pastikan izin kamera sudah diberikan.')
     }
-  }, [slug, state, stopScanner])
+  }, [slug, stopScanner])
 
+  // Start/stop scanner when state changes
   useEffect(() => {
     if (state === 'scanning') {
       startScanner()
+    } else {
+      stopScanner()
     }
-    return () => {
-      if (state !== 'scanning') stopScanner()
-    }
-  }, [state, startScanner, stopScanner])
+  }, [state]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Cleanup on unmount
   useEffect(() => {
     return () => stopScanner()
   }, [stopScanner])
@@ -141,10 +152,10 @@ export default function ScannerView({ slug }: { slug: string }) {
       const data: ScanResult = res.data.data
       setScannedTamu(data.tamu)
       setAlreadyConfirmed(data.alreadyConfirmed)
-      setState('confirmed')
+      setStateSync('confirmed')
       if (!data.alreadyConfirmed) setScanCount((c) => c + 1)
     } catch {
-      setState('error')
+      setStateSync('error')
       setErrorMessage('⚠️ Tidak ada koneksi atau terjadi kesalahan. Coba lagi.')
     } finally {
       setIsConfirming(false)
@@ -155,7 +166,7 @@ export default function ScannerView({ slug }: { slug: string }) {
     setScannedTamu(null)
     setAlreadyConfirmed(false)
     setErrorMessage('')
-    setState('scanning')
+    setStateSync('scanning')
   }
 
   return (
@@ -173,38 +184,35 @@ export default function ScannerView({ slug }: { slug: string }) {
 
       <div className="flex-1 flex flex-col items-center justify-center p-4 gap-6">
 
-        {/* SCANNING STATE */}
-        {state === 'scanning' && (
-          <div className="w-full max-w-sm flex flex-col items-center gap-4">
-            <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-black border-2 border-gray-700">
-              <video
-                ref={videoRef}
-                className="w-full h-full object-cover"
-                playsInline
-                muted
-              />
-              {/* Scan frame overlay */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="w-48 h-48 border-2 border-white/60 rounded-xl relative">
-                  <span className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-white rounded-tl-xl" />
-                  <span className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-white rounded-tr-xl" />
-                  <span className="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-white rounded-bl-xl" />
-                  <span className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-white rounded-br-xl" />
-                </div>
+        {/* Video element — always in DOM so videoRef is never null */}
+        <div className={`w-full max-w-sm flex flex-col items-center gap-4 ${state === 'scanning' ? 'block' : 'hidden'}`}>
+          <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-black border-2 border-gray-700">
+            <video
+              ref={videoRef}
+              className="w-full h-full object-cover"
+              playsInline
+              muted
+            />
+            {/* Scan frame overlay */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="w-48 h-48 border-2 border-white/60 rounded-xl relative">
+                <span className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-white rounded-tl-xl" />
+                <span className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-white rounded-tr-xl" />
+                <span className="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-white rounded-bl-xl" />
+                <span className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-white rounded-br-xl" />
               </div>
             </div>
-            <p className="text-gray-400 text-sm text-center">Arahkan kamera ke QR Code tamu</p>
           </div>
-        )}
+          <p className="text-gray-400 text-sm text-center">Arahkan kamera ke QR Code tamu</p>
+        </div>
 
-        {/* FOUND STATE — tampil info tamu sebelum konfirmasi */}
+        {/* FOUND STATE */}
         {state === 'found' && scannedTamu && (
           <div className="w-full max-w-sm bg-gray-900 rounded-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center gap-2">
               <span className="text-green-400 text-xl">✓</span>
               <h2 className="font-semibold text-lg">Tamu Ditemukan</h2>
             </div>
-
             <div className="flex flex-col gap-2 text-sm">
               <Row label="Nama" value={scannedTamu.name ?? '-'} />
               <Row label="Diundang" value={`${scannedTamu.maxInvite ?? '-'} orang`} />
@@ -217,7 +225,6 @@ export default function ScannerView({ slug }: { slug: string }) {
                 }
               />
             </div>
-
             {alreadyConfirmed ? (
               <div className="bg-yellow-900/40 border border-yellow-700 rounded-xl p-3 text-yellow-300 text-sm">
                 ⚠️ Tamu ini sudah tercatat hadir pukul{' '}
@@ -232,11 +239,7 @@ export default function ScannerView({ slug }: { slug: string }) {
                 {isConfirming ? 'Menyimpan...' : 'Konfirmasi Hadir'}
               </button>
             )}
-
-            <button
-              onClick={handleReset}
-              className="w-full text-gray-400 hover:text-white text-sm py-2"
-            >
+            <button onClick={handleReset} className="w-full text-gray-400 hover:text-white text-sm py-2">
               Batal / Scan Ulang
             </button>
           </div>
@@ -253,9 +256,7 @@ export default function ScannerView({ slug }: { slug: string }) {
               <span className="font-medium text-white">{scannedTamu.name ?? 'Tamu'}</span>
             </p>
             {scannedTamu.attendedAt && (
-              <p className="text-sm text-gray-400">
-                Hadir pukul {formatTime(scannedTamu.attendedAt)}
-              </p>
+              <p className="text-sm text-gray-400">Hadir pukul {formatTime(scannedTamu.attendedAt)}</p>
             )}
             <button
               onClick={handleReset}
