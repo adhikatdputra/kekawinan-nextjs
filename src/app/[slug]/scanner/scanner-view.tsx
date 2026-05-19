@@ -120,20 +120,26 @@ export default function ScannerView({ slug }: { slug: string }) {
             return
           }
 
-          stopScanner()
-          setStateSync('found')
-
+          // Fetch tamu info ONLY — do NOT confirm attendance yet
           try {
-            const res = await axios.post(`/undangan/${slug}/attendance`, { tamuId })
-            const data: ScanResult = res.data.data
-            setScannedTamu(data.tamu)
-            setAlreadyConfirmed(data.alreadyConfirmed)
-          } catch (err: unknown) {
-            const status = (err as { response?: { status?: number } })?.response?.status
+            const res = await fetch(`/api/tamu/${tamuId}/status`)
+            if (!res.ok) throw new Error('not_found')
+            const json = await res.json()
+            const data = json.data
+            stopScanner()
+            setScannedTamu({
+              id: tamuId,
+              name: data.name ?? null,
+              maxInvite: data.maxInvite ?? null,
+              isConfirm: data.isConfirm,
+              attendedAt: data.attendedAt ?? null,
+            })
+            setAlreadyConfirmed(!!data.attendedAt)
+            setStateSync('found')
+          } catch {
+            stopScanner()
             setStateSync('error')
-            if (status === 403) setErrorMessage('Kamu tidak memiliki akses ke scanner undangan ini.')
-            else if (status === 404) setErrorMessage('❌ QR tidak dikenali. Pastikan kamu scan QR dari undangan yang benar.')
-            else setErrorMessage('⚠️ Tidak ada koneksi atau terjadi kesalahan. Coba lagi.')
+            setErrorMessage('❌ QR tidak dikenali. Pastikan kamu scan QR dari undangan yang benar.')
           }
         }
       )
@@ -175,11 +181,7 @@ export default function ScannerView({ slug }: { slug: string }) {
   }
 
   const handleReset = () => {
-    stopScanner()          // ensure camera is released before restarting
-    setScannedTamu(null)
-    setAlreadyConfirmed(false)
-    setErrorMessage('')
-    setStateSync('scanning')
+    window.location.reload()
   }
 
   // ── Render ───────────────────────────────────────────────────────────────────

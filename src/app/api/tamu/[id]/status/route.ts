@@ -11,7 +11,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
   try {
     const tamu = await prisma.tamu.findUnique({
       where: { id },
-      select: { isConfirm: true, attendedAt: true },
+      select: { isConfirm: true, attendedAt: true, name: true, maxInvite: true },
     })
     if (!tamu) return notFound('Tamu tidak ditemukan')
 
