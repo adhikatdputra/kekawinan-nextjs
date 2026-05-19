@@ -44,9 +44,9 @@ export function FloatingQrButton({
     setAttendedAt(tamu?.attendedAt ?? null)
   }, [tamu?.attendedAt])
 
-  // Polling setiap 5 detik jika belum dikonfirmasi
+  // Polling hanya saat popup terbuka dan belum dikonfirmasi fisik
   useEffect(() => {
-    if (isConfirmed || !tamuId) return
+    if (!isOpen || isConfirmed || !tamuId) return
 
     const interval = setInterval(async () => {
       try {
@@ -64,7 +64,7 @@ export function FloatingQrButton({
     }, 5000)
 
     return () => clearInterval(interval)
-  }, [isConfirmed, tamuId])
+  }, [isOpen, isConfirmed, tamuId])
 
   if (!tamu) return null
 

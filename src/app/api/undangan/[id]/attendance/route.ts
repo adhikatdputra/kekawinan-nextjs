@@ -48,8 +48,8 @@ export async function POST(request: NextRequest, { params }: Params) {
       return badRequest('QR tidak dikenali. Pastikan kamu scan QR dari undangan yang benar.')
     }
 
-    // Cek double confirm
-    if (tamu.isConfirm === 1) {
+    // Cek double scan — hanya blok jika sudah benar-benar hadir fisik (attendedAt ter-set)
+    if (tamu.attendedAt !== null) {
       return ok(
         { alreadyConfirmed: true, attendedAt: tamu.attendedAt, tamu },
         'Tamu ini sudah tercatat hadir.'
