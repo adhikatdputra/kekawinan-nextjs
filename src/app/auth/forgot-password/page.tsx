@@ -18,7 +18,7 @@ export default function ForgotPasswordPage() {
   const forgotPassword = useMutation({
     mutationFn: (email: string) => authApi.forgotPassword(email),
     onSuccess: () => setSent(true),
-    onError: () => toast.error("Terjadi kesalahan, silahkan coba lagi"),
+    onError: () => { toast.error("Terjadi kesalahan, silahkan coba lagi"); },
   });
 
   const handleSubmit = () => {
