@@ -152,7 +152,7 @@ export default function Permalink() {
             <div className="relative">
               <div className="absolute -inset-3 bg-gradient-to-tl from-green-100/50 to-emerald-50/50 rounded-3xl backdrop-blur-sm border border-green-200/40" />
               <Image
-                src="/images/image-create.webp"
+                src="/images/dashboard.png"
                 alt="Custom permalink undangan digital pernikahan di Kekawinan.com"
                 width={800}
                 height={800}

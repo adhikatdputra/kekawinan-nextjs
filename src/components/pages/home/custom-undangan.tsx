@@ -76,7 +76,7 @@ export default function CustomUndangan() {
               </span>
             </div>
 
-            <h2 className="text-3xl md:text-4xl text-white font-bold leading-tight max-w-xs">
+            <h2 className="text-3xl md:text-4xl text-white font-bold leading-tight max-w-lg">
               Undangan Digital{" "}
               <span className="text-green-300">Sepenuhnya Custom</span>{" "}
               Sesuai Gaya Kamu
@@ -138,7 +138,7 @@ export default function CustomUndangan() {
               {/* Glass frame */}
               <div className="absolute -inset-3 bg-gradient-to-br from-green-500/20 to-emerald-400/10 rounded-3xl border border-green-500/20" />
               <Image
-                src="/images/image-banner-2.png"
+                src="/images/image-banner-2.webp"
                 alt="Layanan custom undangan digital pernikahan Kekawinan.com"
                 className="relative w-[85%] mx-auto rounded-2xl"
                 width={500}

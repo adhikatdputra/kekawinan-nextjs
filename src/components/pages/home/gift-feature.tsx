@@ -32,13 +32,13 @@ export default function GiftFeature() {
             transition={{ duration: 0.7, ease: "easeOut" }}
           >
             {/* White card frame — provides contrast for the green-toned image */}
-            <div className="relative bg-white rounded-3xl shadow-xl p-4 border border-gray-100">
+            <div className="relative bg-white rounded-3xl shadow-xl p-4 border border-gray-100 py-12">
               <Image
-                src="/images/image-gift.webp"
+                src="/images/gift-image.webp"
                 alt="Fitur daftar kado pernikahan digital di Kekawinan.com"
                 width={800}
                 height={800}
-                className="w-full rounded-2xl"
+                className="w-[80%] mx-auto rounded-2xl"
               />
             </div>
 
@@ -48,7 +48,7 @@ export default function GiftFeature() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="absolute -bottom-4 right-4 md:right-0 bg-white border border-gray-100 rounded-2xl px-4 py-3 shadow-xl flex items-center gap-3"
+              className="absolute -top-8 md:top-15 right-4 md:-right-12 bg-white border border-gray-100 rounded-2xl px-4 py-3 shadow-xl flex items-center gap-3"
             >
               <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                 <Gift className="w-4 h-4 text-green-700" />
