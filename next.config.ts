@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "kekawinan.com" },
       { protocol: "https", hostname: "res.cloudinary.com" },
       { protocol: "https", hostname: "cdn.trakteer.id" },
+      { protocol: "https", hostname: "images.unsplash.com" },
     ],
   },
 };

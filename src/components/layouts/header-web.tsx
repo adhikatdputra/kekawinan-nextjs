@@ -33,10 +33,15 @@ function UserAvatar({ name }: { name: string }) {
   );
 }
 
-function UserDropdown({ name, onLogout }: { name: string; onLogout: () => void }) {
+function UserDropdown({
+  name,
+  onLogout,
+}: {
+  name: string;
+  onLogout: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-
   const { isAuthenticated } = useAuth();
 
   const { data: creditData } = useQuery({
@@ -61,10 +66,10 @@ function UserDropdown({ name, onLogout }: { name: string; onLogout: () => void }
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 rounded-full border border-green-kwn/30 bg-white px-3 py-1.5 hover:bg-green-soft-kwn transition-colors"
+        className="flex items-center gap-2 rounded-full border border-green-200/60 bg-white/80 backdrop-blur-sm px-3 py-1.5 hover:bg-green-soft-kwn transition-all shadow-sm"
       >
         <UserAvatar name={name} />
-        <span className="hidden md:block text-sm font-semibold text-gray-800 max-w-[120px] truncate">
+        <span className="hidden md:block text-sm font-semibold text-gray-800 max-w-[110px] truncate">
           {name}
         </span>
         <div className="hidden md:flex items-center gap-1 bg-green-soft-kwn rounded-full px-2 py-0.5">
@@ -73,46 +78,38 @@ function UserDropdown({ name, onLogout }: { name: string; onLogout: () => void }
         </div>
         <IconChevronDown
           size={14}
-          className={`text-gray-500 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`text-gray-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
         />
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50">
-          {/* Credit badge inside dropdown for mobile */}
+        <div className="absolute right-0 mt-2 w-52 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100/80 py-2 z-50">
           <div className="flex items-center gap-2 px-4 py-2 border-b border-gray-100 md:hidden">
             <IconCoin size={14} className="text-green-kwn" />
             <span className="text-xs text-gray-500">Credit</span>
             <span className="ml-auto text-sm font-bold text-green-kwn">{balance}</span>
           </div>
-
-          <Link
-            href="/user/undangan-list"
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-green-soft-kwn hover:text-green-kwn transition-colors"
-          >
-            <IconLayoutDashboard size={16} />
-            Dashboard
-          </Link>
-          <Link
-            href="/user/profile"
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-green-soft-kwn hover:text-green-kwn transition-colors"
-          >
-            <IconUser size={16} />
-            Profile
-          </Link>
-          <Link
-            href="/user/credit"
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-green-soft-kwn hover:text-green-kwn transition-colors"
-          >
-            <IconCreditCard size={16} />
-            Credit
-          </Link>
+          {[
+            { href: "/user/undangan-list", icon: IconLayoutDashboard, label: "Dashboard" },
+            { href: "/user/profile", icon: IconUser, label: "Profile" },
+            { href: "/user/credit", icon: IconCreditCard, label: "Credit" },
+          ].map(({ href, icon: Icon, label }) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-green-soft-kwn hover:text-green-kwn transition-colors"
+            >
+              <Icon size={16} />
+              {label}
+            </Link>
+          ))}
           <div className="border-t border-gray-100 mt-1 pt-1">
             <button
-              onClick={() => { setOpen(false); onLogout(); }}
+              onClick={() => {
+                setOpen(false);
+                onLogout();
+              }}
               className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"
             >
               <IconLogout2 size={16} />
@@ -128,75 +125,85 @@ function UserDropdown({ name, onLogout }: { name: string; onLogout: () => void }
 export default function HeaderWeb() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { isAuthenticated, getUserName } = useAuth();
   const { logout } = useAuthStore();
 
   useEffect(() => {
     setIsLoaded(true);
+    const handleScroll = () => setScrolled(window.scrollY > 16);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const username = getUserName() ?? "";
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 w-full shadow-xl bg-blur header">
-      <div className="container py-4">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${
+        scrolled
+          ? "bg-white/92 backdrop-blur-md shadow-sm border-b border-green-100/50"
+          : "bg-white/75 backdrop-blur-sm"
+      }`}
+    >
+      <div className="container py-3.5">
         <div className="flex items-center justify-between">
-          <Link href="/">
+          {/* Logo */}
+          <Link href="/" className="flex-shrink-0">
             <Image
               src="/images/kekawinan-logo.png"
               alt="Kekawinan"
               width={400}
               height={400}
-              className="w-[200px]"
+              className="w-[150px] md:w-[170px] h-auto"
               priority
             />
           </Link>
-          <div className="flex items-center gap-4">
-            {isLoaded && (
-              isAuthenticated() ? (
-                <>
-                  {/* Desktop: only show UserDropdown */}
-                  <div className="hidden md:flex items-center gap-4">
-                    
-                    <UserDropdown name={username} onLogout={logout} />
-                  </div>
 
-                  {/* Mobile: hamburger */}
-                  <div className="md:hidden flex items-center gap-3">
-                    <UserDropdown name={username} onLogout={logout} />
-                  </div>
-                </>
+          {/* Right side */}
+          <div className="flex items-center gap-2.5">
+            {isLoaded &&
+              (isAuthenticated() ? (
+                <UserDropdown name={username} onLogout={logout} />
               ) : (
-                <Link href="/auth/login">
-                  <Button className="text-white">
-                    <IconLogin2 size={20} />
-                    Daftar Sekarang
-                  </Button>
-                </Link>
-              )
-            )}
-
-            {/* Mobile menu for unauthenticated */}
-            {isLoaded && !isAuthenticated() && (
-              <Button
-                size="icon"
-                onClick={() => setIsOpen(!isOpen)}
-                className="md:hidden"
-              >
-                {isOpen ? <IconX size={20} /> : <IconMenu4 size={20} />}
-              </Button>
-            )}
+                <>
+                  <Link href="/auth/login" className="hidden md:block">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-green-200 text-green-700 hover:bg-green-soft-kwn hover:border-green-300"
+                    >
+                      Masuk
+                    </Button>
+                  </Link>
+                  <Link href="/auth/login">
+                    <Button
+                      size="sm"
+                      className="text-white bg-green-kwn hover:bg-green-kwn/90 shadow-sm shadow-green-200/40"
+                    >
+                      <IconLogin2 size={15} />
+                      Daftar Gratis
+                    </Button>
+                  </Link>
+                  <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="md:hidden w-9 h-9 rounded-xl border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors"
+                  >
+                    {isOpen ? <IconX size={18} /> : <IconMenu4 size={18} />}
+                  </button>
+                </>
+              ))}
           </div>
         </div>
       </div>
 
-      {/* Mobile dropdown menu for unauthenticated */}
+      {/* Mobile menu */}
       {isLoaded && !isAuthenticated() && isOpen && (
-        <div className="md:hidden bg-white shadow-xl py-3 px-4 flex flex-col gap-2">
-          <Link href="/auth/login">
-            <Button className="text-white w-full">
-              <IconLogin2 size={20} />
-              Daftar Sekarang
+        <div className="md:hidden bg-white/98 backdrop-blur-md border-t border-green-100/50 py-4 px-4 flex flex-col gap-2">
+          <Link href="/auth/login" onClick={() => setIsOpen(false)}>
+            <Button className="text-white w-full bg-green-kwn hover:bg-green-kwn/90">
+              <IconLogin2 size={16} />
+              Daftar Gratis Sekarang
             </Button>
           </Link>
         </div>

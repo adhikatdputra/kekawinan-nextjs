@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Trakteer() {
   return (
-    <div className="fixed bottom-8 right-6">
+    <div className="fixed bottom-8 right-6 z-50">
       <Link href="https://trakteer.id/partnerinaja/tip" target="_blank">
         <Button className="bg-red-700 hover:bg-red-800">
           <Image

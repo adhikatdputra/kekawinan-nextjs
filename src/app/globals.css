@@ -207,6 +207,24 @@
   @apply mx-auto px-4 md:px-6 lg:px-8;
 }
 
+@keyframes marquee-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-right {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+.animate-marquee-left {
+  animation: marquee-left 28s linear infinite;
+}
+
+.animate-marquee-right {
+  animation: marquee-right 28s linear infinite;
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
