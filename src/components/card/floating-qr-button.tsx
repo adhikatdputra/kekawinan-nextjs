@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { IconQrcode, IconX } from '@tabler/icons-react'
 import { UndanganTamu, UndanganContent } from '@/frontend/interface/undangan'
-import { BASE_URL } from '@/lib/config'
 
 interface FloatingQrButtonProps {
   tamu: UndanganTamu | null
@@ -35,7 +34,7 @@ export function FloatingQrButton({
   const [isConfirmed, setIsConfirmed] = useState(tamu?.isConfirm === 1)
   const [attendedAt, setAttendedAt] = useState<string | null>(tamu?.attendedAt ?? null)
 
-  const tamuUrl = `${BASE_URL}/${slug}/${tamuId}`
+  const tamuUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/${slug}/${tamuId}`
   const mempelai = [content?.nameMale, content?.nameFemale].filter(Boolean).join(' & ')
 
   // Sync ulang jika tamu prop berubah (setelah data load)

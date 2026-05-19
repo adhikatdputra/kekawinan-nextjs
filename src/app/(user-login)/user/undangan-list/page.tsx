@@ -22,6 +22,7 @@ import {
   IconTool,
   IconExternalLink,
   IconChevronDown,
+  IconScan,
 } from "@tabler/icons-react";
 import PendingNoData from "@/components/ui/custom/pending-no-data";
 import PendingData from "@/components/ui/custom/pending-data";
@@ -460,6 +461,14 @@ export default function UndanganListPage() {
                             </TooltipTrigger>
                             <TooltipContent><p>Kado pernikahan</p></TooltipContent>
                           </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Link href={`/${item.permalink}/scanner`} target="_blank" className="p-1.5 rounded-lg text-muted-foreground hover:bg-gray-100 hover:text-foreground transition-colors">
+                                <IconScan size={17} />
+                              </Link>
+                            </TooltipTrigger>
+                            <TooltipContent><p>Scanner absensi</p></TooltipContent>
+                          </Tooltip>
                           {isOwner && (
                             <>
                               <div className="w-px h-5 bg-border mx-1" />
@@ -488,6 +497,10 @@ export default function UndanganListPage() {
                           <Link href={`/${item.permalink}/demo`} target="_blank" className="inline-flex items-center gap-1 text-xs font-medium text-green-kwn border border-green-kwn/40 hover:bg-green-kwn hover:text-white px-2 py-1 rounded-lg transition-colors">
                             <IconExternalLink size={13} />
                             Preview
+                          </Link>
+                          <Link href={`/${item.permalink}/scanner`} target="_blank" className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 px-2 py-1 rounded-lg transition-colors">
+                            <IconScan size={13} />
+                            Scan
                           </Link>
                           <button
                             onClick={() => setOpenMenuId(openMenuId === item.id ? null : item.id)}
