@@ -1,9 +1,13 @@
 import nodemailer from 'nodemailer'
 
+const smtpPort = Number(process.env.SMTP_PORT)
+const useTls = process.env.SMTP_USE_TLS === 'true'
+
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: process.env.SMTP_USE_TLS === 'true',
+  port: smtpPort,
+  secure: smtpPort === 465,
+  requireTLS: useTls && smtpPort !== 465,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASSWORD,
