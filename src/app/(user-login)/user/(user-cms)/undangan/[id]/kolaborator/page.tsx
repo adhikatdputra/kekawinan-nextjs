@@ -132,7 +132,7 @@ export default function KolaboratorPage() {
   });
 
   // Resend mutation
-  const { mutate: resend } = useMutation({
+  const { mutate: resend, isPending: isResending, variables: resendingId } = useMutation({
     mutationFn: (collabId: string) => collaboratorApi.resendInvite(id, collabId),
     onSuccess: (data) => {
       if (data.data.success) toast.success("Email undangan berhasil dikirim ulang");
@@ -221,10 +221,13 @@ export default function KolaboratorPage() {
                             variant="outline"
                             size="sm"
                             onClick={() => resend(collab.id)}
+                            disabled={isResending && resendingId === collab.id}
                             title="Kirim ulang email"
                           >
-                            <IconMail size={14} />
-                            Resend
+                            {isResending && resendingId === collab.id
+                              ? <><Loader2 size={14} className="animate-spin" /> Mengirim...</>
+                              : <><IconMail size={14} /> Resend</>
+                            }
                           </Button>
                         )}
                         <Button

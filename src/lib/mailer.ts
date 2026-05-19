@@ -166,7 +166,7 @@ export async function sendCollaboratorInvitePending(opts: {
         </table>
         <p style="margin:0;">Daftar akun gratis di Kekawinan.com untuk mulai membantu. Setelah daftar, undangan ini akan otomatis muncul di dashboard kamu.</p>
       `,
-      ctaHref: opts.registerLink,
+      ctaHref: `${opts.registerLink}?email=${encodeURIComponent(opts.to)}`,
       ctaLabel: 'Daftar Sekarang — Gratis',
       note: 'Jika kamu tidak mengenal pengirim ini, abaikan email ini.',
     }),
