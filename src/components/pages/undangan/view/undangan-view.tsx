@@ -16,7 +16,7 @@ import Loading from "@/components/layouts/loading";
 import NotFound from "@/components/card/not-found";
 
 // Lagi Testing -> Delete Soon
-import Theme14 from "@/components/theme/theme14";
+// import Theme15 from "@/components/theme/theme15";
 
 interface ThemeComponentProps {
   undanganData: UndanganDetail;
@@ -236,7 +236,7 @@ export default function UndanganView({
   return (
     <div className="max-w-[450px] mx-auto overflow-x-hidden">
       {ThemeComponent && undanganData ? (
-        <Theme14
+        <ThemeComponent
           undanganData={undanganData}
           tamuData={tamu}
           ucapan={ucapan}
