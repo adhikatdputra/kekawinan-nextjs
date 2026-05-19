@@ -21,6 +21,7 @@ import {
   IconUserCheck,
   IconTool,
   IconExternalLink,
+  IconChevronDown,
 } from "@tabler/icons-react";
 import PendingNoData from "@/components/ui/custom/pending-no-data";
 import PendingData from "@/components/ui/custom/pending-data";
@@ -87,6 +88,7 @@ export default function UndanganListPage() {
   const [redeemCode, setRedeemCode] = useState("");
   const [isOpenPhoneWarning, setIsOpenPhoneWarning] = useState(false);
   const [isIssueDismissed, setIsIssueDismissed] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
   const { getUser, getUserName } = useAuth();
   const isAdmin = getUser()?.level === "admin" || getUser()?.level === "superadmin";
@@ -422,26 +424,18 @@ export default function UndanganListPage() {
                         {/* Divider — mobile only */}
                         <div className="border-t border-border sm:hidden" />
 
-                        {/* Right: actions */}
-                        <div className="flex items-center gap-1 shrink-0 flex-wrap">
-                          {/* Preview link */}
+                        {/* Right: actions — Desktop */}
+                        <div className="hidden sm:flex items-center gap-1 shrink-0 flex-wrap">
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Link
-                                href={`/${item.permalink}/demo`}
-                                target="_blank"
-                                className="inline-flex items-center gap-1 text-xs font-medium text-green-kwn border border-green-kwn/40 hover:bg-green-kwn hover:text-white px-2 py-1 rounded-lg transition-colors"
-                              >
+                              <Link href={`/${item.permalink}/demo`} target="_blank" className="inline-flex items-center gap-1 text-xs font-medium text-green-kwn border border-green-kwn/40 hover:bg-green-kwn hover:text-white px-2 py-1 rounded-lg transition-colors">
                                 <IconExternalLink size={13} />
                                 Preview
                               </Link>
                             </TooltipTrigger>
                             <TooltipContent><p>Lihat undangan</p></TooltipContent>
                           </Tooltip>
-
-                          {/* Divider */}
                           <div className="w-px h-5 bg-border mx-1" />
-
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Link href={`/user/undangan/${item.id}/overview`} className="p-1.5 rounded-lg text-muted-foreground hover:bg-gray-100 hover:text-foreground transition-colors">
@@ -466,7 +460,6 @@ export default function UndanganListPage() {
                             </TooltipTrigger>
                             <TooltipContent><p>Kado pernikahan</p></TooltipContent>
                           </Tooltip>
-
                           {isOwner && (
                             <>
                               <div className="w-px h-5 bg-border mx-1" />
@@ -488,6 +481,60 @@ export default function UndanganListPage() {
                               </Tooltip>
                             </>
                           )}
+                        </div>
+
+                        {/* Right: actions — Mobile (dropdown) */}
+                        <div className="flex sm:hidden items-center gap-2 shrink-0 relative">
+                          <Link href={`/${item.permalink}/demo`} target="_blank" className="inline-flex items-center gap-1 text-xs font-medium text-green-kwn border border-green-kwn/40 hover:bg-green-kwn hover:text-white px-2 py-1 rounded-lg transition-colors">
+                            <IconExternalLink size={13} />
+                            Preview
+                          </Link>
+                          <button
+                            onClick={() => setOpenMenuId(openMenuId === item.id ? null : item.id)}
+                            className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 px-2.5 py-1 rounded-lg transition-colors"
+                          >
+                            Action
+                            <IconChevronDown size={13} className={`transition-transform ${openMenuId === item.id ? "rotate-180" : ""}`} />
+                          </button>
+                          {openMenuId === item.id && (
+                            <>
+                              {/* Backdrop */}
+                              <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
+                              {/* Dropdown — anchored to right of the flex wrapper */}
+                              <div className="absolute right-0 bottom-full mb-1 z-20 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 overflow-hidden">
+                                  <Link href={`/user/undangan/${item.id}/overview`} onClick={() => setOpenMenuId(null)}
+                                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <IconAdjustments size={16} className="text-gray-400" />
+                                    Dashboard
+                                  </Link>
+                                  <Link href={`/user/undangan/${item.id}/tamu-undangan`} onClick={() => setOpenMenuId(null)}
+                                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <IconUsers size={16} className="text-gray-400" />
+                                    Tamu Undangan
+                                  </Link>
+                                  <Link href={`/user/undangan/${item.id}/kado-pernikahan`} onClick={() => setOpenMenuId(null)}
+                                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <IconGift size={16} className="text-gray-400" />
+                                    Kado Pernikahan
+                                  </Link>
+                                  {isOwner && (
+                                    <>
+                                      <div className="border-t border-gray-100 my-1" />
+                                      <button onClick={() => { setOpenMenuId(null); openEdit(item); }}
+                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-700 transition-colors">
+                                        <IconEdit size={16} className="text-gray-400" />
+                                        Edit Undangan
+                                      </button>
+                                      <button onClick={() => { setOpenMenuId(null); setSelectedItem(item); setIsOpenDelete(true); }}
+                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors">
+                                        <IconTrash size={16} />
+                                        Hapus Undangan
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              </>
+                            )}
                         </div>
                       </div>
                     </div>

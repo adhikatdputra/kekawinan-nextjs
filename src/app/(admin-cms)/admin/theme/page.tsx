@@ -332,7 +332,7 @@ export default function ThemeAdminPage() {
             page={page}
             setPage={setPage}
             totalPage={resultTable?.total_page}
-            totalData={resultTable?.count}
+            totalData={resultTable?.total_data}
             pageSize={limit}
             setPageSize={setLimit}
             totalDataPerPage={tableData.length}

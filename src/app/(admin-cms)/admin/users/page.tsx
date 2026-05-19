@@ -341,7 +341,7 @@ export default function UsersPage() {
             page={page}
             setPage={setPage}
             totalPage={responseTable?.total_page}
-            totalData={responseTable?.count}
+            totalData={responseTable?.total_data}
             pageSize={limit}
             setPageSize={setLimit}
             totalDataPerPage={tableData.length}

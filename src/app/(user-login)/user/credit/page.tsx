@@ -140,6 +140,37 @@ export default function CreditPage() {
           </>
         )}
 
+        {/* Redeem Voucher — always visible */}
+        <div className="bg-white rounded-3xl p-6 shadow-sm flex flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <IconTicket size={20} className="text-green-kwn" />
+            <h2 className="font-bold text-gray-800">Redeem Voucher</h2>
+          </div>
+          <div className="flex gap-3">
+            <Input
+              placeholder="Masukkan kode voucher (contoh: KKW-GRAND-XXXXX)"
+              value={redeemCode}
+              onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
+              onKeyDown={(e) => e.key === "Enter" && !redeem.isPending && handleRedeem()}
+              className="rounded-xl h-11 bg-white flex-1 uppercase tracking-wider"
+            />
+            <Button
+              onClick={handleRedeem}
+              disabled={redeem.isPending || !redeemCode.trim()}
+              className="rounded-xl h-11 px-6 flex-shrink-0"
+            >
+              {redeem.isPending ? (
+                <IconLoader2 size={18} className="animate-spin" />
+              ) : (
+                "Tukar"
+              )}
+            </Button>
+          </div>
+          <p className="text-xs text-gray-400">
+            Masukkan kode voucher yang kamu dapatkan dari Kekawinan untuk menambah credit.
+          </p>
+        </div>
+
         {/* History */}
         <div className="bg-white rounded-3xl p-6 shadow-sm flex flex-col gap-4">
           <div className="flex items-center justify-between">
