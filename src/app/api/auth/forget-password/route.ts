@@ -4,6 +4,12 @@ import { prisma } from '@/lib/prisma'
 import { sendResetPasswordEmail } from '@/lib/mailer'
 import { ok, badRequest, serverError } from '@/lib/api-response'
 
+function getSiteUrl(request: NextRequest) {
+  const host = request.headers.get('host') ?? 'localhost:3000'
+  const proto = host.startsWith('localhost') ? 'http' : 'https'
+  return `${proto}://${host}`
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -30,8 +36,7 @@ export async function POST(request: NextRequest) {
         },
       })
 
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_API_URL?.replace(/\/api$/, '') || ''
-      const resetLink = `${siteUrl}/auth/reset-password?token=${resetEntry.token}`
+      const resetLink = `${getSiteUrl(request)}/auth/reset-password?token=${resetEntry.token}`
       // Fire and forget — don't await so response is not delayed by SMTP
       sendResetPasswordEmail(user.email, resetLink).catch(console.error)
     }

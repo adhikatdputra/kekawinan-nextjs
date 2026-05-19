@@ -3,7 +3,6 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/jwt'
 import { ok, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
 import { sendCollaboratorInvitePending } from '@/lib/mailer'
-import { BASE_URL } from '@/lib/config'
 
 type Params = { params: Promise<{ id: string; collabId: string }> }
 
@@ -28,14 +27,16 @@ export async function POST(request: NextRequest, { params }: Params) {
     if (!collab) return notFound('Kolaborator tidak ditemukan')
     if (collab.status !== 'PENDING') return badRequest('Hanya kolaborator berstatus Pending yang bisa dikirim ulang')
 
-    const baseUrl = BASE_URL
+    const host = request.headers.get('host') ?? 'localhost:3000'
+    const proto = host.startsWith('localhost') ? 'http' : 'https'
+    const siteUrl = `${proto}://${host}`
 
     await sendCollaboratorInvitePending({
       to: collab.email,
       ownerName: undangan.user.fullname ?? undangan.user.email,
       undanganName: undangan.name ?? 'Undangan Pernikahan',
       role: collab.role,
-      registerLink: `${baseUrl}/auth/register`,
+      registerLink: `${siteUrl}/auth/register`,
     })
 
     return ok(null, 'Email undangan berhasil dikirim ulang')
