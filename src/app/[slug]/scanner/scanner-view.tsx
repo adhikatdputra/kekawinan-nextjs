@@ -59,8 +59,14 @@ export default function ScannerView({ slug }: { slug: string }) {
   }, [slug, router])
 
   const stopScanner = useCallback(() => {
+    // Explicitly stop all video tracks so the browser releases the camera hardware
+    if (videoRef.current?.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream
+      stream.getTracks().forEach((track) => track.stop())
+      videoRef.current.srcObject = null
+    }
     if (readerRef.current) {
-      BrowserMultiFormatReader.releaseAllStreams()
+      try { BrowserMultiFormatReader.releaseAllStreams() } catch { /* ignore */ }
       readerRef.current = null
     }
     scanningRef.current = false
