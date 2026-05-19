@@ -201,6 +201,8 @@
   --color-theme12-secondary: var(--theme12-secondary);
   --color-theme13-primary: var(--theme13-primary);
   --color-theme13-secondary: var(--theme13-secondary);
+  --color-theme14-primary: var(--theme14-primary);
+  --color-theme14-secondary: var(--theme14-secondary);
 }
 
 @utility container {
@@ -290,6 +292,8 @@
   --theme12-secondary: oklch(0.75 0.18 340);
   --theme13-primary: oklch(0.62 0.26 350);
   --theme13-secondary: oklch(0.55 0.22 355);
+  --theme14-primary: oklch(0.55 0.20 285);
+  --theme14-secondary: oklch(0.72 0.12 285);
 }
 
 .dark {
@@ -356,6 +360,8 @@
   --theme12-secondary: oklch(0.75 0.18 340);
   --theme13-primary: oklch(0.62 0.26 350);
   --theme13-secondary: oklch(0.55 0.22 355);
+  --theme14-primary: oklch(0.55 0.20 285);
+  --theme14-secondary: oklch(0.72 0.12 285);
 }
 
 @layer base {
