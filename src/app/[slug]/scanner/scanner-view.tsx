@@ -30,12 +30,24 @@ function formatTime(isoString: string) {
   })
 }
 
+/** Stop all tracks on a video element and clear srcObject */
+function releaseVideo(video: HTMLVideoElement | null) {
+  if (!video) return
+  try {
+    if (video.srcObject) {
+      const stream = video.srcObject as MediaStream
+      stream.getTracks().forEach((t) => t.stop())
+      video.srcObject = null
+    }
+    video.load() // reset internal decoder state
+  } catch { /* ignore */ }
+}
+
 export default function ScannerView({ slug }: { slug: string }) {
   const router = useRouter()
   const videoRef = useRef<HTMLVideoElement>(null)
   const readerRef = useRef<BrowserMultiFormatReader | null>(null)
-  const scanningRef = useRef(false)
-  // Use a ref for state so the decode callback always reads the latest value
+  const activeRef = useRef(false)      // true while a decode session is live
   const stateRef = useRef<ScanState>('scanning')
 
   const [state, setState] = useState<ScanState>('scanning')
@@ -52,104 +64,98 @@ export default function ScannerView({ slug }: { slug: string }) {
 
   // Auth check
   useEffect(() => {
-    const isAuthenticated = Cookies.get('isAuthenticated')
-    if (!isAuthenticated) {
-      router.replace(`/auth/login?redirect=/${slug}/scanner`)
-    }
+    const token = Cookies.get('isAuthenticated')
+    if (!token) router.replace(`/auth/login?redirect=/${slug}/scanner`)
   }, [slug, router])
 
+  // ── Camera teardown ──────────────────────────────────────────────────────────
   const stopScanner = useCallback(() => {
-    // Explicitly stop all video tracks so the browser releases the camera hardware
-    if (videoRef.current?.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream
-      stream.getTracks().forEach((track) => track.stop())
-      videoRef.current.srcObject = null
-    }
+    activeRef.current = false
+    releaseVideo(videoRef.current)
     if (readerRef.current) {
       try { BrowserMultiFormatReader.releaseAllStreams() } catch { /* ignore */ }
       readerRef.current = null
     }
-    scanningRef.current = false
   }, [])
 
+  // ── Camera startup ───────────────────────────────────────────────────────────
   const startScanner = useCallback(async () => {
-    if (scanningRef.current) return
-    // Wait one frame for the video element to be in the DOM
-    await new Promise((r) => requestAnimationFrame(r))
-    if (!videoRef.current) return
+    if (activeRef.current) return   // already running
+    activeRef.current = true
 
-    scanningRef.current = true
+    // Give the browser time to fully release camera from previous session
+    await new Promise((r) => setTimeout(r, 400))
+
+    // Check if we were cancelled while waiting
+    if (!activeRef.current || stateRef.current !== 'scanning') return
+    if (!videoRef.current) return
 
     try {
       const reader = new BrowserMultiFormatReader()
       readerRef.current = reader
 
-      await reader.decodeFromVideoDevice(undefined, videoRef.current, async (result, err) => {
-        // Use stateRef instead of closed-over state to always get latest value
-        if (!result || stateRef.current !== 'scanning') return
-        if (err instanceof NotFoundException) return
+      await reader.decodeFromVideoDevice(
+        undefined,
+        videoRef.current,
+        async (result, err) => {
+          // Always ignore non-results
+          if (err instanceof NotFoundException) return
+          if (!result) return
+          // Guard: callback can fire after we stopped
+          if (!activeRef.current || stateRef.current !== 'scanning') return
 
-        const text = result.getText()
+          const text = result.getText()
 
-        let tamuId: string | null = null
-        try {
-          const url = new URL(text)
-          const parts = url.pathname.split('/').filter(Boolean)
-          if (parts.length === 2 && parts[0] === slug) {
-            tamuId = parts[1]
-          }
-        } catch {
-          // not a valid URL
-        }
+          let tamuId: string | null = null
+          try {
+            const url = new URL(text)
+            const parts = url.pathname.split('/').filter(Boolean)
+            if (parts.length === 2 && parts[0] === slug) tamuId = parts[1]
+          } catch { /* not a URL */ }
 
-        if (!tamuId) {
-          stopScanner()
-          setStateSync('error')
-          setErrorMessage('❌ QR tidak dikenali. Pastikan kamu scan QR dari undangan yang benar.')
-          return
-        }
-
-        stopScanner()
-        setStateSync('found')
-
-        try {
-          const res = await axios.post(`/undangan/${slug}/attendance`, { tamuId })
-          const data: ScanResult = res.data.data
-          setScannedTamu(data.tamu)
-          setAlreadyConfirmed(data.alreadyConfirmed)
-        } catch (err: unknown) {
-          const status = (err as { response?: { status?: number } })?.response?.status
-          setStateSync('error')
-          if (status === 403) {
-            setErrorMessage('Kamu tidak memiliki akses ke scanner undangan ini.')
-          } else if (status === 404) {
+          if (!tamuId) {
+            stopScanner()
+            setStateSync('error')
             setErrorMessage('❌ QR tidak dikenali. Pastikan kamu scan QR dari undangan yang benar.')
-          } else {
-            setErrorMessage('⚠️ Tidak ada koneksi atau terjadi kesalahan. Coba lagi.')
+            return
+          }
+
+          stopScanner()
+          setStateSync('found')
+
+          try {
+            const res = await axios.post(`/undangan/${slug}/attendance`, { tamuId })
+            const data: ScanResult = res.data.data
+            setScannedTamu(data.tamu)
+            setAlreadyConfirmed(data.alreadyConfirmed)
+          } catch (err: unknown) {
+            const status = (err as { response?: { status?: number } })?.response?.status
+            setStateSync('error')
+            if (status === 403) setErrorMessage('Kamu tidak memiliki akses ke scanner undangan ini.')
+            else if (status === 404) setErrorMessage('❌ QR tidak dikenali. Pastikan kamu scan QR dari undangan yang benar.')
+            else setErrorMessage('⚠️ Tidak ada koneksi atau terjadi kesalahan. Coba lagi.')
           }
         }
-      })
+      )
     } catch {
-      scanningRef.current = false
+      activeRef.current = false
       setStateSync('error')
       setErrorMessage('⚠️ Kamera tidak dapat diakses. Pastikan izin kamera sudah diberikan.')
     }
   }, [slug, stopScanner])
 
-  // Start/stop scanner when state changes
+  // ── Effect: react to state changes ──────────────────────────────────────────
   useEffect(() => {
     if (state === 'scanning') {
       startScanner()
     } else {
       stopScanner()
     }
+    // Cleanup if the component unmounts mid-session
+    return () => { stopScanner() }
   }, [state]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => stopScanner()
-  }, [stopScanner])
-
+  // ── Handlers ─────────────────────────────────────────────────────────────────
   const handleConfirm = async () => {
     if (!scannedTamu || isConfirming) return
     setIsConfirming(true)
@@ -169,19 +175,19 @@ export default function ScannerView({ slug }: { slug: string }) {
   }
 
   const handleReset = () => {
+    stopScanner()          // ensure camera is released before restarting
     setScannedTamu(null)
     setAlreadyConfirmed(false)
     setErrorMessage('')
     setStateSync('scanning')
   }
 
+  // ── Render ───────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col">
       {/* Header */}
       <div className="flex items-center gap-3 p-4 bg-gray-900 border-b border-gray-800">
-        <button onClick={() => router.back()} className="text-gray-400 hover:text-white">
-          ←
-        </button>
+        <button onClick={() => router.back()} className="text-gray-400 hover:text-white">←</button>
         <div>
           <p className="text-xs text-gray-400">/{slug}</p>
           <h1 className="font-semibold text-sm">Scanner Absensi</h1>
@@ -190,16 +196,10 @@ export default function ScannerView({ slug }: { slug: string }) {
 
       <div className="flex-1 flex flex-col items-center justify-center p-4 gap-6">
 
-        {/* Video element — always in DOM so videoRef is never null */}
-        <div className={`w-full max-w-sm flex flex-col items-center gap-4 ${state === 'scanning' ? 'block' : 'hidden'}`}>
+        {/* Video — always in DOM, just hidden when not scanning */}
+        <div className={`w-full max-w-sm flex flex-col items-center gap-4 ${state === 'scanning' ? '' : 'hidden'}`}>
           <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-black border-2 border-gray-700">
-            <video
-              ref={videoRef}
-              className="w-full h-full object-cover"
-              playsInline
-              muted
-            />
-            {/* Scan frame overlay */}
+            <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="w-48 h-48 border-2 border-white/60 rounded-xl relative">
                 <span className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-white rounded-tl-xl" />
@@ -212,7 +212,7 @@ export default function ScannerView({ slug }: { slug: string }) {
           <p className="text-gray-400 text-sm text-center">Arahkan kamera ke QR Code tamu</p>
         </div>
 
-        {/* FOUND STATE */}
+        {/* FOUND */}
         {state === 'found' && scannedTamu && (
           <div className="w-full max-w-sm bg-gray-900 rounded-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center gap-2">
@@ -251,7 +251,7 @@ export default function ScannerView({ slug }: { slug: string }) {
           </div>
         )}
 
-        {/* CONFIRMED STATE */}
+        {/* CONFIRMED */}
         {state === 'confirmed' && scannedTamu && (
           <div className="w-full max-w-sm bg-gray-900 rounded-2xl p-6 flex flex-col items-center gap-4 text-center">
             <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center">
@@ -273,7 +273,7 @@ export default function ScannerView({ slug }: { slug: string }) {
           </div>
         )}
 
-        {/* ERROR STATE */}
+        {/* ERROR */}
         {state === 'error' && (
           <div className="w-full max-w-sm bg-gray-900 rounded-2xl p-6 flex flex-col items-center gap-4 text-center">
             <p className="text-gray-300 text-sm">{errorMessage}</p>
@@ -287,7 +287,6 @@ export default function ScannerView({ slug }: { slug: string }) {
         )}
       </div>
 
-      {/* Counter */}
       <div className="p-4 text-center text-sm text-gray-500 bg-gray-900 border-t border-gray-800">
         Sudah scan hari ini: <span className="text-white font-medium">{scanCount} tamu</span>
       </div>
