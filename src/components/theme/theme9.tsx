@@ -613,6 +613,7 @@ export default function Theme9({
         darkMode={true}
         giftLength={giftLength}
         slug={slug}
+        tamuId={tamu?.id}
       />
 
       {/* Open Dialog Gift */}

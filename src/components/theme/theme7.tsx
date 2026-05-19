@@ -658,6 +658,7 @@ export default function Theme5({
         bgColor="bg-theme7-primary"
         giftLength={giftLength}
         slug={slug}
+        tamuId={tamu?.id}
       />
 
       {/* Open Dialog Gift */}

@@ -740,6 +740,7 @@ export default function Theme12({
         darkMode={true}
         giftLength={giftLength}
         slug={slug}
+        tamuId={tamu?.id}
       />
 
       <DialogGift

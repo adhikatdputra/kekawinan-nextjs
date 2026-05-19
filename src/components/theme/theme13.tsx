@@ -668,6 +668,7 @@ export default function Theme13({
         bgColor="bg-theme13-primary"
         giftLength={giftLength}
         slug={slug}
+        tamuId={tamu?.id}
       />
 
       <DialogGift

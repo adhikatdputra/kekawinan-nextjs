@@ -631,6 +631,7 @@ export default function Theme7({
         onOpenGift={() => setIsOpenGift(true)}
         giftLength={giftLength}
         slug={slug}
+        tamuId={tamu?.id}
       />
 
       {/* Open Dialog Gift */}

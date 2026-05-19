@@ -651,6 +651,7 @@ export default function Theme10({
         darkMode={false}
         giftLength={giftLength}
         slug={slug}
+        tamuId={tamu?.id}
       />
 
       {/* Open Dialog Gift */}

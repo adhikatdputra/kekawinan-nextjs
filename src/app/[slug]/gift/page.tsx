@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import {
   dehydrate,
   HydrationBoundary,
@@ -5,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { GiftView } from "@/components/pages/gift/view";
 import { fetchUndanganBySlug } from "@/lib/fetch-undangan";
+import Loading from "@/components/layouts/loading";
 
 type Props = {
   params: Promise<{
@@ -24,7 +26,9 @@ export default async function UndanganPage({ params }: Props) {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <GiftView slug={slug} />
+      <Suspense fallback={<Loading />}>
+        <GiftView slug={slug} />
+      </Suspense>
     </HydrationBoundary>
   );
 }

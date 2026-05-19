@@ -3,6 +3,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import undanganUserApi from "@/frontend/api/undangan-user";
 import giftApi from "@/frontend/api/gift";
 import { UndanganDetail, Gift } from "@/frontend/interface/undangan";
@@ -17,6 +18,8 @@ import { IconGift, IconCheck, IconArrowRight, IconSparkles } from "@tabler/icons
 
 export default function GiftView({ slug }: { slug: string }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tamuId = searchParams.get("id") ?? undefined;
   const [isOpenGiftList, setIsOpenGiftList] = useState(false);
   const [giftList, setGiftList] = useState<Gift[]>([]);
 
@@ -63,6 +66,7 @@ export default function GiftView({ slug }: { slug: string }) {
           giftCount={giftList.length}
           onOpen={() => setIsOpenGiftList(true)}
           slug={slug}
+          tamuId={tamuId}
         />
       ) : (
         <GiftList
@@ -82,11 +86,13 @@ function GiftCover({
   giftCount,
   onOpen,
   slug,
+  tamuId,
 }: {
   undanganData: UndanganDetail;
   giftCount: number;
   onOpen: () => void;
   slug: string;
+  tamuId?: string;
 }) {
   const thumbnail = undanganData?.content?.imgThumbnail || undanganData?.content?.imgBg;
 
@@ -110,30 +116,13 @@ function GiftCover({
           >
             <IconGift size={13} className="text-green-kwn" />
             <span className="text-green-kwn text-xs font-semibold">
-              {giftCount} hadiah
+              {giftCount} hadiah tersedia
             </span>
           </motion.div>
         )}
       </div>
 
-      {/* Decorative chips row — above the shape grid */}
-      <motion.div
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6, duration: 0.5 }}
-        className="flex items-center gap-2 px-6 mt-3"
-      >
-        <div className="bg-white rounded-2xl px-3 py-1.5 shadow-sm flex items-center gap-1.5">
-          <IconSparkles size={12} className="text-amber-400" />
-          <span className="text-[10px] font-semibold text-gray-600">Kado Pilihan</span>
-        </div>
-        <div className="bg-white rounded-2xl px-3 py-1.5 shadow-sm flex items-center gap-1.5">
-          <span className="text-sm leading-none">🎁</span>
-          <span className="text-[10px] font-semibold text-gray-600">Hadiahkan Cinta</span>
-        </div>
-      </motion.div>
-
-      {/* Shape grid hero (inspired by blob layout) */}
+      {/* Shape grid */}
       <motion.div
         initial={{ opacity: 0, scale: 0.92 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -142,9 +131,8 @@ function GiftCover({
       >
         <div className="grid grid-cols-3 gap-2.5">
           {/* Row 1 */}
-          <div className="rounded-full bg-white shadow-sm aspect-square" />
+          <div className="rounded-full bg-white shadow aspect-square" />
           <div className="rounded-[20px] bg-green-kwn/70 aspect-square" />
-          {/* Cross / plus shape via clip-path */}
           <div className="aspect-square flex items-center justify-center">
             <div
               className="w-full h-full"
@@ -156,11 +144,10 @@ function GiftCover({
           </div>
 
           {/* Row 2 */}
-          {/* Pentagon blob */}
           <div
             className="aspect-square"
             style={{
-              background: "white",
+              background: "#d1e8d4",
               clipPath: "polygon(50% 0%, 95% 25%, 82% 88%, 18% 88%, 5% 25%)",
               filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.06))",
             }}
@@ -179,22 +166,17 @@ function GiftCover({
               <div className="w-full h-full bg-green-kwn/20 flex items-center justify-center text-3xl">💍</div>
             )}
           </div>
-          {/* Large pill spanning — using a tall rounded rect */}
           <div className="rounded-[20px] bg-[#2E7D32] aspect-square" />
 
           {/* Row 3 */}
-          {/* Wide pill — spans 2 cols */}
-          <div className="col-span-2 h-12 rounded-full bg-green-kwn/50 self-center" />
-          {/* Flower / clover */}
+          <div className="col-span-2 h-12 rounded-full bg-green-kwn/40 self-center" />
           <div className="aspect-square flex items-center justify-center">
             <div
               className="w-[85%] h-[85%]"
               style={{
-                background: "white",
-                borderRadius: "50% 50% 50% 50% / 50% 50% 50% 50%",
-                boxShadow: "0 0 0 0 white, 12px 0 0 0 white, -12px 0 0 0 white, 0 12px 0 0 white, 0 -12px 0 0 white",
+                background: "#4CAF50",
                 clipPath: "polygon(50% 15%, 85% 0%, 100% 35%, 85% 50%, 100% 65%, 85% 100%, 50% 85%, 15% 100%, 0% 65%, 15% 50%, 0% 35%, 15% 0%)",
-                filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.08))",
+                filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.1))",
               }}
             />
           </div>
@@ -208,15 +190,16 @@ function GiftCover({
         transition={{ duration: 0.7, delay: 0.5 }}
         className="text-center px-6 flex flex-col items-center gap-2 mt-6"
       >
-        <p className="text-xs uppercase tracking-[0.2em] text-green-kwn font-semibold">
-          Registry Pernikahan
-        </p>
-        <h1 className="text-3xl font-bold font-recoleta text-gray-900 leading-tight">
+        <span className="inline-flex items-center gap-1.5 bg-green-kwn/10 text-green-kwn text-[11px] font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+          <IconGift size={12} />
+          Daftar Kado Pernikahan
+        </span>
+        <h1 className="text-3xl font-bold font-recoleta text-gray-900 leading-tight mt-1">
           {undanganData?.content?.title}
         </h1>
         <p className="text-gray-500 text-sm leading-relaxed mt-1 max-w-[300px]">
-          Wujudkan kebahagiaanmu dengan memilih hadiah bermakna yang akan
-          menemani perjalanan baru mereka.
+          Bantu mereka memulai babak baru dengan hadiah yang benar-benar
+          dibutuhkan — kamu pilih, mereka bahagia.
         </p>
       </motion.div>
 
@@ -233,11 +216,11 @@ function GiftCover({
           style={{ height: "52px", background: "linear-gradient(135deg, #2E7D32, #4CAF50)", boxShadow: "0 4px 16px rgba(46,125,50,0.3)" }}
         >
           <IconGift size={16} />
-          Lihat Hadiah Mereka
+          Pilih Kado untuk Mereka
           <IconArrowRight size={15} />
         </button>
-        <Link href={`/${slug}`}>
-          <button className="w-full h-12 rounded-2xl font-medium text-gray-400 text-sm bg-white border border-gray-100">
+        <Link href={tamuId ? `/${slug}/${tamuId}` : `/${slug}/demo`}>
+          <button className="w-full h-12 rounded-2xl font-medium text-gray-500 text-sm bg-white border border-gray-200 hover:bg-gray-50 transition-colors">
             Kembali ke Undangan
           </button>
         </Link>

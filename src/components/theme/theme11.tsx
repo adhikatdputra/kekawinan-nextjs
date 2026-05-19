@@ -618,6 +618,7 @@ export default function Theme11({
         darkMode={true}
         giftLength={giftLength}
         slug={slug}
+        tamuId={tamu?.id}
       />
 
       <DialogGift

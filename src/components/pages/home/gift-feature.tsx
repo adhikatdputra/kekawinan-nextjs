@@ -14,38 +14,11 @@ const benefits = [
 
 export default function GiftFeature() {
   return (
-    <section className="relative py-16 md:py-28 overflow-hidden bg-white">
-      {/* Diagonal line decoration */}
+    <section className="relative py-16 md:py-28 overflow-hidden bg-gray-50">
+      {/* Blobs */}
       <div className="absolute inset-0 pointer-events-none">
-        <svg
-          className="absolute inset-0 w-full h-full opacity-[0.035]"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            <pattern
-              id="gift-lines"
-              patternUnits="userSpaceOnUse"
-              width="40"
-              height="40"
-              patternTransform="rotate(45)"
-            >
-              <line
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="40"
-                stroke="#16a34a"
-                strokeWidth="1.5"
-              />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#gift-lines)" />
-        </svg>
-
-        <div className="absolute -bottom-20 -left-20 w-[500px] h-[400px] bg-green-200/20 rounded-full blur-3xl" />
-
-        {/* Glow */}
-        <div className="absolute right-1/4 top-1/4 w-72 h-72 bg-green-100/40 rounded-full blur-3xl" />
+        <div className="absolute -top-20 -right-20 w-[400px] h-[400px] bg-green-100/50 rounded-full blur-3xl" />
+        <div className="absolute -bottom-20 -left-20 w-[400px] h-[300px] bg-emerald-100/40 rounded-full blur-3xl" />
       </div>
 
       <div className="container mx-auto px-4 md:px-6 lg:px-8 relative z-10">
@@ -58,15 +31,14 @@ export default function GiftFeature() {
             viewport={{ once: true }}
             transition={{ duration: 0.7, ease: "easeOut" }}
           >
-            {/* Glass frame around image */}
-            <div className="relative">
-              <div className="absolute -inset-3 bg-gradient-to-br from-green-100/60 to-emerald-50/60 rounded-3xl backdrop-blur-sm border border-green-200/40" />
+            {/* White card frame — provides contrast for the green-toned image */}
+            <div className="relative bg-white rounded-3xl shadow-xl p-4 border border-gray-100">
               <Image
                 src="/images/image-gift.webp"
                 alt="Fitur daftar kado pernikahan digital di Kekawinan.com"
                 width={800}
                 height={800}
-                className="relative w-[85%] mx-auto rounded-2xl"
+                className="w-full rounded-2xl"
               />
             </div>
 
@@ -76,10 +48,10 @@ export default function GiftFeature() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="absolute bottom-4 right-4 md:right-8 bg-white/80 backdrop-blur-md border border-white/80 rounded-2xl px-4 py-3 shadow-lg flex items-center gap-3"
+              className="absolute -bottom-4 right-4 md:right-0 bg-white border border-gray-100 rounded-2xl px-4 py-3 shadow-xl flex items-center gap-3"
             >
               <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                <Gift className="w-4.5 h-4.5 text-green-700" />
+                <Gift className="w-4 h-4 text-green-700" />
               </div>
               <div>
                 <p className="text-xs font-bold text-gray-900 leading-none mb-0.5">

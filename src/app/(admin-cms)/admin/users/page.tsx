@@ -84,6 +84,7 @@ export default function UsersPage() {
   const [isOpenCreate, setIsOpenCreate] = useState(false);
   const [isOpenPassword, setIsOpenPassword] = useState(false);
   const [isOpenToggleStatus, setIsOpenToggleStatus] = useState(false);
+  const [isOpenToggleLevel, setIsOpenToggleLevel] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   // Create user form
@@ -188,6 +189,23 @@ export default function UsersPage() {
             setSelectedUser(null);
             setNewPass("");
             setNewPassConfirm("");
+          }
+        },
+      }
+    );
+  };
+
+  const handleToggleLevel = () => {
+    if (!selectedUser) return;
+    const newLevel = selectedUser.level === "user" ? "admin" : "user";
+    updateUser(
+      { id: selectedUser.id, data: { level: newLevel } },
+      {
+        onSuccess: (res) => {
+          if (res.data.success) {
+            setIsOpenToggleLevel(false);
+            setSelectedUser(null);
+            refetch();
           }
         },
       }
@@ -303,13 +321,19 @@ export default function UsersPage() {
                           <Button
                             variant="ghost"
                             className="justify-start rounded-none w-full hover:bg-green-soft-kwn text-sm"
-                            onClick={() => {
-                              setSelectedUser(item);
-                              setIsOpenPassword(true);
-                            }}
+                            onClick={() => { setSelectedUser(item); setIsOpenPassword(true); }}
                           >
                             Ubah Password
                           </Button>
+                          {item.level !== "superadmin" && (
+                            <Button
+                              variant="ghost"
+                              className="justify-start rounded-none w-full text-sm hover:bg-blue-50 hover:text-blue-700"
+                              onClick={() => { setSelectedUser(item); setIsOpenToggleLevel(true); }}
+                            >
+                              {item.level === "user" ? "Jadikan Admin" : "Jadikan User"}
+                            </Button>
+                          )}
                           <Button
                             variant="ghost"
                             className={`justify-start rounded-none w-full text-sm ${
@@ -317,10 +341,7 @@ export default function UsersPage() {
                                 ? "hover:bg-red-100 hover:text-red-700"
                                 : "hover:bg-green-100 hover:text-green-700"
                             }`}
-                            onClick={() => {
-                              setSelectedUser(item);
-                              setIsOpenToggleStatus(true);
-                            }}
+                            onClick={() => { setSelectedUser(item); setIsOpenToggleStatus(true); }}
                           >
                             {item.status === "ACTIVE" ? "Nonaktifkan" : "Aktifkan"}
                           </Button>
@@ -467,6 +488,36 @@ export default function UsersPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* AlertDialog: Toggle Level */}
+      <AlertDialog open={isOpenToggleLevel} onOpenChange={setIsOpenToggleLevel}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {selectedUser?.level === "user" ? "Jadikan Admin" : "Jadikan User"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedUser?.level === "user"
+                ? `${selectedUser?.fullname} akan mendapatkan akses admin dan bisa mengelola data di sistem.`
+                : `${selectedUser?.fullname} akan dikembalikan ke level user biasa.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => { setIsOpenToggleLevel(false); setSelectedUser(null); }}>
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleToggleLevel} disabled={isPendingUpdate}>
+              {isPendingUpdate ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /><span>Memproses...</span></>
+              ) : selectedUser?.level === "user" ? (
+                "Ya, Jadikan Admin"
+              ) : (
+                "Ya, Jadikan User"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* AlertDialog: Toggle Status */}
       <AlertDialog open={isOpenToggleStatus} onOpenChange={setIsOpenToggleStatus}>
