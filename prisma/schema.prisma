@@ -101,6 +101,7 @@ model Tamu {
   attendedAt      DateTime?
   confirmedBy     String?   @db.VarChar(255)
   isAttend        Int       @default(0)
+  attendCount     Int?                        // jumlah orang yang benar-benar hadir (diinput crew saat scan)
   confirmedByUser User?     @relation("AttendanceConfirmedBy", fields: [confirmedBy], references: [id])
   undangan        Undangan  @relation(fields: [undanganId], references: [id], onDelete: Cascade)
   ucapan          Ucapan?

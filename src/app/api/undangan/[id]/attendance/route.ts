@@ -14,9 +14,18 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   try {
     const body = await request.json()
-    const { tamuId } = body
+    const { tamuId, attendCount } = body
 
     if (!tamuId) return badRequest('tamuId wajib diisi')
+
+    // attendCount optional — jika dikirim harus integer positif
+    let parsedAttendCount: number | undefined
+    if (attendCount !== undefined && attendCount !== null) {
+      parsedAttendCount = parseInt(String(attendCount), 10)
+      if (isNaN(parsedAttendCount) || parsedAttendCount < 1) {
+        return badRequest('attendCount harus angka positif')
+      }
+    }
 
     // Cari undangan berdasarkan permalink (slug)
     const undangan = await prisma.undangan.findUnique({
@@ -63,8 +72,9 @@ export async function POST(request: NextRequest, { params }: Params) {
         isAttend: 1,
         attendedAt: new Date(),
         confirmedBy: auth.id,
+        ...(parsedAttendCount !== undefined && { attendCount: parsedAttendCount }),
       },
-      select: { id: true, name: true, maxInvite: true, isAttend: true, attendedAt: true },
+      select: { id: true, name: true, maxInvite: true, attendCount: true, isAttend: true, attendedAt: true },
     })
 
     return ok({ alreadyConfirmed: false, tamu: updated }, 'Kehadiran berhasil dikonfirmasi')

@@ -57,6 +57,7 @@ export default function ScannerView({ slug }: { slug: string }) {
   const [errorMessage, setErrorMessage] = useState('')
   const [scanCount, setScanCount] = useState(0)
   const [isConfirming, setIsConfirming] = useState(false)
+  const [attendCount, setAttendCount] = useState(1)
 
   const setStateSync = (s: ScanState) => {
     stateRef.current = s
@@ -136,6 +137,7 @@ export default function ScannerView({ slug }: { slug: string }) {
               isAttend: data.isAttend,
               attendedAt: data.attendedAt ?? null,
             })
+            setAttendCount(data.maxInvite ?? 1)
             setAlreadyConfirmed(!!data.attendedAt)
             setStateSync('found')
           } catch {
@@ -168,7 +170,7 @@ export default function ScannerView({ slug }: { slug: string }) {
     if (!scannedTamu || isConfirming) return
     setIsConfirming(true)
     try {
-      const res = await axios.post(`/undangan/${slug}/attendance`, { tamuId: scannedTamu.id })
+      const res = await axios.post(`/undangan/${slug}/attendance`, { tamuId: scannedTamu.id, attendCount })
       const data: ScanResult = res.data.data
       setScannedTamu(data.tamu)
       setAlreadyConfirmed(data.alreadyConfirmed)
@@ -245,13 +247,42 @@ export default function ScannerView({ slug }: { slug: string }) {
                 {scannedTamu.attendedAt ? formatTime(scannedTamu.attendedAt) : '-'}. Scan tidak diproses ulang.
               </div>
             ) : (
-              <button
-                onClick={handleConfirm}
-                disabled={isConfirming}
-                className="w-full bg-green-600 hover:bg-green-500 disabled:opacity-60 text-white font-semibold py-3 rounded-xl transition-colors"
-              >
-                {isConfirming ? 'Menyimpan...' : 'Konfirmasi Hadir'}
-              </button>
+              <>
+                {/* Adjust jumlah orang yang hadir */}
+                <div className="bg-gray-800 rounded-xl p-4 flex flex-col gap-3">
+                  <p className="text-sm text-gray-300">
+                    Jumlah yang hadir
+                    {scannedTamu.maxInvite ? (
+                      <span className="text-gray-500 ml-1">(diundang: {scannedTamu.maxInvite} orang)</span>
+                    ) : null}
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => setAttendCount((c) => Math.max(1, c - 1))}
+                      className="w-10 h-10 rounded-xl bg-gray-700 hover:bg-gray-600 text-white font-bold text-xl flex items-center justify-center transition-colors"
+                    >
+                      −
+                    </button>
+                    <span className="flex-1 text-center text-3xl font-bold">{attendCount}</span>
+                    <button
+                      onClick={() => setAttendCount((c) => c + 1)}
+                      className="w-10 h-10 rounded-xl bg-gray-700 hover:bg-gray-600 text-white font-bold text-xl flex items-center justify-center transition-colors"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 text-center">
+                    Bisa kurang atau lebih dari jumlah undangan
+                  </p>
+                </div>
+                <button
+                  onClick={handleConfirm}
+                  disabled={isConfirming}
+                  className="w-full bg-green-600 hover:bg-green-500 disabled:opacity-60 text-white font-semibold py-3 rounded-xl transition-colors"
+                >
+                  {isConfirming ? 'Menyimpan...' : `Konfirmasi Hadir (${attendCount} orang)`}
+                </button>
+              </>
             )}
             <button onClick={handleReset} className="w-full text-gray-400 hover:text-white text-sm py-2">
               Batal / Scan Ulang
@@ -269,6 +300,7 @@ export default function ScannerView({ slug }: { slug: string }) {
             <p className="text-gray-300">
               <span className="font-medium text-white">{scannedTamu.name ?? 'Tamu'}</span>
             </p>
+            <p className="text-xl font-bold text-green-400">{attendCount} orang</p>
             {scannedTamu.attendedAt && (
               <p className="text-sm text-gray-400">Hadir pukul {formatTime(scannedTamu.attendedAt)}</p>
             )}
