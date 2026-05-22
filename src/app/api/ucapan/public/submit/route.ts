@@ -11,8 +11,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { undanganId, tamuId, name, message, attend, attendTotal } = body
 
-    if (!undanganId || !name || !message || !attend) {
-      return badRequest('undanganId, name, message, and attend are required')
+    // tamuId wajib — hanya tamu yang diundang boleh kirim ucapan
+    if (!undanganId || !tamuId || !name || !message || !attend) {
+      return badRequest('undanganId, tamuId, name, message, and attend are required')
     }
     if (name.length > 100) {
       return badRequest('Name must be 100 characters or less')
@@ -34,20 +35,25 @@ export async function POST(request: NextRequest) {
       return badRequest('This invitation is no longer active')
     }
 
-    // Look up tamu's maxInvite if tamuId is provided
-    let tamuMaxInvite: number | null = null
-    if (tamuId) {
-      const tamu = await prisma.tamu.findUnique({
-        where: { id: tamuId },
-        select: { maxInvite: true },
-      })
-      tamuMaxInvite = tamu?.maxInvite ?? null
+    // Validasi tamu: harus ada dan milik undangan ini
+    const tamu = await prisma.tamu.findUnique({
+      where: { id: tamuId },
+      select: { maxInvite: true, undanganId: true },
+    })
+    if (!tamu) return notFound('Tamu tidak ditemukan')
+    if (tamu.undanganId !== undanganId) {
+      return badRequest('Tamu tidak terdaftar di undangan ini')
+    }
+
+    // Cek duplikat — satu tamu hanya boleh kirim satu ucapan
+    const existing = await prisma.ucapan.findUnique({ where: { tamuId } })
+    if (existing) {
+      return badRequest('Kamu sudah mengirim ucapan sebelumnya')
     }
 
     const parsedAttendTotal = Number(attendTotal) || 1
-    const maxInvite = tamuMaxInvite ?? parsedAttendTotal
+    const maxInvite = tamu.maxInvite ?? parsedAttendTotal
 
-    // Calculate notAttendTotal: guests who were invited but won't attend
     let finalAttendTotal: number | null = null
     let notAttendTotal: number | null = null
 
@@ -63,6 +69,7 @@ export async function POST(request: NextRequest) {
       data: {
         id: nanoid(),
         undanganId,
+        tamuId,
         name: name.trim(),
         message: message.trim(),
         attend,

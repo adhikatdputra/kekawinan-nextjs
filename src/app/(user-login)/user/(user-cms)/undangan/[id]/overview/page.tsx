@@ -218,7 +218,7 @@ export default function OverviewPage() {
           Doa & Ucapan yang sudah diberikan tamu yang di undang
         </p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-[url('/images/bg-fitur.png')] bg-cover bg-center rounded-2xl p-6 border border-gray-200 min-h-[180px] flex  items-end">
           <div>
             <h3 className="text-lg font-bold">Total Tamu Undangan</h3>
@@ -258,6 +258,21 @@ export default function OverviewPage() {
                   <IconLoader2 size={40} className="animate-spin pb-1" />
                 ) : (
                   undanganOverview?.total_tamu_tidak_hadir || 0
+                )}
+              </h6>
+              <p className="text-muted-foreground pb-1">Tamu</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-[url('/images/bg-fitur.png')] bg-cover bg-center rounded-2xl p-6 border border-gray-200 min-h-[180px] flex items-end">
+          <div>
+            <h3 className="text-lg font-bold">Sudah Hadir</h3>
+            <div className="flex items-end gap-2 mt-4">
+              <h6 className="text-6xl font-bold">
+                {isLoadingOverview ? (
+                  <IconLoader2 size={40} className="animate-spin pb-1" />
+                ) : (
+                  undanganOverview?.total_tamu_sudah_hadir || 0
                 )}
               </h6>
               <p className="text-muted-foreground pb-1">Tamu</p>

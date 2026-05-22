@@ -128,6 +128,7 @@ export interface Params {
   sendStatus?: string;
   isRead?: string;
   isConfirm?: string;
+  isAttend?: string;
 }
 
 export interface UndanganUcapanResponse {
@@ -166,6 +167,7 @@ export interface UndanganTamu {
   sendStatus: number;
   isRead: number;
   isConfirm: number;
+  isAttend: number;
   maxInvite: number;
   attendedAt: string | null;
   confirmedBy: string | null;

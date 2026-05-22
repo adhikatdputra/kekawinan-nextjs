@@ -14,6 +14,7 @@ interface TamuData {
   name: string | null
   maxInvite: number | null
   isConfirm: number
+  isAttend: number
   attendedAt: string | null
 }
 
@@ -132,6 +133,7 @@ export default function ScannerView({ slug }: { slug: string }) {
               name: data.name ?? null,
               maxInvite: data.maxInvite ?? null,
               isConfirm: data.isConfirm,
+              isAttend: data.isAttend,
               attendedAt: data.attendedAt ?? null,
             })
             setAlreadyConfirmed(!!data.attendedAt)
@@ -225,9 +227,13 @@ export default function ScannerView({ slug }: { slug: string }) {
               <Row label="Nama" value={scannedTamu.name ?? '-'} />
               <Row label="Diundang" value={`${scannedTamu.maxInvite ?? '-'} orang`} />
               <Row
-                label="Status"
+                label="RSVP"
+                value={scannedTamu.isConfirm === 1 ? 'Sudah konfirmasi' : 'Belum konfirmasi'}
+              />
+              <Row
+                label="Absensi"
                 value={
-                  scannedTamu.isConfirm === 1
+                  scannedTamu.isAttend === 1
                     ? `Sudah hadir pukul ${scannedTamu.attendedAt ? formatTime(scannedTamu.attendedAt) : '-'}`
                     : 'Belum absen'
                 }

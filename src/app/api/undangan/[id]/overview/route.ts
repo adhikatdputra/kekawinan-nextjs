@@ -20,7 +20,7 @@ export async function GET(request: NextRequest, { params }: Params) {
       return forbidden('Access denied')
     }
 
-    const [totalTamu, totalHadir, totalTidakHadir] = await Promise.all([
+    const [totalTamu, totalHadir, totalTidakHadir, totalSudahHadir] = await Promise.all([
       prisma.tamu.aggregate({
         _sum: { maxInvite: true },
         where: { undanganId: id },
@@ -33,12 +33,17 @@ export async function GET(request: NextRequest, { params }: Params) {
         _sum: { notAttendTotal: true },
         where: { undanganId: id },
       }),
+      prisma.tamu.aggregate({
+        _sum: { maxInvite: true },
+        where: { undanganId: id, isAttend: 1 },
+      }),
     ])
 
     return ok({
       total_tamu: totalTamu._sum.maxInvite ?? 0,
       total_tamu_hadir: totalHadir._sum.attendTotal ?? 0,
       total_tamu_tidak_hadir: totalTidakHadir._sum.notAttendTotal ?? 0,
+      total_tamu_sudah_hadir: totalSudahHadir._sum.maxInvite ?? 0,
     }, 'Get overview success')
   } catch (e) {
     console.error('[overview]', e)

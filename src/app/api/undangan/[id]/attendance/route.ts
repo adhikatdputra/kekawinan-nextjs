@@ -41,7 +41,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     // Cari tamu dan pastikan milik undangan ini
     const tamu = await prisma.tamu.findUnique({
       where: { id: tamuId },
-      select: { id: true, undanganId: true, name: true, maxInvite: true, isConfirm: true, attendedAt: true },
+      select: { id: true, undanganId: true, name: true, maxInvite: true, isAttend: true, attendedAt: true },
     })
     if (!tamu) return notFound('Tamu tidak ditemukan')
     if (tamu.undanganId !== undangan.id) {
@@ -56,15 +56,15 @@ export async function POST(request: NextRequest, { params }: Params) {
       )
     }
 
-    // Konfirmasi kehadiran
+    // Konfirmasi kehadiran (absensi fisik oleh crew)
     const updated = await prisma.tamu.update({
       where: { id: tamuId },
       data: {
-        isConfirm: 1,
+        isAttend: 1,
         attendedAt: new Date(),
         confirmedBy: auth.id,
       },
-      select: { id: true, name: true, maxInvite: true, isConfirm: true, attendedAt: true },
+      select: { id: true, name: true, maxInvite: true, isAttend: true, attendedAt: true },
     })
 
     return ok({ alreadyConfirmed: false, tamu: updated }, 'Kehadiran berhasil dikonfirmasi')

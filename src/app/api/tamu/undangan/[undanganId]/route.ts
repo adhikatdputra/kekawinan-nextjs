@@ -30,6 +30,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     const sendStatus = sp.get('sendStatus')
     const isRead = sp.get('isRead')
     const isConfirm = sp.get('isConfirm')
+    const isAttend = sp.get('isAttend')
 
     const where: Record<string, unknown> = {
       undanganId,
@@ -37,6 +38,7 @@ export async function GET(request: NextRequest, { params }: Params) {
       ...(sendStatus !== null && sendStatus !== '' && { sendStatus: Number(sendStatus) }),
       ...(isRead !== null && isRead !== '' && { isRead: Number(isRead) }),
       ...(isConfirm !== null && isConfirm !== '' && { isConfirm: Number(isConfirm) }),
+      ...(isAttend !== null && isAttend !== '' && { isAttend: Number(isAttend) }),
     }
 
     const [rows, count] = await prisma.$transaction([

@@ -55,7 +55,7 @@ export default function QrAbsensiSection({
   fontHeading = '',
   wrapperBg = 'bg-white/5',
 }: QrAbsensiSectionProps) {
-  const [isConfirmed, setIsConfirmed] = useState(tamu.isConfirm === 1)
+  const [isConfirmed, setIsConfirmed] = useState(tamu.isAttend === 1)
   const [attendedAt, setAttendedAt] = useState<string | null>(tamu.attendedAt)
 
   const hariH = isHariH(content?.dateWedding)
@@ -76,7 +76,7 @@ export default function QrAbsensiSection({
         const res = await fetch(`/api/tamu/${tamuId}/status`)
         if (!res.ok) return
         const json = await res.json()
-        if (json?.data?.isConfirm === 1) {
+        if (json?.data?.isAttend === 1) {
           setIsConfirmed(true)
           setAttendedAt(json.data.attendedAt ?? null)
           clearInterval(interval)
