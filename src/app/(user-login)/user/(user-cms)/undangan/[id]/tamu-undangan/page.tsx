@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -12,6 +12,7 @@ import {
   IconQrcode,
   IconDownload,
   IconFileSpreadsheet,
+  IconTrash,
 } from "@tabler/icons-react";
 import MenuAction from "@/components/ui/custom/menu-action";
 import TablePending from "@/components/ui/custom/table-pending";
@@ -50,6 +51,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
 
 import {
   Dialog,
@@ -65,6 +67,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { IconChevronDown } from "@tabler/icons-react";
 import Pagination from "@/components/ui/custom/pagination";
 
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
@@ -116,6 +124,12 @@ export default function TamuPage() {
   const [filterIsConfirm, setFilterIsConfirm] = useState("");
   const [filterIsAttend, setFilterIsAttend] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
+
+  // Bulk select state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+  const [isOpenBulkDelete, setIsOpenBulkDelete] = useState(false);
+  const [isDownloadingSelectedQR, setIsDownloadingSelectedQR] = useState(false);
 
   const [queryParams, setQueryParams] = useState<Params>({
     limit: limit,
@@ -343,6 +357,7 @@ export default function TamuPage() {
   useEffect(() => {
     if (undanganTamu) {
       setTableData(undanganTamu.rows);
+      setSelectedIds(new Set()); // clear selection when page data changes
     }
     setIsDataLoaded(true);
   }, [undanganTamu]);
@@ -366,6 +381,66 @@ export default function TamuPage() {
       debounceSetParamsTable.cancel();
     };
   }, []);
+
+  const toggleSelect = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const isAllOnPageSelected = tableData.length > 0 && tableData.every((t) => selectedIds.has(t.id));
+
+  const toggleSelectAll = useCallback(() => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (tableData.every((t) => next.has(t.id))) {
+        tableData.forEach((t) => next.delete(t.id));
+      } else {
+        tableData.forEach((t) => next.add(t.id));
+      }
+      return next;
+    });
+  }, [tableData]);
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    setIsBulkDeleting(true);
+    try {
+      await undanganTamuApi.bulkDelete([...selectedIds]);
+      toast.success(`${selectedIds.size} tamu berhasil dihapus`);
+      setSelectedIds(new Set());
+      refetch();
+      refetchTotalKirimWA();
+      refetchOverview();
+    } catch {
+      toast.error("Gagal menghapus tamu");
+    } finally {
+      setIsBulkDeleting(false);
+      setIsOpenBulkDelete(false);
+    }
+  };
+
+  const handleDownloadSelectedQR = async () => {
+    const slug = undangan?.permalink;
+    if (!slug || selectedIds.size === 0) return;
+    setIsDownloadingSelectedQR(true);
+    try {
+      const res = await undanganTamuApi.downloadSelectedQR(slug, [...selectedIds]);
+      const blob = new Blob([res.data], { type: "application/zip" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `qr-terpilih-${slug}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error("Gagal mendownload QR");
+    } finally {
+      setIsDownloadingSelectedQR(false);
+    }
+  };
 
   const handleImport = async () => {
     if (!importFile) return;
@@ -611,6 +686,38 @@ export default function TamuPage() {
 
       <div className="border border-border p-6 rounded-2xl grid gap-4">
         <div className="flex flex-wrap gap-2 justify-end items-center">
+          {selectedIds.size > 0 && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm">
+                  {selectedIds.size} Terpilih
+                  <IconChevronDown size={14} className="ml-1" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-52 p-1" align="end">
+                <button
+                  onClick={handleDownloadSelectedQR}
+                  disabled={isDownloadingSelectedQR}
+                  className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors disabled:opacity-50"
+                >
+                  {isDownloadingSelectedQR ? (
+                    <IconLoader2 size={15} className="animate-spin" />
+                  ) : (
+                    <IconDownload size={15} />
+                  )}
+                  Download QR ({selectedIds.size})
+                </button>
+                <button
+                  onClick={() => setIsOpenBulkDelete(true)}
+                  disabled={isBulkDeleting}
+                  className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
+                >
+                  <IconTrash size={15} />
+                  Hapus Terpilih ({selectedIds.size})
+                </button>
+              </PopoverContent>
+            </Popover>
+          )}
           <Button
             variant="outline"
             onClick={handleDownloadAllQr}
@@ -674,6 +781,13 @@ export default function TamuPage() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-10">
+                <Checkbox
+                  checked={isAllOnPageSelected}
+                  onCheckedChange={toggleSelectAll}
+                  aria-label="Pilih semua"
+                />
+              </TableHead>
               <TableHead>Nama Tamu</TableHead>
               <TableHead>No. Whatsapp</TableHead>
               <TableHead>Total Tamu (Orang)</TableHead>
@@ -686,10 +800,17 @@ export default function TamuPage() {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TablePending colSpan={8} />
+              <TablePending colSpan={9} />
             ) : tableData.length > 0 ? (
               tableData.map((item) => (
-                <TableRow key={item.id}>
+                <TableRow key={item.id} data-selected={selectedIds.has(item.id)} className="data-[selected=true]:bg-primary/5">
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedIds.has(item.id)}
+                      onCheckedChange={() => toggleSelect(item.id)}
+                      aria-label={`Pilih ${item.name}`}
+                    />
+                  </TableCell>
                   <TableCell>{item.name}</TableCell>
                   <TableCell>{item.phone}</TableCell>
                   <TableCell>{item.maxInvite}</TableCell>
@@ -786,7 +907,7 @@ export default function TamuPage() {
                 </TableRow>
               ))
             ) : (
-              <TableNoData colSpan={8} />
+              <TableNoData colSpan={9} />
             )}
           </TableBody>
         </Table>
@@ -930,6 +1051,37 @@ export default function TamuPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Bulk delete confirmation */}
+      <AlertDialog open={isOpenBulkDelete} onOpenChange={setIsOpenBulkDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold">
+              Hapus {selectedIds.size} Tamu
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base">
+              Tindakan ini tidak dapat dibatalkan. {selectedIds.size} tamu yang dipilih akan dihapus permanen.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBulkDeleting}>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDelete}
+              disabled={isBulkDeleting}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {isBulkDeleting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Menghapus...</span>
+                </>
+              ) : (
+                `Ya, Hapus ${selectedIds.size} Tamu`
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog open={isOpenDelete} onOpenChange={setIsOpenDelete}>
         <AlertDialogContent>

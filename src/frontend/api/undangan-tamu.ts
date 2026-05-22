@@ -29,6 +29,12 @@ const undanganTamuApi = {
   downloadQR: (slug: string) => {
     return axios.get(`/undangan/${slug}/qr-download`, { responseType: 'blob' })
   },
+  downloadSelectedQR: (slug: string, ids: string[]) => {
+    return axios.post(`/undangan/${slug}/qr-download`, { ids }, { responseType: 'blob' })
+  },
+  bulkDelete: (ids: string[]) => {
+    return axios.delete(`/tamu/bulk-delete`, { data: { ids } })
+  },
 };
 
 export default undanganTamuApi;

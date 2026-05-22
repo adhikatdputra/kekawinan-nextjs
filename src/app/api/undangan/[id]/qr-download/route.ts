@@ -56,3 +56,59 @@ export async function GET(request: NextRequest, { params }: Params) {
     return serverError()
   }
 }
+
+// POST /api/undangan/[id]/qr-download — download QR for selected tamu ids
+export async function POST(request: NextRequest, { params }: Params) {
+  const auth = requireAuth(request)
+  if (auth instanceof NextResponse) return auth
+
+  const { id: slug } = await params
+
+  try {
+    const body = await request.json()
+    const { ids } = body
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return new NextResponse('ids wajib diisi', { status: 400 })
+    }
+
+    const undangan = await prisma.undangan.findUnique({
+      where: { permalink: slug },
+      select: { id: true, userId: true },
+    })
+    if (!undangan) return notFound('Undangan tidak ditemukan')
+    if (undangan.userId !== auth.id) return forbidden('Hanya Owner yang dapat mendownload QR')
+
+    const tamuList = await prisma.tamu.findMany({
+      where: { id: { in: ids }, undanganId: undangan.id },
+      select: { id: true, name: true },
+    })
+
+    if (tamuList.length === 0) {
+      return new NextResponse('Tidak ada tamu yang ditemukan', { status: 400 })
+    }
+
+    const zip = new JSZip()
+
+    await Promise.all(
+      tamuList.map(async (tamu) => {
+        const url = `${BASE_URL}/${slug}/${tamu.id}`
+        const qrBuffer = await QRCode.toBuffer(url, { width: 400, margin: 2 })
+        const fileName = `${(tamu.name ?? tamu.id).replace(/[^a-zA-Z0-9\s-]/g, '').trim()}.png`
+        zip.file(fileName, qrBuffer)
+      })
+    )
+
+    const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' })
+
+    return new NextResponse(zipBuffer, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/zip',
+        'Content-Disposition': `attachment; filename="qr-selected-${slug}.zip"`,
+      },
+    })
+  } catch {
+    return serverError()
+  }
+}
