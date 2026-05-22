@@ -2,7 +2,6 @@ export const runtime = 'nodejs'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { nanoid } from 'nanoid'
-import * as XLSX from 'xlsx'
 import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
@@ -75,7 +74,8 @@ export async function POST(request: NextRequest) {
       return forbidden('Akses ditolak')
     }
 
-    // Parse xlsx
+    // Parse xlsx — dynamic import agar tidak dianalisis saat build
+    const XLSX = await import('xlsx')
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
     const workbook = XLSX.read(buffer, { type: 'buffer' })

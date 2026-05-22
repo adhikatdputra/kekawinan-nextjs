@@ -3,7 +3,6 @@ import type { NextConfig } from "next";
 const isDev = process.env.VERCEL_ENV === "preview";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ['xlsx'],
   async headers() {
     if (!isDev) return [];
     return [
