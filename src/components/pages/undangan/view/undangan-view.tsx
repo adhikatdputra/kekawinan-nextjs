@@ -16,7 +16,7 @@ import Loading from "@/components/layouts/loading";
 import NotFound from "@/components/card/not-found";
 
 // Lagi Testing -> Delete Soon
-// import Theme15 from "@/components/theme/theme15";
+// import Theme16 from "@/components/theme/theme16";
 
 interface ThemeComponentProps {
   undanganData: UndanganDetail;
@@ -156,29 +156,27 @@ export default function UndanganView({
       const audioElement = document.getElementById("music") as HTMLAudioElement;
 
       if (document.hidden) {
-        // Halaman tersembunyi - pause musik
+        // Halaman tersembunyi - pause musik (tanpa ubah state isPlayMusic)
         if (audioElement && !audioElement.paused) {
           audioElement.pause();
         }
       } else {
-        // Halaman terlihat kembali - selalu auto play musik
-        if (audioElement && music) {
+        // Halaman terlihat kembali - hanya resume jika sebelumnya sedang play
+        // (isPlayMusic=false berarti: cover belum dibuka, atau user sudah stop musik)
+        if (audioElement && music && isPlayMusic) {
           audioElement.play().catch((error) => {
             console.log("Auto-play failed:", error);
           });
-          setIsPlayMusic(true);
         }
       }
     };
 
-    // Tambahkan event listener untuk page visibility
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    // Cleanup event listener
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [music]);
+  }, [music, isPlayMusic]);
 
   useEffect(() => {
     const loadTheme = async () => {
