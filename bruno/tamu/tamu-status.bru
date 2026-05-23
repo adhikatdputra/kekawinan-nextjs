@@ -1,0 +1,43 @@
+meta {
+  name: Get Tamu Status
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{base_url}}/api/tamu/:id/status
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Get Tamu Status
+
+  Ambil status kehadiran tamu berdasarkan ID. Digunakan oleh halaman scanner sebelum melakukan konfirmasi absensi.
+
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "tamu_id",
+      "name": "Budi Hartono",
+      "maxInvite": 4,
+      "isConfirm": 1,
+      "isAttend": 0,
+      "attendedAt": null
+    }
+  }
+  ```
+
+  | Field      | Description                                      |
+  |------------|--------------------------------------------------|
+  | isConfirm  | 1 = sudah RSVP via halaman publik                |
+  | isAttend   | 1 = sudah absen fisik via scanner                |
+  | attendedAt | Timestamp absensi fisik, null jika belum absen   |
+}

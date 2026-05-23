@@ -1,0 +1,45 @@
+meta {
+  name: Bulk Delete Tamu
+  type: http
+  seq: 10
+}
+
+delete {
+  url: {{base_url}}/api/tamu/bulk-delete
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "ids": ["tamu_id_1", "tamu_id_2", "tamu_id_3"]
+  }
+}
+
+docs {
+  # Bulk Delete Tamu
+
+  Hapus beberapa tamu sekaligus. Maksimal 500 ID per request.
+
+  Hanya ID yang benar-benar dimiliki oleh undangan caller yang akan dihapus. ID tidak valid diabaikan.
+
+  | Field | Type     | Required | Description                  |
+  |-------|----------|----------|------------------------------|
+  | ids   | string[] | Ya       | Array ID tamu (maks 500)     |
+
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "message": "5 tamu berhasil dihapus",
+    "data": {
+      "deleted_count": 5
+    }
+  }
+  ```
+}

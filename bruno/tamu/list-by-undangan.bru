@@ -23,6 +23,7 @@ params:query {
   sendStatus:
   isRead:
   isConfirm:
+  isAttend:
 }
 
 docs {
@@ -30,9 +31,10 @@ docs {
 
   Daftar tamu undangan dengan pagination dan filter.
 
-  | Param      | Description                         |
-  |------------|-------------------------------------|
-  | sendStatus | Filter status kirim WhatsApp        |
-  | isRead     | Filter sudah dibuka atau belum      |
-  | isConfirm  | Filter sudah konfirmasi kehadiran   |
+  | Param      | Description                                  |
+  |------------|----------------------------------------------|
+  | sendStatus | Filter status kirim WhatsApp (0/1)           |
+  | isRead     | Filter sudah dibuka atau belum (0/1)         |
+  | isConfirm  | Filter sudah RSVP via halaman publik (0/1)   |
+  | isAttend   | Filter sudah absen fisik via scanner (0/1)   |
 }

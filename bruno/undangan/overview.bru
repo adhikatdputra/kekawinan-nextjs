@@ -17,5 +17,26 @@ auth:bearer {
 docs {
   # Undangan Overview
 
-  Statistik ringkasan undangan: total tamu diundang, total hadir, total tidak hadir.
+  Statistik ringkasan undangan berdasarkan RSVP dan absensi fisik.
+
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "total_tamu": 120,
+      "total_tamu_hadir": 85,
+      "total_tamu_tidak_hadir": 10,
+      "total_tamu_sudah_hadir": 60
+    }
+  }
+  ```
+
+  | Field                   | Description                                               |
+  |-------------------------|-----------------------------------------------------------|
+  | total_tamu              | Total orang diundang (sum maxInvite)                      |
+  | total_tamu_hadir        | Total orang yang RSVP akan hadir (sum maxInvite isConfirm=1) |
+  | total_tamu_tidak_hadir  | Total yang RSVP tidak hadir                               |
+  | total_tamu_sudah_hadir  | Total orang yang benar-benar hadir fisik (sum maxInvite isAttend=1) |
 }

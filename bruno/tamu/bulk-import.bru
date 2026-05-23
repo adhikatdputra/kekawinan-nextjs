@@ -1,0 +1,50 @@
+meta {
+  name: Bulk Import Tamu
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{base_url}}/api/tamu/bulk-import
+  body: multipart-form
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  undanganId: undangan_id_here
+  file: @file(/path/to/tamu.xlsx)
+}
+
+docs {
+  # Bulk Import Tamu
+
+  Import banyak tamu sekaligus dari file Excel (.xlsx). Sheet harus bernama **TAMU** (atau sheet pertama jika tidak ditemukan).
+
+  ## Format Excel
+
+  | Kolom | Header    | Required | Keterangan                                 |
+  |-------|-----------|----------|--------------------------------------------|
+  | A     | Nama Tamu | Ya       | Karakter `&` otomatis diganti `dan`         |
+  | B     | No. WA    | Ya       | Format: `08xxx`, `628xxx`, atau `8xxx`      |
+  | C     | Total     | Tidak    | Jumlah undangan 1–20 (default: 1)           |
+
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "success_count": 8,
+      "failed_count": 2,
+      "batch_id": "abc123",
+      "total": 10
+    }
+  }
+  ```
+
+  Baris yang gagal divalidasi disimpan ke log (`TamuBulkLog`) dengan `batch_id` yang sama dan dapat dilihat/diperbaiki via endpoint bulk-log.
+}
