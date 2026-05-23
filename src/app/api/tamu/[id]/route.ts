@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
+import { isActiveCollaborator } from '@/lib/undangan-access'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -11,7 +12,7 @@ async function getOwnedTamu(id: string, userId: string, level: string) {
     include: { undangan: { select: { userId: true } } },
   })
   if (!tamu) return { tamu: null, error: notFound('Tamu not found') }
-  if (!isAdminLevel(level) && tamu.undangan.userId !== userId) {
+  if (!isAdminLevel(level) && tamu.undangan.userId !== userId && !(await isActiveCollaborator(userId, tamu.undanganId))) {
     return { tamu: null, error: forbidden('Access denied') }
   }
   return { tamu, error: null }

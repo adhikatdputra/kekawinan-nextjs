@@ -15,6 +15,9 @@ import { toast } from "react-hot-toast";
 import Loading from "@/components/layouts/loading";
 import NotFound from "@/components/card/not-found";
 
+// Lagi Testing -> Delete Soon
+// import Theme16 from "@/components/theme/theme16";
+
 interface ThemeComponentProps {
   undanganData: UndanganDetail;
   tamuData: UndanganTamu;
@@ -45,7 +48,7 @@ export default function UndanganView({
   const [isPlayMusic, setIsPlayMusic] = useState(false);
   const [ucapan, setUcapan] = useState<UndanganUcapan[]>([]);
   const [giftList, setGiftList] = useState<Gift[]>([]);
-  
+
   const {
     data: undanganData,
     isError,
@@ -58,7 +61,11 @@ export default function UndanganView({
 
   const isDemo = id_tamu === "demo";
 
-  const { data: tamu, refetch: refetchTamu, isError: isTamuError } = useQuery({
+  const {
+    data: tamu,
+    refetch: refetchTamu,
+    isError: isTamuError,
+  } = useQuery({
     queryKey: ["undangan-user-tamu", id_tamu],
     queryFn: () => undanganUserApi.getTamu(id_tamu),
     select: (data) => data.data,
@@ -77,9 +84,7 @@ export default function UndanganView({
     },
   });
 
-  const {
-    mutate: mutateGiftList,
-  } = useMutation({
+  const { mutate: mutateGiftList } = useMutation({
     mutationFn: (undangan_id: string) => giftApi.getPublic(undangan_id),
     onSuccess: (data) => {
       setGiftList(data.data.data);
@@ -131,7 +136,7 @@ export default function UndanganView({
   };
 
   const handlePlayMusic = () => {
-    console.log("isPlayMusicBefore", isPlayMusic);
+    // console.log("isPlayMusicBefore", isPlayMusic);
     const a = document.getElementById("music") as HTMLAudioElement;
     if (isPlayMusic) {
       a.pause();
@@ -151,29 +156,27 @@ export default function UndanganView({
       const audioElement = document.getElementById("music") as HTMLAudioElement;
 
       if (document.hidden) {
-        // Halaman tersembunyi - pause musik
+        // Halaman tersembunyi - pause musik (tanpa ubah state isPlayMusic)
         if (audioElement && !audioElement.paused) {
           audioElement.pause();
         }
       } else {
-        // Halaman terlihat kembali - selalu auto play musik
-        if (audioElement && music) {
+        // Halaman terlihat kembali - hanya resume jika sebelumnya sedang play
+        // (isPlayMusic=false berarti: cover belum dibuka, atau user sudah stop musik)
+        if (audioElement && music && isPlayMusic) {
           audioElement.play().catch((error) => {
             console.log("Auto-play failed:", error);
           });
-          setIsPlayMusic(true);
         }
       }
     };
 
-    // Tambahkan event listener untuk page visibility
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    // Cleanup event listener
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [music]);
+  }, [music, isPlayMusic]);
 
   useEffect(() => {
     const loadTheme = async () => {

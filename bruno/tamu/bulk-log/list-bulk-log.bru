@@ -1,0 +1,49 @@
+meta {
+  name: List Bulk Import Log
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/tamu/bulk-log/undangan/:undanganId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+params:query {
+  page: 1
+  limit: 10
+}
+
+docs {
+  # List Bulk Import Log
+
+  Daftar baris yang gagal divalidasi saat bulk import. Tiap baris menyimpan nama, nomor, maxInvite, dan alasan kegagalan.
+
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "rows": [
+        {
+          "id": "log_id",
+          "batchId": "batch_id",
+          "rowNumber": 3,
+          "name": "Budi &amp; Ani",
+          "phone": "0899",
+          "maxInvite": null,
+          "errorMessage": "No. WhatsApp tidak valid"
+        }
+      ],
+      "total_data": 2,
+      "total_page": 1
+    }
+  }
+  ```
+}

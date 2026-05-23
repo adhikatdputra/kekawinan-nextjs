@@ -1,0 +1,70 @@
+meta {
+  name: Confirm Attendance (Scanner)
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{base_url}}/api/undangan/:id/attendance
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "tamuId": "tamu_id_here",
+    "attendCount": 3
+  }
+}
+
+docs {
+  # Confirm Attendance (Scanner)
+
+  Konfirmasi kehadiran fisik tamu oleh crew saat hari H menggunakan QR scanner. Parameter `:id` adalah **permalink/slug** undangan.
+
+  Hanya Owner, Member, atau Crew ACTIVE di undangan yang dapat memanggil endpoint ini.
+
+  | Field       | Type   | Required | Description                              |
+  |-------------|--------|----------|------------------------------------------|
+  | tamuId      | string | Ya       | ID tamu dari hasil scan QR               |
+  | attendCount | number | Tidak    | Jumlah orang yang benar-benar hadir      |
+
+  ## Response — belum absen
+
+  ```json
+  {
+    "success": true,
+    "message": "Kehadiran berhasil dikonfirmasi",
+    "data": {
+      "alreadyConfirmed": false,
+      "tamu": {
+        "id": "tamu_id",
+        "name": "Budi Hartono",
+        "maxInvite": 4,
+        "attendCount": 3,
+        "isAttend": 1,
+        "attendedAt": "2025-11-12T08:30:00.000Z"
+      }
+    }
+  }
+  ```
+
+  ## Response — sudah absen sebelumnya
+
+  ```json
+  {
+    "success": true,
+    "message": "Tamu ini sudah tercatat hadir.",
+    "data": {
+      "alreadyConfirmed": true,
+      "attendedAt": "2025-11-12T08:30:00.000Z"
+    }
+  }
+  ```
+
+  > **isAttend** vs **isConfirm**: `isConfirm` = RSVP via halaman publik. `isAttend` = absensi fisik via scanner.
+}

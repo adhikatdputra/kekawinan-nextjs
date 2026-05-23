@@ -4,13 +4,14 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, created, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
 import { resolveMediaUrl, paginate, parsePagination } from '@/lib/helpers'
+import { isActiveCollaborator } from '@/lib/undangan-access'
 
 type Params = { params: Promise<{ id: string }> }
 
 async function getOwnedUndangan(undanganId: string, userId: string, level: string) {
   const undangan = await prisma.undangan.findUnique({ where: { id: undanganId } })
   if (!undangan) return { undangan: null, error: notFound('Undangan not found') }
-  if (!isAdminLevel(level) && undangan.userId !== userId) {
+  if (!isAdminLevel(level) && undangan.userId !== userId && !(await isActiveCollaborator(userId, undanganId))) {
     return { undangan: null, error: forbidden('Access denied') }
   }
   return { undangan, error: null }

@@ -50,7 +50,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     const { email, role } = body
 
     if (!email || !role) return badRequest('Email dan role wajib diisi')
-    if (!['MEMBER', 'CREW'].includes(role)) return badRequest('Role harus MEMBER atau CREW')
+    if (!['MEMBER', 'CREW', 'OWNER'].includes(role)) return badRequest('Role harus MEMBER, CREW, atau OWNER')
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return badRequest('Format email tidak valid')
 
     const undangan = await prisma.undangan.findUnique({
@@ -96,7 +96,9 @@ export async function POST(request: NextRequest, { params }: Params) {
       },
     })
 
-    const baseUrl = BASE_URL
+    const host = request.headers.get('host') ?? 'localhost:3000'
+    const proto = host.startsWith('localhost') ? 'http' : 'https'
+    const siteUrl = `${proto}://${host}`
 
     // Send email notification (fire-and-forget)
     if (targetUser) {
@@ -106,7 +108,7 @@ export async function POST(request: NextRequest, { params }: Params) {
         ownerName: undangan.user.fullname ?? undangan.user.email,
         undanganName: undangan.name ?? 'Undangan Pernikahan',
         role,
-        dashboardLink: `${baseUrl}/user/undangan-list`,
+        dashboardLink: `${siteUrl}/user/undangan-list`,
       }).catch(() => {})
     } else {
       sendCollaboratorInvitePending({
@@ -114,7 +116,7 @@ export async function POST(request: NextRequest, { params }: Params) {
         ownerName: undangan.user.fullname ?? undangan.user.email,
         undanganName: undangan.name ?? 'Undangan Pernikahan',
         role,
-        registerLink: `${baseUrl}/auth/register`,
+        registerLink: `${siteUrl}/auth/register`,
       }).catch(() => {})
     }
 

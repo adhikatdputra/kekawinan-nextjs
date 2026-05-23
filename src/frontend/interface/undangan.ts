@@ -34,6 +34,7 @@ export interface Theme {
   credit: number;
   promo: number | null;
   isActive: boolean;
+  isShowAdmin?: boolean;
   createdAt: string;
   updatedAt: string;
   _count?: { undangan: number };
@@ -47,6 +48,7 @@ export interface UndanganDetail {
   status: string;
   expired: string;
   themeId: string;
+  packageType: 'AKAD' | 'RESEPSI' | 'GRAND';
   createdAt: string;
   updatedAt: string;
   content: UndanganContent | null;
@@ -54,6 +56,7 @@ export interface UndanganDetail {
   gallery: UndanganGaleri[];
   ucapan: UndanganUcapan[];
   theme: Theme | null;
+  loveStories: LoveStory[];
 }
 
 export interface UndanganContent {
@@ -125,6 +128,7 @@ export interface Params {
   sendStatus?: string;
   isRead?: string;
   isConfirm?: string;
+  isAttend?: string;
 }
 
 export interface UndanganUcapanResponse {
@@ -163,7 +167,22 @@ export interface UndanganTamu {
   sendStatus: number;
   isRead: number;
   isConfirm: number;
+  isAttend: number;
   maxInvite: number;
+  attendedAt: string | null;
+  confirmedBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LoveStory {
+  id: string;
+  undanganId: string;
+  image: string | null;
+  waktu: string | null;
+  lokasi: string | null;
+  story: string;
+  rank: number;
   createdAt: string;
   updatedAt: string;
 }

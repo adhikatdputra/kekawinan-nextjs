@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
+import { isActiveCollaborator } from '@/lib/undangan-access'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -13,7 +14,7 @@ async function getOwnedUcapan(id: string, userId: string, level: string) {
     include: { undangan: { select: { userId: true } } },
   })
   if (!ucapan) return { ucapan: null, error: notFound('Ucapan not found') }
-  if (!isAdminLevel(level) && ucapan.undangan.userId !== userId) {
+  if (!isAdminLevel(level) && ucapan.undangan.userId !== userId && !(await isActiveCollaborator(userId, ucapan.undanganId))) {
     return { ucapan: null, error: forbidden('Access denied') }
   }
   return { ucapan, error: null }

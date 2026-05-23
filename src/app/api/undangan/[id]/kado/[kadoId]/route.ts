@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, forbidden, notFound, serverError } from '@/lib/api-response'
 import { resolveMediaUrl } from '@/lib/helpers'
+import { isActiveCollaborator } from '@/lib/undangan-access'
 
 type Params = { params: Promise<{ id: string; kadoId: string }> }
 
@@ -13,7 +14,7 @@ async function getOwnedKado(kadoId: string, undanganId: string, userId: string, 
   })
   if (!kado) return { kado: null, error: notFound('Kado not found') }
   if (kado.undanganId !== undanganId) return { kado: null, error: notFound('Kado not found') }
-  if (!isAdminLevel(level) && kado.undangan.userId !== userId) {
+  if (!isAdminLevel(level) && kado.undangan.userId !== userId && !(await isActiveCollaborator(userId, kado.undanganId))) {
     return { kado: null, error: forbidden('Access denied') }
   }
   return { kado, error: null }

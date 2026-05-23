@@ -28,11 +28,11 @@ export default function Galeri({
     <div>
       <Gallery>
         <Swiper
-          loop={true}
+          loop={galeri.length > Math.ceil(view) * 2}
           modules={[Navigation, Pagination]}
           spaceBetween={24}
           slidesPerView={view}
-          centeredSlides={true}
+          centeredSlides={galeri.length > 1}
           navigation={navigation}
           pagination={pagination}
           className="w-full"

@@ -8,7 +8,7 @@ export default function LandingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div>
+    <div className="overflow-x-hidden">
       <HeaderWeb />
       {children}
       <FooterWeb />

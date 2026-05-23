@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, forbidden, notFound, serverError } from '@/lib/api-response'
+import { isActiveCollaborator } from '@/lib/undangan-access'
 
 type Params = { params: Promise<{ undanganId: string }> }
 
@@ -15,17 +16,13 @@ export async function GET(request: NextRequest, { params }: Params) {
 
     const undangan = await prisma.undangan.findUnique({ where: { id: undanganId } })
     if (!undangan) return notFound('Undangan not found')
-    if (!isAdminLevel(auth.level) && undangan.userId !== auth.id) {
+    if (!isAdminLevel(auth.level) && undangan.userId !== auth.id && !(await isActiveCollaborator(auth.id, undanganId))) {
       return forbidden('Access denied')
     }
 
     const result = await prisma.tamu.aggregate({
       where: { undanganId },
-      _sum: {
-        sendStatus: true,
-        isRead: true,
-        isConfirm: true,
-      },
+      _sum: { sendStatus: true, isRead: true, isConfirm: true, isAttend: true },
       _count: { id: true },
     })
 
@@ -34,6 +31,7 @@ export async function GET(request: NextRequest, { params }: Params) {
       total_send: result._sum.sendStatus ?? 0,
       total_read: result._sum.isRead ?? 0,
       total_confirm: result._sum.isConfirm ?? 0,
+      total_attended: result._sum.isAttend ?? 0,
     }, 'Get stats success')
   } catch {
     return serverError()

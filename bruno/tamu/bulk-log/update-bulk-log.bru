@@ -1,0 +1,35 @@
+meta {
+  name: Update Bulk Log Row
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{base_url}}/api/tamu/bulk-log/:id
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Budi dan Ani",
+    "phone": "081234567890",
+    "maxInvite": 2
+  }
+}
+
+docs {
+  # Update Bulk Log Row
+
+  Perbaiki data pada satu baris log yang gagal (sebelum retry). Semua field opsional — hanya field yang dikirim yang diupdate.
+
+  | Field     | Type   | Required | Description                   |
+  |-----------|--------|----------|-------------------------------|
+  | name      | string | Tidak    | Nama tamu                     |
+  | phone     | string | Tidak    | No. WhatsApp (08x/62x/8x)     |
+  | maxInvite | number | Tidak    | Jumlah undangan 1–20          |
+}

@@ -1,0 +1,37 @@
+meta {
+  name: Download QR Selected Tamu
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{base_url}}/api/undangan/:id/qr-download
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "ids": ["tamu_id_1", "tamu_id_2", "tamu_id_3"]
+  }
+}
+
+docs {
+  # Download QR Selected Tamu
+
+  Download file ZIP berisi QR code PNG untuk tamu yang dipilih. Parameter `:id` adalah **permalink/slug** undangan.
+
+  Hanya Owner yang dapat menggunakan endpoint ini.
+
+  | Field | Type     | Required | Description                    |
+  |-------|----------|----------|--------------------------------|
+  | ids   | string[] | Ya       | Array ID tamu yang dipilih     |
+
+  Response berupa binary ZIP (`application/zip`).
+
+  > Untuk download **semua** QR sekaligus, gunakan `GET /api/undangan/:id/qr-download`.
+}

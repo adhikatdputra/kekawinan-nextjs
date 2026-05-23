@@ -17,6 +17,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
         content: true,
         gifts: true,
         gallery: { orderBy: { rank: 'asc' } },
+        loveStories: { orderBy: { rank: 'asc' } },
         ucapan: {
           where: { isShow: 1 },
           orderBy: { createdAt: 'desc' },
@@ -42,6 +43,9 @@ export async function GET(_request: NextRequest, { params }: Params) {
     }
     for (const g of data.gallery) {
       (g as Record<string, unknown>).image = resolveMediaUrl(g.image)
+    }
+    for (const ls of data.loveStories) {
+      if (ls.image) (ls as Record<string, unknown>).image = resolveMediaUrl(ls.image)
     }
 
     return ok(data, 'Get undangan success')

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, forbidden, notFound, serverError } from '@/lib/api-response'
+import { isActiveCollaborator } from '@/lib/undangan-access'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -18,7 +19,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
       include: { undangan: { select: { userId: true } } },
     })
     if (!tamu) return notFound('Tamu not found')
-    if (!isAdminLevel(auth.level) && tamu.undangan.userId !== auth.id) {
+    if (!isAdminLevel(auth.level) && tamu.undangan.userId !== auth.id && !(await isActiveCollaborator(auth.id, tamu.undanganId))) {
       return forbidden('Access denied')
     }
 

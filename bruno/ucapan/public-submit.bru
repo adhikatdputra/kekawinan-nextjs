@@ -24,14 +24,16 @@ body:json {
 docs {
   # Public - Submit Ucapan
 
-  Tamu mengirim ucapan dan konfirmasi kehadiran dari halaman publik. Tidak memerlukan autentikasi.
+  Tamu mengirim ucapan dan konfirmasi kehadiran (RSVP) dari halaman publik. Tidak memerlukan autentikasi.
 
-  | Field       | Type   | Required | Description                      |
-  |-------------|--------|----------|----------------------------------|
-  | undanganId  | string | Ya       | ID undangan                      |
-  | tamuId      | string | Tidak    | ID tamu (jika punya link personal)|
-  | name        | string | Ya       | Nama (maks 100 karakter)         |
-  | message     | string | Ya       | Ucapan (maks 500 karakter)       |
-  | attend      | string | Ya       | "Yes" atau "No"                  |
-  | attendTotal | number | Tidak    | Jumlah yang hadir                |
+  `tamuId` **wajib diisi** dan harus valid (tamu yang diundang). Satu tamu hanya bisa mengirim satu ucapan — submit ulang akan ditolak.
+
+  | Field       | Type   | Required | Description                          |
+  |-------------|--------|----------|--------------------------------------|
+  | undanganId  | string | Ya       | ID undangan                          |
+  | tamuId      | string | **Ya**   | ID tamu (dari link QR personal)      |
+  | name        | string | Ya       | Nama (maks 100 karakter)             |
+  | message     | string | Ya       | Ucapan (maks 500 karakter)           |
+  | attend      | string | Ya       | `"Yes"` atau `"No"`                  |
+  | attendTotal | number | Tidak    | Jumlah yang hadir (jika attend=Yes)  |
 }

@@ -1,0 +1,38 @@
+meta {
+  name: Retry Bulk Log Row
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/api/tamu/bulk-log/:id/retry
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Budi dan Ani",
+    "phone": "081234567890",
+    "maxInvite": 2
+  }
+}
+
+docs {
+  # Retry Bulk Log Row
+
+  Coba ulang import satu baris log yang gagal. Field opsional — jika tidak dikirim, nilai dari log yang tersimpan digunakan.
+
+  Jika validasi berhasil: tamu dibuat dan baris log dihapus otomatis.
+  Jika validasi gagal: `errorMessage` di log diperbarui.
+
+  | Field     | Type   | Required | Description                        |
+  |-----------|--------|----------|------------------------------------|
+  | name      | string | Tidak    | Override nama (default: dari log)  |
+  | phone     | string | Tidak    | Override no WA (default: dari log) |
+  | maxInvite | number | Tidak    | Override total (default: dari log) |
+}

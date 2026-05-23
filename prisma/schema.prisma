@@ -8,34 +8,30 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// ─── Users ────────────────────────────────────────────────────────────────────
-
 model User {
-  id             String    @id @db.VarChar(255)
-  fullname       String?   @db.VarChar(255)
-  email          String    @unique @db.VarChar(255)
-  password       String    @db.VarChar(255)
-  level          String    @db.VarChar(20)           // "user" | "admin" | "superadmin"
-  phone          String?   @db.VarChar(50)
-  dob            DateTime?
-  status         String    @default("ACTIVE") @db.VarChar(50)
-  isMember       Int       @default(0)
-  expiredMember  DateTime?
-  lastLogin      DateTime?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-
-  undangan               Undangan[]
-  subscribers            UserSubscriber[]
-  resetPasswords         ResetPassword[]
-  userCredits            UserCredit[]
-  collaboratorInvited    UndanganCollaborator[] @relation("CollaboratorUser")
-  collaboratorInvites    UndanganCollaborator[] @relation("CollaboratorInviter")
+  id                  String                 @id @db.VarChar(255)
+  fullname            String?                @db.VarChar(255)
+  email               String                 @unique @db.VarChar(255)
+  password            String                 @db.VarChar(255)
+  level               String                 @db.VarChar(20)
+  phone               String?                @db.VarChar(50)
+  dob                 DateTime?
+  status              String                 @default("ACTIVE") @db.VarChar(50)
+  isMember            Int                    @default(0)
+  expiredMember       DateTime?
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
+  lastLogin           DateTime?
+  resetPasswords      ResetPassword[]
+  attendanceConfirmed Tamu[]                 @relation("AttendanceConfirmedBy")
+  undangan            Undangan[]
+  collaboratorInvites UndanganCollaborator[] @relation("CollaboratorInviter")
+  collaboratorInvited UndanganCollaborator[] @relation("CollaboratorUser")
+  userCredits         UserCredit[]
+  subscribers         UserSubscriber[]
 
   @@map("tbl_users")
 }
-
-// ─── Theme Component (Master Data) ───────────────────────────────────────────
 
 model ThemeComponent {
   id          String   @id @db.VarChar(64)
@@ -47,129 +43,123 @@ model ThemeComponent {
   @@map("tbl_theme_components")
 }
 
-// ─── Theme ────────────────────────────────────────────────────────────────────
-
 model Theme {
-  id            String   @id @db.VarChar(64)
-  name          String?  @db.VarChar(255)
-  thumbnail     String?  @db.Text
-  componentName String?  @db.Text
-  linkUrl       String?  @db.Text
-  credit        Int      @default(0)
+  id            String     @id @db.VarChar(64)
+  name          String?    @db.VarChar(255)
+  thumbnail     String?
+  componentName String?
+  linkUrl       String?
+  credit        Int        @default(0)
   promo         Int?
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  undangan        Undangan[]
+  isActive      Boolean    @default(true)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  isShowAdmin   Boolean    @default(false)
+  undangan      Undangan[]
 
   @@map("tbl_theme")
 }
 
-// ─── Undangan ─────────────────────────────────────────────────────────────────
-
 model Undangan {
-  id          String      @id @db.VarChar(64)
-  userId      String      @db.VarChar(255)
-  permalink   String      @unique @db.VarChar(500)
-  name        String?     @db.VarChar(255)
-  status      String      @default("ACTIVE") @db.VarChar(50)
-  expired     DateTime?
-  themeId     String?     @db.VarChar(64)
-  packageType PackageType @default(AKAD)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-
-  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  theme         Theme?            @relation(fields: [themeId], references: [id])
+  id            String                 @id @db.VarChar(64)
+  userId        String                 @db.VarChar(255)
+  permalink     String                 @unique @db.VarChar(500)
+  name          String?                @db.VarChar(255)
+  status        String                 @default("ACTIVE") @db.VarChar(50)
+  expired       DateTime?
+  themeId       String?                @db.VarChar(64)
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  packageType   PackageType            @default(AKAD)
+  kado          Kado[]
+  loveStories   LoveStory[]
   tamu          Tamu[]
   ucapan        Ucapan[]
-  content       UndanganContent?
-  gifts         UndanganGift[]
-  gallery       UndanganGallery[]
-  kado          Kado[]
-  userCredits   UserCredit[]
+  theme         Theme?                 @relation(fields: [themeId], references: [id])
+  user          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
   collaborators UndanganCollaborator[]
+  content       UndanganContent?
+  gallery       UndanganGallery[]
+  gifts         UndanganGift[]
+  userCredits   UserCredit[]
+  bulkLogs      TamuBulkLog[]
 
   @@map("tbl_undangan")
 }
 
-// ─── Tamu (Guests) ────────────────────────────────────────────────────────────
-
 model Tamu {
-  id          String   @id @db.VarChar(64)
-  undanganId  String   @db.VarChar(64)
-  name        String?  @db.VarChar(255)
-  phone       String?  @db.VarChar(50)
-  sendStatus  Int      @default(0)        // 0 = belum dikirim, 1 = sudah dikirim
-  isRead      Int      @default(0)        // 0 = belum dibuka, 1 = sudah dibuka
-  isConfirm   Int      @default(0)        // 0 = belum konfirm, 1 = sudah konfirm
-  maxInvite   Int?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  undangan    Undangan @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+  id              String    @id @db.VarChar(64)
+  undanganId      String    @db.VarChar(64)
+  name            String?   @db.VarChar(255)
+  phone           String?   @db.VarChar(50)
+  sendStatus      Int       @default(0)
+  isRead          Int       @default(0)
+  isConfirm       Int       @default(0)
+  maxInvite       Int?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  attendedAt      DateTime?
+  confirmedBy     String?   @db.VarChar(255)
+  isAttend        Int       @default(0)
+  attendCount     Int?                        // jumlah orang yang benar-benar hadir (diinput crew saat scan)
+  confirmedByUser User?     @relation("AttendanceConfirmedBy", fields: [confirmedBy], references: [id])
+  undangan        Undangan  @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+  ucapan          Ucapan?
 
   @@map("tbl_tamu")
 }
 
-// ─── Ucapan (Wishes) ──────────────────────────────────────────────────────────
-
 model Ucapan {
-  id           String   @id @db.VarChar(64)
-  undanganId   String   @db.VarChar(64)
-  name         String?  @db.VarChar(255)
-  message      String?  @db.Text
-  attend          String?  @db.VarChar(50)
-  attendTotal     Int?
-  notAttendTotal  Int?
-  maxInvite       Int?
-  isShow          Int      @default(1)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  undangan     Undangan @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+  id             String   @id @db.VarChar(64)
+  undanganId     String   @db.VarChar(64)
+  name           String?  @db.VarChar(255)
+  message        String?
+  attend         String?  @db.VarChar(50)
+  attendTotal    Int?
+  isShow         Int      @default(1)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  maxInvite      Int?
+  notAttendTotal Int?
+  tamuId         String?  @unique @db.VarChar(64)
+  tamu           Tamu?    @relation(fields: [tamuId], references: [id])
+  undangan       Undangan @relation(fields: [undanganId], references: [id], onDelete: Cascade)
 
   @@map("tbl_ucapan")
 }
 
-// ─── Undangan Content ─────────────────────────────────────────────────────────
-
 model UndanganContent {
-  id               String    @id @db.VarChar(64)
-  undanganId       String    @unique @db.VarChar(64)
-  title            String?   @db.VarChar(255)
-  nameMale         String?   @db.VarChar(255)
-  nameFemale       String?   @db.VarChar(255)
-  dateWedding      DateTime?
-  motherFemale     String?   @db.VarChar(255)
-  fatherFemale     String?   @db.VarChar(255)
-  motherMale       String?   @db.VarChar(255)
-  fatherMale       String?   @db.VarChar(255)
-  maleNo           String?   @db.VarChar(30)
-  femaleNo         String?   @db.VarChar(30)
-  akadTime         String?   @db.VarChar(255)
-  akadPlace        String?   @db.Text
-  resepsiTime      String?   @db.VarChar(255)
-  resepsiPlace     String?   @db.Text
-  gmaps            String?   @db.Text
-  streamLink       String?   @db.Text
-  imgBg            String?   @db.Text
-  imgMale          String?   @db.Text
-  imgFemale        String?   @db.Text
-  imgThumbnail     String?   @db.Text
-  music            String?   @db.Text
-  isCovid          Int?
-  religionVersion  String    @default("ISLAM") @db.VarChar(24)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-
-  undangan         Undangan  @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+  id              String    @id @db.VarChar(64)
+  undanganId      String    @unique @db.VarChar(64)
+  title           String?   @db.VarChar(255)
+  nameMale        String?   @db.VarChar(255)
+  nameFemale      String?   @db.VarChar(255)
+  dateWedding     DateTime?
+  motherFemale    String?   @db.VarChar(255)
+  fatherFemale    String?   @db.VarChar(255)
+  motherMale      String?   @db.VarChar(255)
+  fatherMale      String?   @db.VarChar(255)
+  maleNo          String?   @db.VarChar(30)
+  femaleNo        String?   @db.VarChar(30)
+  akadTime        String?   @db.VarChar(255)
+  akadPlace       String?
+  resepsiTime     String?   @db.VarChar(255)
+  resepsiPlace    String?
+  gmaps           String?
+  streamLink      String?
+  imgBg           String?
+  imgMale         String?
+  imgFemale       String?
+  imgThumbnail    String?
+  music           String?
+  isCovid         Int?
+  religionVersion String    @default("ISLAM") @db.VarChar(24)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  undangan        Undangan  @relation(fields: [undanganId], references: [id], onDelete: Cascade)
 
   @@map("tbl_undangan_content")
 }
-
-// ─── Undangan Gift (Rekening) ─────────────────────────────────────────────────
 
 model UndanganGift {
   id          String   @id @db.VarChar(64)
@@ -179,84 +169,197 @@ model UndanganGift {
   bankNumber  String?  @db.VarChar(50)
   nameAddress String?  @db.VarChar(255)
   phone       String?  @db.VarChar(50)
-  address     String?  @db.Text
+  address     String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
   undangan    Undangan @relation(fields: [undanganId], references: [id], onDelete: Cascade)
 
   @@map("tbl_undangan_gift")
 }
 
-// ─── Undangan Gallery ─────────────────────────────────────────────────────────
-
 model UndanganGallery {
-  id          String   @id @db.VarChar(64)
-  undanganId  String   @db.VarChar(64)
-  image       String?  @db.Text
-  rank        Int      @default(1)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  undangan    Undangan @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+  id         String   @id @db.VarChar(64)
+  undanganId String   @db.VarChar(64)
+  image      String?
+  rank       Int      @default(1)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  undangan   Undangan @relation(fields: [undanganId], references: [id], onDelete: Cascade)
 
   @@map("tbl_undangan_gallery")
 }
 
-// ─── Kado (Wishlist) ──────────────────────────────────────────────────────────
-
 model Kado {
-  id           String   @id @db.VarChar(64)
-  undanganId   String   @db.VarChar(64)
-  title        String?  @db.VarChar(255)
-  description  String?  @db.Text
-  price        String?  @db.VarChar(255)
-  thumbnail    String?  @db.Text
-  linkProduct  String?  @db.Text
-  name         String?  @db.VarChar(255)
-  phone        String?  @db.VarChar(255)
-  isConfirm    Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  undangan     Undangan @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+  id          String   @id @db.VarChar(64)
+  undanganId  String   @db.VarChar(64)
+  title       String?  @db.VarChar(255)
+  description String?
+  price       String?  @db.VarChar(255)
+  thumbnail   String?
+  linkProduct String?
+  name        String?  @db.VarChar(255)
+  phone       String?  @db.VarChar(255)
+  isConfirm   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  undangan    Undangan @relation(fields: [undanganId], references: [id], onDelete: Cascade)
 
   @@map("tbl_kado")
 }
 
-// ─── User Subscriber ──────────────────────────────────────────────────────────
-
 model UserSubscriber {
-  id              String    @id @db.VarChar(64)
-  userId          String    @db.VarChar(255)
-  purchaseDate    DateTime?
-  paymentMethod   String?   @db.VarChar(255)
-  purchaseStatus  String?   @db.VarChar(50)
-  image           String?   @db.Text
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String    @id @db.VarChar(64)
+  userId         String    @db.VarChar(255)
+  purchaseDate   DateTime?
+  paymentMethod  String?   @db.VarChar(255)
+  purchaseStatus String?   @db.VarChar(50)
+  image          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("tbl_user_subscriber")
 }
-
-// ─── Reset Password ───────────────────────────────────────────────────────────
 
 model ResetPassword {
   id        String    @id @db.VarChar(64)
   userId    String    @db.VarChar(255)
   expiredAt DateTime?
-  token     String?   @db.Text
+  token     String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("tbl_reset_password")
 }
 
-// ─── Enums ────────────────────────────────────────────────────────────────────
+model Setting {
+  key         String   @id @db.VarChar(100)
+  value       String
+  description String?
+  updatedBy   String?  @db.VarChar(255)
+  updatedAt   DateTime @updatedAt
+
+  @@map("tbl_settings")
+}
+
+model SettingLog {
+  id         Int      @id @default(autoincrement())
+  settingKey String   @db.VarChar(100)
+  oldValue   String?
+  newValue   String
+  changedBy  String   @db.VarChar(255)
+  changedAt  DateTime @default(now())
+
+  @@map("tbl_settings_log")
+}
+
+model RedemptionCode {
+  id              String           @id @db.VarChar(64)
+  code            String           @unique @db.VarChar(50)
+  packageType     PackageType
+  totalCredit     Int              @default(1)
+  remainingCredit Int              @default(1)
+  usedBy          String?          @db.VarChar(255)
+  usedAt          DateTime?
+  expiredAt       DateTime?
+  status          RedeemCodeStatus @default(UNUSED)
+  note            String?
+  generatedBy     String           @db.VarChar(255)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  userCredits     UserCredit[]
+
+  @@map("tbl_redemption_codes")
+}
+
+model UserCredit {
+  id               String           @id @db.VarChar(64)
+  userId           String           @db.VarChar(255)
+  packageType      PackageType
+  status           UserCreditStatus @default(AVAILABLE)
+  redemptionCodeId String           @db.VarChar(64)
+  usedForUndangan  String?          @db.VarChar(64)
+  usedAt           DateTime?
+  redeemedAt       DateTime         @default(now())
+  redemptionCode   RedemptionCode   @relation(fields: [redemptionCodeId], references: [id])
+  undangan         Undangan?        @relation(fields: [usedForUndangan], references: [id])
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("tbl_user_credits")
+}
+
+model Bank {
+  id        String   @id @db.VarChar(64)
+  name      String   @db.VarChar(255)
+  code      String   @unique @db.VarChar(50)
+  icon      String?
+  color     String?  @db.VarChar(50)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tbl_bank")
+}
+
+model LoveStory {
+  id         String   @id @db.VarChar(64)
+  undanganId String   @db.VarChar(64)
+  image      String?
+  waktu      String?  @db.VarChar(255)
+  lokasi     String?  @db.VarChar(255)
+  story      String
+  rank       Int      @default(1)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  undangan   Undangan @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+
+  @@map("tbl_love_story")
+}
+
+model UndanganCollaborator {
+  id         String    @id @db.VarChar(64)
+  undanganId String    @db.VarChar(64)
+  userId     String?   @db.VarChar(255)
+  email      String    @db.VarChar(255)
+  role       String    @db.VarChar(20)
+  status     String    @default("PENDING") @db.VarChar(20)
+  invitedBy  String    @db.VarChar(255)
+  joinedAt   DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  inviter    User      @relation("CollaboratorInviter", fields: [invitedBy], references: [id])
+  undangan   Undangan  @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+  user       User?     @relation("CollaboratorUser", fields: [userId], references: [id])
+
+  @@unique([undanganId, email])
+  @@map("tbl_undangan_collaborators")
+}
+
+model Image {
+  contentId String   @id @db.VarChar(255)
+  setting   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tbl_images")
+}
+
+model TamuBulkLog {
+  id           String   @id @db.VarChar(64)
+  undanganId   String   @db.VarChar(64)
+  batchId      String   @db.VarChar(64)
+  rowNumber    Int
+  name         String?  @db.VarChar(255)
+  phone        String?  @db.VarChar(50)
+  maxInvite    Int?
+  errorMessage String?  @db.VarChar(500)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  undangan Undangan @relation(fields: [undanganId], references: [id], onDelete: Cascade)
+
+  @@map("tbl_tamu_bulk_log")
+}
 
 enum PackageType {
   AKAD
@@ -273,115 +376,4 @@ enum RedeemCodeStatus {
 enum UserCreditStatus {
   AVAILABLE
   USED
-}
-
-// ─── Settings ─────────────────────────────────────────────────────────────────
-
-model Setting {
-  key         String   @id @db.VarChar(100)
-  value       String   @db.Text
-  description String?  @db.Text
-  updatedBy   String?  @db.VarChar(255)
-  updatedAt   DateTime @updatedAt
-
-  @@map("tbl_settings")
-}
-
-model SettingLog {
-  id         Int      @id @default(autoincrement())
-  settingKey String   @db.VarChar(100)
-  oldValue   String?  @db.Text
-  newValue   String   @db.Text
-  changedBy  String   @db.VarChar(255)
-  changedAt  DateTime @default(now())
-
-  @@map("tbl_settings_log")
-}
-
-// ─── Redemption Codes ─────────────────────────────────────────────────────────
-
-model RedemptionCode {
-  id              String           @id @db.VarChar(64)
-  code            String           @unique @db.VarChar(50)
-  packageType     PackageType
-  totalCredit     Int              @default(1)
-  remainingCredit Int              @default(1)
-  usedBy          String?          @db.VarChar(255)
-  usedAt          DateTime?
-  expiredAt       DateTime?
-  status          RedeemCodeStatus @default(UNUSED)
-  note            String?          @db.Text
-  generatedBy     String           @db.VarChar(255)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-
-  userCredits     UserCredit[]
-
-  @@map("tbl_redemption_codes")
-}
-
-// ─── User Credits ─────────────────────────────────────────────────────────────
-
-model UserCredit {
-  id               String           @id @db.VarChar(64)
-  userId           String           @db.VarChar(255)
-  packageType      PackageType
-  status           UserCreditStatus @default(AVAILABLE)
-  redemptionCodeId String           @db.VarChar(64)
-  usedForUndangan  String?          @db.VarChar(64)
-  usedAt           DateTime?
-  redeemedAt       DateTime         @default(now())
-
-  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  redemptionCode   RedemptionCode   @relation(fields: [redemptionCodeId], references: [id])
-  undangan         Undangan?        @relation(fields: [usedForUndangan], references: [id])
-
-  @@map("tbl_user_credits")
-}
-
-// ─── Bank (Master Data) ───────────────────────────────────────────────────────
-
-model Bank {
-  id        String   @id @db.VarChar(64)
-  name      String   @db.VarChar(255)
-  code      String   @unique @db.VarChar(50)
-  icon      String?  @db.Text
-  color     String?  @db.VarChar(50)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("tbl_bank")
-}
-
-// ─── Undangan Collaborators ───────────────────────────────────────────────────
-
-model UndanganCollaborator {
-  id          String    @id @db.VarChar(64)
-  undanganId  String    @db.VarChar(64)
-  userId      String?   @db.VarChar(255)
-  email       String    @db.VarChar(255)
-  role        String    @db.VarChar(20)    // "MEMBER" | "CREW"
-  status      String    @default("PENDING") @db.VarChar(20) // "PENDING" | "ACTIVE"
-  invitedBy   String    @db.VarChar(255)
-  joinedAt    DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  undangan    Undangan  @relation(fields: [undanganId], references: [id], onDelete: Cascade)
-  user        User?     @relation("CollaboratorUser", fields: [userId], references: [id], onDelete: SetNull)
-  inviter     User      @relation("CollaboratorInviter", fields: [invitedBy], references: [id])
-
-  @@unique([undanganId, email])
-  @@map("tbl_undangan_collaborators")
-}
-
-// ─── Images ───────────────────────────────────────────────────────────────────
-
-model Image {
-  contentId String   @id @db.VarChar(255)
-  setting   String   @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("tbl_images")
 }

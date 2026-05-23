@@ -1,0 +1,344 @@
+'use client'
+
+import { useEffect, useRef, useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import Cookies from 'js-cookie'
+import axios from '@/lib/axios'
+import { BrowserMultiFormatReader } from '@zxing/browser'
+import { NotFoundException } from '@zxing/library'
+
+type ScanState = 'scanning' | 'found' | 'confirming' | 'confirmed' | 'error'
+
+interface TamuData {
+  id: string
+  name: string | null
+  maxInvite: number | null
+  isConfirm: number
+  isAttend: number
+  attendedAt: string | null
+}
+
+interface ScanResult {
+  alreadyConfirmed: boolean
+  tamu: TamuData
+}
+
+function formatTime(isoString: string) {
+  return new Date(isoString).toLocaleTimeString('id-ID', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  })
+}
+
+/** Stop all tracks on a video element and clear srcObject */
+function releaseVideo(video: HTMLVideoElement | null) {
+  if (!video) return
+  try {
+    if (video.srcObject) {
+      const stream = video.srcObject as MediaStream
+      stream.getTracks().forEach((t) => t.stop())
+      video.srcObject = null
+    }
+    video.load() // reset internal decoder state
+  } catch { /* ignore */ }
+}
+
+export default function ScannerView({ slug }: { slug: string }) {
+  const router = useRouter()
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const readerRef = useRef<BrowserMultiFormatReader | null>(null)
+  const activeRef = useRef(false)      // true while a decode session is live
+  const stateRef = useRef<ScanState>('scanning')
+
+  const [state, setState] = useState<ScanState>('scanning')
+  const [scannedTamu, setScannedTamu] = useState<TamuData | null>(null)
+  const [alreadyConfirmed, setAlreadyConfirmed] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+  const [scanCount, setScanCount] = useState(0)
+  const [isConfirming, setIsConfirming] = useState(false)
+  const [attendCount, setAttendCount] = useState(1)
+
+  const setStateSync = (s: ScanState) => {
+    stateRef.current = s
+    setState(s)
+  }
+
+  // Auth check
+  useEffect(() => {
+    const token = Cookies.get('isAuthenticated')
+    if (!token) router.replace(`/auth/login?redirect=/${slug}/scanner`)
+  }, [slug, router])
+
+  // ── Camera teardown ──────────────────────────────────────────────────────────
+  const stopScanner = useCallback(() => {
+    activeRef.current = false
+    releaseVideo(videoRef.current)
+    if (readerRef.current) {
+      try { BrowserMultiFormatReader.releaseAllStreams() } catch { /* ignore */ }
+      readerRef.current = null
+    }
+  }, [])
+
+  // ── Camera startup ───────────────────────────────────────────────────────────
+  const startScanner = useCallback(async () => {
+    if (activeRef.current) return   // already running
+    activeRef.current = true
+
+    // Give the browser time to fully release camera from previous session
+    await new Promise((r) => setTimeout(r, 400))
+
+    // Check if we were cancelled while waiting
+    if (!activeRef.current || stateRef.current !== 'scanning') return
+    if (!videoRef.current) return
+
+    try {
+      const reader = new BrowserMultiFormatReader()
+      readerRef.current = reader
+
+      await reader.decodeFromVideoDevice(
+        undefined,
+        videoRef.current,
+        async (result, err) => {
+          // Always ignore non-results
+          if (err instanceof NotFoundException) return
+          if (!result) return
+          // Guard: callback can fire after we stopped
+          if (!activeRef.current || stateRef.current !== 'scanning') return
+
+          const text = result.getText()
+
+          let tamuId: string | null = null
+          try {
+            const url = new URL(text)
+            const parts = url.pathname.split('/').filter(Boolean)
+            if (parts.length === 2 && parts[0] === slug) tamuId = parts[1]
+          } catch { /* not a URL */ }
+
+          if (!tamuId) {
+            stopScanner()
+            setStateSync('error')
+            setErrorMessage('❌ QR tidak dikenali. Pastikan kamu scan QR dari undangan yang benar.')
+            return
+          }
+
+          // Fetch tamu info ONLY — do NOT confirm attendance yet
+          try {
+            const res = await fetch(`/api/tamu/${tamuId}/status`)
+            if (!res.ok) throw new Error('not_found')
+            const json = await res.json()
+            const data = json.data
+            stopScanner()
+            setScannedTamu({
+              id: tamuId,
+              name: data.name ?? null,
+              maxInvite: data.maxInvite ?? null,
+              isConfirm: data.isConfirm,
+              isAttend: data.isAttend,
+              attendedAt: data.attendedAt ?? null,
+            })
+            setAttendCount(data.maxInvite ?? 1)
+            setAlreadyConfirmed(!!data.attendedAt)
+            setStateSync('found')
+          } catch {
+            stopScanner()
+            setStateSync('error')
+            setErrorMessage('❌ QR tidak dikenali. Pastikan kamu scan QR dari undangan yang benar.')
+          }
+        }
+      )
+    } catch {
+      activeRef.current = false
+      setStateSync('error')
+      setErrorMessage('⚠️ Kamera tidak dapat diakses. Pastikan izin kamera sudah diberikan.')
+    }
+  }, [slug, stopScanner])
+
+  // ── Effect: react to state changes ──────────────────────────────────────────
+  useEffect(() => {
+    if (state === 'scanning') {
+      startScanner()
+    } else {
+      stopScanner()
+    }
+    // Cleanup if the component unmounts mid-session
+    return () => { stopScanner() }
+  }, [state]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Handlers ─────────────────────────────────────────────────────────────────
+  const handleConfirm = async () => {
+    if (!scannedTamu || isConfirming) return
+    setIsConfirming(true)
+    try {
+      const res = await axios.post(`/undangan/${slug}/attendance`, { tamuId: scannedTamu.id, attendCount })
+      const data: ScanResult = res.data.data
+      setScannedTamu(data.tamu)
+      setAlreadyConfirmed(data.alreadyConfirmed)
+      setStateSync('confirmed')
+      if (!data.alreadyConfirmed) setScanCount((c) => c + 1)
+    } catch {
+      setStateSync('error')
+      setErrorMessage('⚠️ Tidak ada koneksi atau terjadi kesalahan. Coba lagi.')
+    } finally {
+      setIsConfirming(false)
+    }
+  }
+
+  const handleReset = () => {
+    window.location.reload()
+  }
+
+  // ── Render ───────────────────────────────────────────────────────────────────
+  return (
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
+      {/* Header */}
+      <div className="flex items-center gap-3 p-4 bg-gray-900 border-b border-gray-800">
+        <button onClick={() => router.back()} className="text-gray-400 hover:text-white">←</button>
+        <div>
+          <p className="text-xs text-gray-400">/{slug}</p>
+          <h1 className="font-semibold text-sm">Scanner Absensi</h1>
+        </div>
+      </div>
+
+      <div className="flex-1 flex flex-col items-center justify-center p-4 gap-6">
+
+        {/* Video — always in DOM, just hidden when not scanning */}
+        <div className={`w-full max-w-sm flex flex-col items-center gap-4 ${state === 'scanning' ? '' : 'hidden'}`}>
+          <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-black border-2 border-gray-700">
+            <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="w-48 h-48 border-2 border-white/60 rounded-xl relative">
+                <span className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-white rounded-tl-xl" />
+                <span className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-white rounded-tr-xl" />
+                <span className="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-white rounded-bl-xl" />
+                <span className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-white rounded-br-xl" />
+              </div>
+            </div>
+          </div>
+          <p className="text-gray-400 text-sm text-center">Arahkan kamera ke QR Code tamu</p>
+        </div>
+
+        {/* FOUND */}
+        {state === 'found' && scannedTamu && (
+          <div className="w-full max-w-sm bg-gray-900 rounded-2xl p-6 flex flex-col gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-green-400 text-xl">✓</span>
+              <h2 className="font-semibold text-lg">Tamu Ditemukan</h2>
+            </div>
+            <div className="flex flex-col gap-2 text-sm">
+              <Row label="Nama" value={scannedTamu.name ?? '-'} />
+              <Row label="Diundang" value={`${scannedTamu.maxInvite ?? '-'} orang`} />
+              <Row
+                label="RSVP"
+                value={scannedTamu.isConfirm === 1 ? 'Sudah konfirmasi' : 'Belum konfirmasi'}
+              />
+              <Row
+                label="Absensi"
+                value={
+                  scannedTamu.isAttend === 1
+                    ? `Sudah hadir pukul ${scannedTamu.attendedAt ? formatTime(scannedTamu.attendedAt) : '-'}`
+                    : 'Belum absen'
+                }
+              />
+            </div>
+            {alreadyConfirmed ? (
+              <div className="bg-yellow-900/40 border border-yellow-700 rounded-xl p-3 text-yellow-300 text-sm">
+                ⚠️ Tamu ini sudah tercatat hadir pukul{' '}
+                {scannedTamu.attendedAt ? formatTime(scannedTamu.attendedAt) : '-'}. Scan tidak diproses ulang.
+              </div>
+            ) : (
+              <>
+                {/* Adjust jumlah orang yang hadir */}
+                <div className="bg-gray-800 rounded-xl p-4 flex flex-col gap-3">
+                  <p className="text-sm text-gray-300">
+                    Jumlah yang hadir
+                    {scannedTamu.maxInvite ? (
+                      <span className="text-gray-500 ml-1">(diundang: {scannedTamu.maxInvite} orang)</span>
+                    ) : null}
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => setAttendCount((c) => Math.max(1, c - 1))}
+                      className="w-10 h-10 rounded-xl bg-gray-700 hover:bg-gray-600 text-white font-bold text-xl flex items-center justify-center transition-colors"
+                    >
+                      −
+                    </button>
+                    <span className="flex-1 text-center text-3xl font-bold">{attendCount}</span>
+                    <button
+                      onClick={() => setAttendCount((c) => c + 1)}
+                      className="w-10 h-10 rounded-xl bg-gray-700 hover:bg-gray-600 text-white font-bold text-xl flex items-center justify-center transition-colors"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 text-center">
+                    Bisa kurang atau lebih dari jumlah undangan
+                  </p>
+                </div>
+                <button
+                  onClick={handleConfirm}
+                  disabled={isConfirming}
+                  className="w-full bg-green-600 hover:bg-green-500 disabled:opacity-60 text-white font-semibold py-3 rounded-xl transition-colors"
+                >
+                  {isConfirming ? 'Menyimpan...' : `Konfirmasi Hadir (${attendCount} orang)`}
+                </button>
+              </>
+            )}
+            <button onClick={handleReset} className="w-full text-gray-400 hover:text-white text-sm py-2">
+              Batal / Scan Ulang
+            </button>
+          </div>
+        )}
+
+        {/* CONFIRMED */}
+        {state === 'confirmed' && scannedTamu && (
+          <div className="w-full max-w-sm bg-gray-900 rounded-2xl p-6 flex flex-col items-center gap-4 text-center">
+            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center">
+              <span className="text-green-400 text-3xl">✓</span>
+            </div>
+            <h2 className="font-semibold text-xl text-green-400">Berhasil Dicatat!</h2>
+            <p className="text-gray-300">
+              <span className="font-medium text-white">{scannedTamu.name ?? 'Tamu'}</span>
+            </p>
+            <p className="text-xl font-bold text-green-400">{attendCount} orang</p>
+            {scannedTamu.attendedAt && (
+              <p className="text-sm text-gray-400">Hadir pukul {formatTime(scannedTamu.attendedAt)}</p>
+            )}
+            <button
+              onClick={handleReset}
+              className="w-full mt-2 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 rounded-xl transition-colors"
+            >
+              Scan Tamu Berikutnya
+            </button>
+          </div>
+        )}
+
+        {/* ERROR */}
+        {state === 'error' && (
+          <div className="w-full max-w-sm bg-gray-900 rounded-2xl p-6 flex flex-col items-center gap-4 text-center">
+            <p className="text-gray-300 text-sm">{errorMessage}</p>
+            <button
+              onClick={handleReset}
+              className="w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 rounded-xl transition-colors"
+            >
+              Coba Lagi
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="p-4 text-center text-sm text-gray-500 bg-gray-900 border-t border-gray-800">
+        Sudah scan hari ini: <span className="text-white font-medium">{scanCount} tamu</span>
+      </div>
+    </div>
+  )
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex justify-between gap-2">
+      <span className="text-gray-400">{label}</span>
+      <span className="text-white text-right">{value}</span>
+    </div>
+  )
+}

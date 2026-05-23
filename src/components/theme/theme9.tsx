@@ -16,7 +16,9 @@ import {
 
 import DialogGift from "@/components/card/dialog-gift";
 import Galeri from "@/components/card/galeri";
+import LoveStoryTimeline from "@/components/card/love-story-timeline";
 import { FloatingMusicGift } from "../card/floating-music-gift";
+import { FloatingQrButton } from "@/components/card/floating-qr-button";
 
 import CountdownTimer from "@/components/card/counting-down";
 import UcapanConfirm from "@/components/card/ucapan-confirm";
@@ -140,6 +142,14 @@ export default function Theme9({
             </Button>
           </div>
         </motion.div>
+        <FloatingQrButton
+          tamu={tamu}
+          tamuId={tamu?.id ?? ""}
+          slug={slug}
+          content={undangan?.content ?? null}
+          bgColor="bg-theme9-primary"
+          iconColor="text-white"
+        />
       </div>
     );
   }
@@ -455,10 +465,7 @@ export default function Theme9({
             }}
             viewport={{ once: false }}
           >
-            <Link
-              href={undangan?.content?.gmaps ?? ""}
-              target="_blank"
-            >
+            <Link href={undangan?.content?.gmaps ?? ""} target="_blank">
               <Button className="bg-theme9-primary hover:bg-theme9-primary text-white hover:text-white font-semibold">
                 <IconMapPin size={16} />
                 <span>Lihat di Google Maps</span>
@@ -479,10 +486,7 @@ export default function Theme9({
               <p className="text-sm text-white font-semibold text-center pb-3">
                 Virtual Akad session:
               </p>
-              <Link
-                href={undangan?.content?.streamLink ?? ""}
-                target="_blank"
-              >
+              <Link href={undangan?.content?.streamLink ?? ""} target="_blank">
                 <Button className="bg-theme9-primary hover:bg-theme9-primary text-white hover:text-white font-semibold">
                   <IconDeviceTvOld size={16} />
                   <span>Live Streaming</span>
@@ -507,6 +511,14 @@ export default function Theme9({
           </motion.div>
         </div>
       </div>
+      {/* Love Story */}
+      <LoveStoryTimeline
+        loveStories={undanganData.loveStories ?? []}
+        bgImage={undangan?.content?.imgBg}
+        accentColor="bg-theme9-primary"
+        headingColor="text-theme9-secondary"
+        textColor="text-white"
+      />
       {/* Galeri */}
       <div className="py-16 bg-[#040032]">
         <motion.div
@@ -524,11 +536,7 @@ export default function Theme9({
             Galeri Kami
           </h2>
         </motion.div>
-        <Galeri
-          galeri={undanganData.gallery}
-          view={1.5}
-          color="#FFFFFF"
-        />
+        <Galeri galeri={undanganData.gallery} view={1.5} color="#FFFFFF" />
       </div>
       {/* Reservasi Ucapan Doa */}
       <UcapanConfirm
@@ -605,6 +613,7 @@ export default function Theme9({
         darkMode={true}
         giftLength={giftLength}
         slug={slug}
+        tamuId={tamu?.id}
       />
 
       {/* Open Dialog Gift */}
@@ -614,6 +623,7 @@ export default function Theme9({
         setIsOpen={setIsOpenGift}
         giftLength={giftLength}
         slug={slug}
+            buttonBg="bg-theme9-primary"
       />
     </div>
   );

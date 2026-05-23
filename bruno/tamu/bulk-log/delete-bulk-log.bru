@@ -1,0 +1,21 @@
+meta {
+  name: Delete Bulk Log Row
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{base_url}}/api/tamu/bulk-log/:id
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Delete Bulk Log Row
+
+  Hapus satu baris log import yang gagal tanpa mencoba membuat tamu. Gunakan ini jika baris memang tidak perlu diimport.
+}

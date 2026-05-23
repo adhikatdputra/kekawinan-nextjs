@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, badRequest, forbidden, notFound, conflict, serverError } from '@/lib/api-response'
 import { isValidPermalink, resolveMediaUrl } from '@/lib/helpers'
+import { isActiveCollaborator } from '@/lib/undangan-access'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -15,6 +16,15 @@ async function getOwnedUndangan(id: string, userId: string, level: string) {
   return { undangan, error: null }
 }
 
+async function getAccessibleUndangan(id: string, userId: string, level: string) {
+  const undangan = await prisma.undangan.findUnique({ where: { id } })
+  if (!undangan) return { undangan: null, error: notFound('Undangan not found') }
+  if (!isAdminLevel(level) && undangan.userId !== userId && !(await isActiveCollaborator(userId, id))) {
+    return { undangan: null, error: forbidden('Access denied') }
+  }
+  return { undangan, error: null }
+}
+
 // GET /api/undangan/:id — full detail with all relations
 export async function GET(request: NextRequest, { params }: Params) {
   const auth = requireAuth(request)
@@ -22,7 +32,7 @@ export async function GET(request: NextRequest, { params }: Params) {
 
   try {
     const { id } = await params
-    const { error } = await getOwnedUndangan(id, auth.id, auth.level)
+    const { error } = await getAccessibleUndangan(id, auth.id, auth.level)
     if (error) return error
 
     const data = await prisma.undangan.findUnique({
@@ -64,7 +74,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
   try {
     const { id } = await params
-    const { error, undangan } = await getOwnedUndangan(id, auth.id, auth.level)
+    const { error, undangan } = await getAccessibleUndangan(id, auth.id, auth.level)
     if (error || !undangan) return error!
 
     const body = await request.json()

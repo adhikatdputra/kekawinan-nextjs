@@ -106,20 +106,17 @@ export default function ProfilePage() {
               />
               <div className="absolute top-1/2 -translate-y-1/2 right-4">
                 {showPassword ? (
-                  <IconEyeOff
-                    size={20}
-                    onClick={() => setShowPassword(false)}
-                    className="cursor-pointer"
-                  />
+                  <IconEyeOff size={20} onClick={() => setShowPassword(false)} className="cursor-pointer" />
                 ) : (
-                  <IconEye
-                    size={20}
-                    onClick={() => setShowPassword(true)}
-                    className="cursor-pointer"
-                  />
+                  <IconEye size={20} onClick={() => setShowPassword(true)} className="cursor-pointer" />
                 )}
               </div>
             </div>
+            {newPassword && !passwordRegex.test(newPassword) && (
+              <p className="text-xs text-red-500 px-1">
+                Min. 8 karakter, 1 huruf besar, 1 huruf kecil, 1 angka, 1 simbol (@$!%*?&)
+              </p>
+            )}
           </div>
           <div className="grid gap-3">
             <Label htmlFor="phone">Konfirmasi Password</Label>
@@ -133,20 +130,15 @@ export default function ProfilePage() {
               />
               <div className="absolute top-1/2 -translate-y-1/2 right-4">
                 {showConfirmPassword ? (
-                  <IconEyeOff
-                    size={20}
-                    onClick={() => setShowConfirmPassword(false)}
-                    className="cursor-pointer"
-                  />
+                  <IconEyeOff size={20} onClick={() => setShowConfirmPassword(false)} className="cursor-pointer" />
                 ) : (
-                  <IconEye
-                    size={20}
-                    onClick={() => setShowConfirmPassword(true)}
-                    className="cursor-pointer"
-                  />
+                  <IconEye size={20} onClick={() => setShowConfirmPassword(true)} className="cursor-pointer" />
                 )}
               </div>
             </div>
+            {confirmPassword && newPassword !== confirmPassword && (
+              <p className="text-xs text-red-500 px-1">Password tidak cocok</p>
+            )}
           </div>
           <div className="flex flex-col md:flex-row gap-4 justify-center items-center mt-6">
             <div>

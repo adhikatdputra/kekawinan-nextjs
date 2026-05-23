@@ -16,6 +16,7 @@ export async function getPublicUndanganBySlug(permalink: string) {
       content: true,
       gifts: true,
       gallery: { orderBy: { rank: 'asc' } },
+      loveStories: { orderBy: { rank: 'asc' } },
       ucapan: {
         where: { isShow: 1 },
         orderBy: { createdAt: 'desc' },
@@ -40,6 +41,9 @@ export async function getPublicUndanganBySlug(permalink: string) {
   }
   for (const g of data.gallery) {
     (g as Record<string, unknown>).image = resolveMediaUrl(g.image)
+  }
+  for (const ls of data.loveStories) {
+    if (ls.image) (ls as Record<string, unknown>).image = resolveMediaUrl(ls.image)
   }
 
   return { success: true, data, message: 'Get undangan success' }

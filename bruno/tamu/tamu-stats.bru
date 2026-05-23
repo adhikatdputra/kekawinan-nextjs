@@ -17,5 +17,26 @@ auth:bearer {
 docs {
   # Tamu Stats
 
-  Statistik tamu: total dikirim, total dibuka, total konfirmasi kehadiran.
+  Statistik tamu untuk undangan tertentu.
+
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "total_send": 9,
+      "total_read": 5,
+      "total_confirm": 3,
+      "total_attended": 2
+    }
+  }
+  ```
+
+  | Field          | Description                                        |
+  |----------------|----------------------------------------------------|
+  | total_send     | Jumlah tamu yang sudah dikirim WhatsApp            |
+  | total_read     | Jumlah tamu yang sudah membuka undangan            |
+  | total_confirm  | Jumlah tamu yang sudah RSVP (isConfirm = 1)       |
+  | total_attended | Total orang yang benar-benar hadir (sum attendCount atau sum isAttend) |
 }

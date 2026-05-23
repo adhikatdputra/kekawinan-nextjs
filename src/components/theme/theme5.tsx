@@ -16,7 +16,9 @@ import {
 
 import DialogGift from "@/components/card/dialog-gift";
 import Galeri from "@/components/card/galeri";
+import LoveStoryTimeline from "@/components/card/love-story-timeline";
 import { FloatingMusicGift } from "../card/floating-music-gift";
+import { FloatingQrButton } from "@/components/card/floating-qr-button";
 
 import CountdownTimer from "@/components/card/counting-down";
 import UcapanConfirm from "@/components/card/ucapan-confirm";
@@ -141,6 +143,14 @@ export default function Theme5({
             </Button>
           </div>
         </motion.div>
+        <FloatingQrButton
+          tamu={tamu}
+          tamuId={tamu?.id ?? ""}
+          slug={slug}
+          content={undangan?.content ?? null}
+          bgColor="bg-theme5-primary"
+          iconColor="text-white"
+        />
       </div>
     );
   }
@@ -574,6 +584,14 @@ export default function Theme5({
           </div>
         </div>
       </div>
+      {/* Love Story */}
+      <LoveStoryTimeline
+        loveStories={undanganData.loveStories ?? []}
+        bgImage={undangan?.content?.imgBg}
+        accentColor="bg-theme5-primary"
+        headingColor="text-white"
+        textColor="text-white"
+      />
       {/* Galeri */}
       <div className="py-16 bg-[url('/images/theme2/bg1.png')] bg-cover bg-center">
         <motion.div
@@ -666,6 +684,7 @@ export default function Theme5({
         bgColor="bg-theme5-primary"
         giftLength={giftLength}
         slug={slug}
+        tamuId={tamu?.id}
       />
 
       {/* Open Dialog Gift */}
@@ -675,6 +694,7 @@ export default function Theme5({
         setIsOpen={setIsOpenGift}
         giftLength={giftLength}
         slug={slug}
+            buttonBg="bg-theme5-primary"
       />
     </div>
   );
