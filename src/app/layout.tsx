@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Toaster } from "react-hot-toast";
 import ReactQueryProvider from "@/lib/tanstack";
 import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import { home } from "@/frontend/constants/meta";
 const isPreview = process.env.VERCEL_ENV === "preview";
@@ -47,6 +48,7 @@ export default function RootLayout({
         <ReactQueryProvider>
           {children}
           <Toaster />
+          <Analytics />
         </ReactQueryProvider>
       </body>
     </html>
