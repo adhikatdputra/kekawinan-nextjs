@@ -43,7 +43,9 @@ import {
 import Pagination from "@/components/ui/custom/pagination";
 
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { toast } from "react-hot-toast";
 import giftApi from "@/frontend/api/gift";
+import uploadApi from "@/frontend/api/upload";
 import GiftStore from "@/frontend/store/gift-store";
 import { debounce } from "lodash";
 import { formatNumber } from "@/helper/number";
@@ -120,8 +122,18 @@ export default function KadoPernikahanPage() {
     }
   };
 
-  const handleCreate = () => {
-    createGift({ undanganId: id, data: { title, price, linkProduct, description: " " } }, {
+  const handleCreate = async () => {
+    let thumbnailUrl: string | undefined;
+    if (thumbnail instanceof File) {
+      try {
+        const res = await uploadApi.uploadImage(thumbnail, "kekawinan/kado");
+        thumbnailUrl = res.data.data.url;
+      } catch {
+        toast.error("Gagal mengupload gambar");
+        return;
+      }
+    }
+    createGift({ undanganId: id, data: { title, price, linkProduct, description: " ", thumbnail: thumbnailUrl } }, {
       onSuccess: () => {
         setIsOpen(false);
         setSelectedItem(null);
@@ -131,12 +143,22 @@ export default function KadoPernikahanPage() {
     });
   };
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
+    let thumbnailUrl: string | undefined;
+    if (thumbnail instanceof File) {
+      try {
+        const res = await uploadApi.uploadImage(thumbnail, "kekawinan/kado");
+        thumbnailUrl = res.data.data.url;
+      } catch {
+        toast.error("Gagal mengupload gambar");
+        return;
+      }
+    }
     updateGift(
       {
         undanganId: id,
         id: selectedItem?.id as string,
-        data: { title, price, linkProduct },
+        data: { title, price, linkProduct, ...(thumbnailUrl && { thumbnail: thumbnailUrl }) },
       },
       {
         onSuccess: () => {
@@ -258,13 +280,19 @@ export default function KadoPernikahanPage() {
               tableData.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell className="w-[10%]">
-                    <Image
-                      src={item.thumbnail || ""}
-                      alt={item.title}
-                      width={100}
-                      height={100}
-                      className="rounded-md aspect-square object-cover"
-                    />
+                    {item.thumbnail ? (
+                      <Image
+                        src={item.thumbnail}
+                        alt={item.title}
+                        width={100}
+                        height={100}
+                        className="rounded-md aspect-square object-cover"
+                      />
+                    ) : (
+                      <div className="w-[60px] h-[60px] rounded-md bg-muted flex items-center justify-center text-muted-foreground text-xs">
+                        No Image
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell className="w-[25%] whitespace-break-spaces">
                     {item.title}
