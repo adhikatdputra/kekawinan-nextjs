@@ -7,6 +7,7 @@ import GiftFeature from "@/components/pages/home/gift-feature";
 import Themes from "@/components/pages/home/themes";
 import Testimoni from "@/components/pages/home/testimoni";
 import CustomUndangan from "@/components/pages/home/custom-undangan";
+import HomeFaq from "@/components/pages/home/faq";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -75,6 +76,7 @@ export default function Homepage() {
         <CreateUndangan />
         <Themes />
         <Testimoni />
+        <HomeFaq />
         <CustomUndangan />
       </div>
     </>

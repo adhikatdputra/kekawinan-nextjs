@@ -17,7 +17,7 @@ const links = {
   Bantuan: [
     { label: "Hubungi Kami", href: "https://wa.me/085772193242" },
     { label: "Panduan Pengguna", href: "/" },
-    { label: "FAQ", href: "/" },
+    { label: "FAQ", href: "/faq" },
   ],
 };
 
@@ -56,9 +56,9 @@ export default function FooterWeb() {
           {/* Links */}
           {Object.entries(links).map(([title, items]) => (
             <div key={title} className="flex flex-col gap-3">
-              <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+              <div className="text-xs font-bold text-gray-500 uppercase tracking-widest">
                 {title}
-              </h4>
+              </div>
               <ul className="flex flex-col gap-2">
                 {items.map((item) => (
                   <li key={item.label}>
