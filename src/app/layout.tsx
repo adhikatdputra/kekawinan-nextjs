@@ -16,19 +16,44 @@ export const metadata: Metadata = {
     ? { index: false, follow: false }
     : { index: true, follow: true },
   icons: {
-    icon: "/favicon.ico", // pastikan file ini ada di folder /public
-    shortcut: "/favicon.ico", // opsional
-    apple: "/apple-touch-icon.png", // opsional
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
   keywords: [
     "undangan pernikahan digital",
     "undangan online",
     "website undangan nikah",
-    "template undangan",
-    "kado pernikahan",
+    "template undangan pernikahan",
+    "undangan digital gratis",
+    "buat undangan pernikahan",
+    "kado pernikahan digital",
     "kekawinan",
     "undangan gratis",
+    "undangan digital aesthetic",
   ],
+  openGraph: {
+    title: home.title,
+    description: home.description,
+    url: "https://www.kekawinan.com",
+    siteName: "Kekawinan",
+    images: [
+      {
+        url: "https://www.kekawinan.com/images/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Kekawinan - Buat Undangan Pernikahan Digital Gratis & Mudah",
+      },
+    ],
+    locale: "id_ID",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: home.title,
+    description: home.description,
+    images: ["https://www.kekawinan.com/images/og-image.png"],
+  },
 };
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || "GTM-PLMJCNCM";

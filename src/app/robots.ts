@@ -7,10 +7,10 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: ["/"],
-        disallow: ["/user/", "/admin/"],
+        disallow: ["/user/", "/admin/", "/auth/"],
       },
     ],
     sitemap: "https://www.kekawinan.com/sitemap.xml",
-    host: "https://www.kekawinan.com/",
+    host: "https://www.kekawinan.com",
   };
 }

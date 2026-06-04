@@ -1,11 +1,15 @@
 import { MetadataRoute } from "next";
-const baseUrl = "https://www.kekawinan.com/";
+const baseUrl = "https://www.kekawinan.com";
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticPages = [
-    { path: "/", priority: 1.0 },
-    { path: "/auth/login", priority: 1.0 },
-    { path: "/auth/register", priority: 1.0 },
+export default function sitemap(): MetadataRoute.Sitemap {
+  const now = new Date().toISOString();
+
+  const staticPages: Array<{
+    path: string;
+    priority: number;
+    changeFrequency?: "monthly" | "weekly" | "daily" | "yearly" | "always" | "hourly" | "never";
+  }> = [
+    { path: "/", priority: 1.0, changeFrequency: "weekly" },
     { path: "/theme1/demo", priority: 0.8, changeFrequency: "monthly" },
     { path: "/theme2/demo", priority: 0.8, changeFrequency: "monthly" },
     { path: "/theme3/demo", priority: 0.8, changeFrequency: "monthly" },
@@ -15,19 +19,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: "/theme7/demo", priority: 0.8, changeFrequency: "monthly" },
     { path: "/theme8/demo", priority: 0.8, changeFrequency: "monthly" },
     { path: "/theme9/demo", priority: 0.8, changeFrequency: "monthly" },
-  ].map(({ path, priority, changeFrequency = "weekly" }) => ({
+    { path: "/theme10/demo", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/theme11/demo", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/theme12/demo", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/theme13/demo", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/theme14/demo", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/theme15/demo", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/theme16/demo", priority: 0.8, changeFrequency: "monthly" },
+  ];
+
+  return staticPages.map(({ path, priority, changeFrequency = "weekly" }) => ({
     url: `${baseUrl}${path}`,
-    lastModified: "2025-08-28T07:36:12.961Z",
-    changeFrequency: changeFrequency as
-      | "monthly"
-      | "weekly"
-      | "daily"
-      | "yearly"
-      | "always"
-      | "hourly"
-      | "never",
+    lastModified: now,
+    changeFrequency,
     priority,
   }));
-
-  return [...staticPages];
 }
