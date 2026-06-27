@@ -23,6 +23,7 @@ import {
   IconExternalLink,
   IconChevronDown,
   IconScan,
+  IconCopy,
 } from "@tabler/icons-react";
 import PendingNoData from "@/components/ui/custom/pending-no-data";
 import PendingData from "@/components/ui/custom/pending-data";
@@ -80,6 +81,7 @@ export default function UndanganListPage() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Undangan | null>(null);
+  const [duplicateSource, setDuplicateSource] = useState<Undangan | null>(null);
   const [selectedTheme, setSelectedTheme] = useState<Theme | null>(null);
   const [name, setName] = useState("");
   const [permalink, setPermalink] = useState("");
@@ -168,6 +170,23 @@ export default function UndanganListPage() {
     },
   });
 
+  const { mutate: duplicateUndangan, isPending: isPendingDuplicate } = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UndanganBody }) =>
+      undanganApi.duplicateUndangan(id, data),
+    onSuccess: (data) => {
+      if (data.data.success) {
+        handleCancel();
+        toast.success("Undangan berhasil diduplikat");
+        refetchUndangan();
+      } else {
+        toast.error(data.data.message);
+      }
+    },
+    onError: (err: { response?: { data?: { message?: string } } }) => {
+      toast.error(err?.response?.data?.message ?? "Gagal menduplikat undangan");
+    },
+  });
+
   const { mutate: deleteUndangan, isPending: isPendingDelete } = useMutation({
     mutationFn: (id: string) => undanganApi.deleteUndangan(id),
   });
@@ -202,6 +221,7 @@ export default function UndanganListPage() {
       return;
     }
     setSelectedItem(null);
+    setDuplicateSource(null);
     setSelectedTheme(null);
     setName("");
     setPermalink("");
@@ -210,22 +230,35 @@ export default function UndanganListPage() {
 
   const openEdit = (item: Undangan) => {
     setSelectedItem(item);
+    setDuplicateSource(null);
     setSelectedTheme(null);
     setName(item.name ?? "");
     setPermalink(item.permalink);
     setIsOpen(true);
   };
 
+  const openDuplicate = (item: Undangan) => {
+    setSelectedItem(null);
+    setDuplicateSource(item);
+    setSelectedTheme(null);
+    setName(`${item.name ?? "Undangan"} (Copy)`);
+    setPermalink("");
+    setIsOpen(true);
+  };
+
   const handleCancel = () => {
     setIsOpen(false);
     setSelectedItem(null);
+    setDuplicateSource(null);
     setSelectedTheme(null);
     setName("");
     setPermalink("");
   };
 
   const handleSubmit = () => {
-    if (selectedItem) {
+    if (duplicateSource) {
+      duplicateUndangan({ id: duplicateSource.id, data: { name, permalink, themeId: selectedTheme?.id } });
+    } else if (selectedItem) {
       updateUndangan({ id: selectedItem.id, data: { name, permalink } });
     } else {
       createUndangan({ name, permalink, themeId: selectedTheme?.id });
@@ -247,7 +280,9 @@ export default function UndanganListPage() {
   useSession();
   useEffect(() => { setIsLoaded(true); }, []);
 
-  const canCreate = selectedItem
+  const canCreate = duplicateSource
+    ? !!name && !!permalink && !!selectedTheme
+    : selectedItem
     ? !!name && !!permalink
     : isAdmin
     ? !!name && !!permalink
@@ -469,6 +504,16 @@ export default function UndanganListPage() {
                             </TooltipTrigger>
                             <TooltipContent><p>Scanner absensi</p></TooltipContent>
                           </Tooltip>
+                          {isAdmin && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button onClick={() => openDuplicate(item)} className="p-1.5 rounded-lg text-muted-foreground hover:bg-green-soft-kwn hover:text-green-kwn transition-colors">
+                                  <IconCopy size={17} />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent><p>Duplikat undangan</p></TooltipContent>
+                            </Tooltip>
+                          )}
                           {isOwner && (
                             <>
                               <div className="w-px h-5 bg-border mx-1" />
@@ -530,6 +575,16 @@ export default function UndanganListPage() {
                                     <IconGift size={16} className="text-gray-400" />
                                     Kado Pernikahan
                                   </Link>
+                                  {isAdmin && (
+                                    <>
+                                      <div className="border-t border-gray-100 my-1" />
+                                      <button onClick={() => { setOpenMenuId(null); openDuplicate(item); }}
+                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-green-soft-kwn hover:text-green-kwn transition-colors">
+                                        <IconCopy size={16} className="text-gray-400" />
+                                        Duplikat Undangan
+                                      </button>
+                                    </>
+                                  )}
                                   {isOwner && (
                                     <>
                                       <div className="border-t border-gray-100 my-1" />
@@ -589,7 +644,7 @@ export default function UndanganListPage() {
         <form>
           <DialogContent className="sm:max-w-[560px]">
             <DialogHeader>
-              <DialogTitle>{selectedItem ? "Edit" : "Buat"} Undangan</DialogTitle>
+              <DialogTitle>{selectedItem ? "Edit" : duplicateSource ? "Duplikat" : "Buat"} Undangan</DialogTitle>
               <Separator className="my-2" />
               <DialogDescription />
             </DialogHeader>
@@ -720,12 +775,12 @@ export default function UndanganListPage() {
               </DialogClose>
               <Button
                 type="submit"
-                disabled={!canCreate || isPendingCreate || isPendingUpdate}
+                disabled={!canCreate || isPendingCreate || isPendingUpdate || isPendingDuplicate}
                 onClick={handleSubmit}
               >
-                {isPendingCreate || isPendingUpdate
+                {isPendingCreate || isPendingUpdate || isPendingDuplicate
                   ? <><Loader2 className="w-4 h-4 animate-spin" /><span>Menyimpan...</span></>
-                  : selectedItem ? "Simpan" : "Buat Undangan"}
+                  : selectedItem ? "Simpan" : duplicateSource ? "Duplikat Undangan" : "Buat Undangan"}
               </Button>
             </DialogFooter>
           </DialogContent>

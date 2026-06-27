@@ -23,6 +23,9 @@ const undanganApi = {
   deleteUndangan: (id: string) => {
     return axios.delete(`/undangan/${id}`);
   },
+  duplicateUndangan: (id: string, formData: UndanganBody) => {
+    return axios.post(`/undangan/${id}/duplicate`, formData);
+  },
   getThemeUndangan: () => {
     return axios.get(`/theme/public?sortBy=createdAt&order=ASC`);
   },
