@@ -9,7 +9,7 @@ const links = {
     { label: "Custom Design", href: "https://wa.me/085772193242" },
   ],
   Perusahaan: [
-    { label: "Tentang Kami", href: "/" },
+    { label: "Tentang Kami", href: "/about" },
     { label: "Testimoni", href: "#testimoni" },
     { label: "Kebijakan Privasi", href: "/" },
     { label: "Syarat & Ketentuan", href: "/" },

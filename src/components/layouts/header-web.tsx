@@ -21,6 +21,11 @@ import useAuthStore from "@/frontend/store/auth-store";
 import { useQuery } from "@tanstack/react-query";
 import creditsApi from "@/frontend/api/credits";
 
+const navLinks = [
+  { href: "/about", label: "Tentang Kami" },
+  { href: "/faq", label: "FAQ" },
+];
+
 function UserAvatar({ name }: { name: string }) {
   const initials = name
     .split(" ")
@@ -173,8 +178,27 @@ export default function HeaderWeb() {
             />
           </Link>
 
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm font-semibold text-gray-700 hover:text-green-kwn transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
           {/* Right side */}
           <div className="flex items-center gap-2.5">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="md:hidden w-9 h-9 rounded-xl border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors order-last"
+            >
+              {isOpen ? <IconX size={18} /> : <IconMenu4 size={18} />}
+            </button>
             {isLoaded &&
               (isAuthenticated() ? (
                 <UserDropdown name={username} onLogout={logout} />
@@ -198,12 +222,6 @@ export default function HeaderWeb() {
                       Daftar Gratis
                     </Button>
                   </Link>
-                  <button
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="md:hidden w-9 h-9 rounded-xl border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors"
-                  >
-                    {isOpen ? <IconX size={18} /> : <IconMenu4 size={18} />}
-                  </button>
                 </>
               ))}
           </div>
@@ -211,14 +229,30 @@ export default function HeaderWeb() {
       </div>
 
       {/* Mobile menu */}
-      {isLoaded && !isAuthenticated() && isOpen && (
-        <div className="md:hidden bg-white/98 backdrop-blur-md border-t border-green-100/50 py-4 px-4 flex flex-col gap-2">
-          <Link href="/auth/login" onClick={() => setIsOpen(false)}>
-            <Button className="text-white w-full bg-green-kwn hover:bg-green-kwn/90">
-              <IconLogin2 size={16} />
-              Daftar Gratis Sekarang
-            </Button>
-          </Link>
+      {isLoaded && isOpen && (
+        <div className="md:hidden bg-white/98 backdrop-blur-md border-t border-green-100/50 py-4 px-4 flex flex-col gap-1">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setIsOpen(false)}
+              className="px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700 hover:bg-green-soft-kwn hover:text-green-kwn transition-colors"
+            >
+              {link.label}
+            </Link>
+          ))}
+          {!isAuthenticated() && (
+            <Link
+              href="/auth/login"
+              onClick={() => setIsOpen(false)}
+              className="mt-2"
+            >
+              <Button className="text-white w-full bg-green-kwn hover:bg-green-kwn/90">
+                <IconLogin2 size={16} />
+                Daftar Gratis Sekarang
+              </Button>
+            </Link>
+          )}
         </div>
       )}
     </header>
