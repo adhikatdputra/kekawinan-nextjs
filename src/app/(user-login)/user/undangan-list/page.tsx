@@ -297,17 +297,8 @@ export default function UndanganListPage() {
     }
   };
 
-  // Tutup popup sukses → arahkan ke halaman edit konten (cover pembuka)
-  // supaya user langsung isi undangannya, bukan cuma menutup popup.
-  const closeTrakteer = () => {
-    setIsOpenTrakteer(false);
-    if (createdUndanganId) {
-      router.push(`/user/undangan/${createdUndanganId}/cover-pembuka`);
-      setCreatedUndanganId(null);
-    }
-  };
-
-  // Klik tombol dukung: buka Trakteer di tab baru, lalu pindah ke cover-pembuka.
+  // Menutup popup sukses (via tombol maupun klik di luar) selalu: buka Trakteer
+  // di tab baru + arahkan ke halaman edit konten (cover pembuka).
   // Navigasi current tab ditunda sedikit supaya tab baru sempat terbuka
   // (kalau router.push jalan di gesture yang sama, browser membatalkan popup).
   const handleSupportTrakteer = () => {
@@ -892,7 +883,7 @@ export default function UndanganListPage() {
       </AlertDialog>
 
       {/* ── Dialog: Trakteer ────────────────────────────────────────────────── */}
-      <Dialog open={isOpenTrakteer} onOpenChange={(open) => { if (!open) closeTrakteer(); }}>
+      <Dialog open={isOpenTrakteer} onOpenChange={(open) => { if (!open) handleSupportTrakteer(); }}>
         <DialogContent showCloseButton={false}>
           <DialogHeader><DialogTitle /><DialogDescription /></DialogHeader>
           <div className="md:px-8">
