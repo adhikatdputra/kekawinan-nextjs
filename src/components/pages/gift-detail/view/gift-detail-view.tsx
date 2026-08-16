@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import giftApi from "@/frontend/api/gift";
@@ -25,6 +25,7 @@ import {
 
 export default function GiftDetailView({ id }: { id: string }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -49,6 +50,8 @@ export default function GiftDetailView({ id }: { id: string }) {
       {
         onSuccess: () => {
           refetch();
+          // Refresh the kado list so its status stays in sync with this detail.
+          queryClient.invalidateQueries({ queryKey: ["undangan-user-page"] });
           setIsOpen(false);
         },
       }

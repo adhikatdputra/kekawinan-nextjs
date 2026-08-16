@@ -128,6 +128,7 @@ export default function Themes() {
             <Link
               key={index}
               href={`/${theme?.componentName.toLowerCase()}/demo`}
+              target="_blank"
               className="w-[calc(16.66%-14px)] min-w-[120px]"
             >
               <div className="relative group rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
@@ -174,7 +175,10 @@ export default function Themes() {
             >
               {themes?.map((theme: Theme, index: number) => (
                 <SwiperSlide key={index}>
-                  <Link href={`/${theme?.componentName.toLowerCase()}/demo`}>
+                  <Link
+                    href={`/${theme?.componentName.toLowerCase()}/demo`}
+                    target="_blank"
+                  >
                     <div className="relative group rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
                       <Image
                         src={theme?.thumbnail}

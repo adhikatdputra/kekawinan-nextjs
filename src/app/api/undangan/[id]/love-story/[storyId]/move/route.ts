@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
 import { isActiveCollaborator } from '@/lib/undangan-access'
+import { revalidateUndanganById } from '@/lib/queries/revalidate-undangan'
 
 type Params = { params: Promise<{ id: string; storyId: string }> }
 
@@ -51,6 +52,8 @@ export async function PATCH(request: NextRequest, { params }: Params) {
         })
       )
     )
+
+    await revalidateUndanganById(id)
 
     return ok(null, `Love story berhasil dipindahkan`)
   } catch (err) {

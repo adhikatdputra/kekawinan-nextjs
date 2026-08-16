@@ -5,6 +5,7 @@ import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, created, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
 import { resolveMediaUrl } from '@/lib/helpers'
 import { isActiveCollaborator } from '@/lib/undangan-access'
+import { revalidateUndanganById } from '@/lib/queries/revalidate-undangan'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -75,6 +76,8 @@ export async function POST(request: NextRequest, { params }: Params) {
         },
       })
     })
+
+    await revalidateUndanganById(id)
 
     return created(resolveGallery(item as unknown as { image: string | null; [key: string]: unknown }), 'Gallery image added successfully')
   } catch {

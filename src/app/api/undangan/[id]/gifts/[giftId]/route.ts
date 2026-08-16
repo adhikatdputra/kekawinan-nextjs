@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
 import { isActiveCollaborator } from '@/lib/undangan-access'
+import { revalidateUndanganById } from '@/lib/queries/revalidate-undangan'
 
 type Params = { params: Promise<{ id: string; giftId: string }> }
 
@@ -64,6 +65,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
       },
     })
 
+    await revalidateUndanganById(id)
+
     return ok(updated, 'Gift updated successfully')
   } catch {
     return serverError()
@@ -81,6 +84,8 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     if (error) return error
 
     await prisma.undanganGift.delete({ where: { id: giftId } })
+
+    await revalidateUndanganById(id)
 
     return ok(null, 'Gift deleted successfully')
   } catch {

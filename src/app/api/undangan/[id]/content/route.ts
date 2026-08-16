@@ -4,6 +4,7 @@ import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, forbidden, notFound, serverError } from '@/lib/api-response'
 import { resolveMediaUrl } from '@/lib/helpers'
 import { isActiveCollaborator } from '@/lib/undangan-access'
+import { revalidateUndanganById } from '@/lib/queries/revalidate-undangan'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -96,6 +97,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
       where: { undanganId: id },
       data,
     })
+
+    await revalidateUndanganById(id)
 
     return ok(resolveContent(updated as unknown as Record<string, unknown>), 'Content updated')
   } catch {

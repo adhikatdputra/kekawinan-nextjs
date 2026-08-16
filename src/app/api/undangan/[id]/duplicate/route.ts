@@ -8,17 +8,16 @@ import { isValidPermalink } from '@/lib/helpers'
 type Params = { params: Promise<{ id: string }> }
 
 // POST /api/undangan/:id/duplicate
-// Admin-only. Duplicates the content of an existing undangan into a brand new one:
+// Available to all roles. Duplicates the content of an existing undangan into a brand new one:
 // content, gifts (amplop), gallery, love stories, and kado (registry — claim data reset).
 // Guests (tamu), ucapan, and collaborators are intentionally NOT copied.
 // Media (images/music) keep the same Cloudinary URLs as the source.
+// - Admin: bypass credit (free), can duplicate any undangan.
+// - Regular user: can only duplicate their own undangan, and pays credit for the target theme
+//   just like creating a brand new undangan.
 export async function POST(request: NextRequest, { params }: Params) {
   const auth = requireAuth(request)
   if (auth instanceof NextResponse) return auth
-
-  if (!isAdminLevel(auth.level)) {
-    return forbidden('Only admin can duplicate undangan')
-  }
 
   try {
     const { id } = await params
@@ -47,6 +46,47 @@ export async function POST(request: NextRequest, { params }: Params) {
     })
     if (!source) return notFound('Undangan not found')
 
+    const isAdmin = isAdminLevel(auth.level)
+
+    // Non-admin may only duplicate an undangan they own
+    if (!isAdmin && source.userId !== auth.id) {
+      return forbidden('Kamu hanya bisa menduplikat undangan milikmu sendiri')
+    }
+
+    // ── Credit handling (non-admin pays for the target theme, admin is free) ──
+    let packageType = source.packageType
+    let creditIds: string[] = []
+
+    if (!isAdmin) {
+      if (!themeId) return badRequest('Pilih tema terlebih dahulu')
+
+      const theme = await prisma.theme.findUnique({ where: { id: themeId } })
+      if (!theme) return badRequest('Tema tidak ditemukan')
+
+      // Harga efektif: gunakan promo jika ada (null = tidak ada promo), fallback ke credit
+      const cost = theme.promo !== null ? theme.promo : theme.credit
+      if (cost === null || cost === undefined) return badRequest('Tema belum memiliki harga credit')
+
+      // Tema berbayar: potong credit AVAILABLE secara FIFO
+      if (cost > 0) {
+        const availableCredits = await prisma.userCredit.findMany({
+          where: { userId: auth.id, status: 'AVAILABLE' },
+          take: cost,
+          orderBy: { redeemedAt: 'asc' },
+          select: { id: true, packageType: true },
+        })
+
+        if (availableCredits.length < cost) {
+          return forbidden(
+            `Credit tidak cukup. Tema ini membutuhkan ${cost} credit, kamu hanya punya ${availableCredits.length}.`,
+          )
+        }
+
+        packageType = availableCredits[0]?.packageType ?? packageType
+        creditIds = availableCredits.map((c) => c.id)
+      }
+    }
+
     const newId = nanoid()
     const expiredDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) // 3 months default
 
@@ -57,11 +97,11 @@ export async function POST(request: NextRequest, { params }: Params) {
       prisma.undangan.create({
         data: {
           id: newId,
-          userId: auth.id, // owned by the admin who duplicates
+          userId: auth.id, // owned by whoever duplicates
           permalink,
           name,
           themeId: themeId ?? source.themeId ?? null,
-          packageType: source.packageType,
+          packageType,
           expired: expiredDate,
         },
       }),
@@ -172,6 +212,16 @@ export async function POST(request: NextRequest, { params }: Params) {
             phone: null,
             isConfirm: 0,
           })),
+        }),
+      )
+    }
+
+    // ── Potong credit (hanya non-admin dengan tema berbayar) ──────────────────
+    if (creditIds.length > 0) {
+      ops.push(
+        prisma.userCredit.updateMany({
+          where: { id: { in: creditIds } },
+          data: { status: 'USED', usedForUndangan: newId, usedAt: new Date() },
         }),
       )
     }

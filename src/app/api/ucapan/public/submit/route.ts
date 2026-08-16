@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { nanoid } from 'nanoid'
 import { prisma } from '@/lib/prisma'
 import { created, badRequest, notFound, serverError } from '@/lib/api-response'
+import { revalidateUndanganById } from '@/lib/queries/revalidate-undangan'
 
 const VALID_ATTEND = ['Yes', 'No']
 
@@ -79,6 +80,9 @@ export async function POST(request: NextRequest) {
         isShow: 1,
       },
     })
+
+    // Refresh public cache so other guests see the new wish in the buku tamu.
+    await revalidateUndanganById(undanganId)
 
     return created(ucapan, 'Wish submitted successfully')
   } catch {

@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, created, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
 import { isActiveCollaborator } from '@/lib/undangan-access'
+import { revalidateUndanganById } from '@/lib/queries/revalidate-undangan'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -66,6 +67,8 @@ export async function POST(request: NextRequest, { params }: Params) {
         address: address?.trim() ?? null,
       },
     })
+
+    await revalidateUndanganById(id)
 
     return created(gift, 'Gift added successfully')
   } catch {

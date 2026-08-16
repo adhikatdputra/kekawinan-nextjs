@@ -1,11 +1,10 @@
 "use client";
 
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import undanganUserApi from "@/frontend/api/undangan-user";
-import giftApi from "@/frontend/api/gift";
 import { UndanganDetail, Gift } from "@/frontend/interface/undangan";
 import Loading from "@/components/layouts/loading";
 import { motion } from "motion/react";
@@ -20,8 +19,15 @@ export default function GiftView({ slug }: { slug: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tamuId = searchParams.get("id") ?? undefined;
-  const [isOpenGiftList, setIsOpenGiftList] = useState(false);
-  const [giftList, setGiftList] = useState<Gift[]>([]);
+  // Drive the list/cover view from the URL so returning from a gift detail
+  // page (via back) restores the list instead of resetting to the cover.
+  const isOpenGiftList = searchParams.get("view") === "list";
+
+  const openList = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("view", "list");
+    router.push(`/${slug}/gift?${params.toString()}`);
+  };
 
   const {
     data: undanganData,
@@ -31,22 +37,17 @@ export default function GiftView({ slug }: { slug: string }) {
     queryKey: ["undangan-user-page", slug],
     queryFn: () => undanganUserApi.getUndangan(slug),
     select: (data) => data.data as UndanganDetail,
+    // Prefetched/hydrated from the server — never refetch on the client.
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 
-  const { isPending: isLoadingGiftList, mutate: mutateGiftList } = useMutation({
-    mutationFn: (undangan_id: string) => giftApi.getPublic(undangan_id),
-    onSuccess: (data) => {
-      setGiftList(data.data.data);
-    },
-  });
+  // Kado list ships with the invitation payload — no separate fetch needed.
+  const giftList: Gift[] = undanganData?.kado ?? [];
 
   useEffect(() => {
     if (isError) router.push("/");
   }, [isError]);
-
-  useEffect(() => {
-    if (undanganData) mutateGiftList(undanganData.id);
-  }, [undanganData]);
 
   if (isLoading) return <Loading />;
 
@@ -64,7 +65,7 @@ export default function GiftView({ slug }: { slug: string }) {
         <GiftCover
           undanganData={undanganData}
           giftCount={giftList.length}
-          onOpen={() => setIsOpenGiftList(true)}
+          onOpen={openList}
           slug={slug}
           tamuId={tamuId}
         />
@@ -72,7 +73,7 @@ export default function GiftView({ slug }: { slug: string }) {
         <GiftList
           slug={slug}
           giftList={giftList}
-          isLoading={isLoadingGiftList}
+          isLoading={false}
           undanganData={undanganData}
         />
       )}

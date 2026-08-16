@@ -4,6 +4,7 @@ import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, badRequest, forbidden, notFound, conflict, serverError } from '@/lib/api-response'
 import { isValidPermalink, resolveMediaUrl } from '@/lib/helpers'
 import { isActiveCollaborator } from '@/lib/undangan-access'
+import { revalidateUndanganByPermalink } from '@/lib/queries/revalidate-undangan'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -104,6 +105,13 @@ export async function PUT(request: NextRequest, { params }: Params) {
       },
     })
 
+    // Refresh the public cache — covers publish (status → ACTIVE) and permalink
+    // renames (old slug must be invalidated too).
+    revalidateUndanganByPermalink(updated.permalink)
+    if (undangan.permalink !== updated.permalink) {
+      revalidateUndanganByPermalink(undangan.permalink)
+    }
+
     return ok(updated, 'Undangan updated')
   } catch {
     return serverError()
@@ -118,10 +126,12 @@ export async function DELETE(request: NextRequest, { params }: Params) {
 
   try {
     const { id } = await params
-    const { error } = await getOwnedUndangan(id, auth.id, auth.level)
+    const { error, undangan } = await getOwnedUndangan(id, auth.id, auth.level)
     if (error) return error
 
     await prisma.undangan.delete({ where: { id } })
+
+    if (undangan) revalidateUndanganByPermalink(undangan.permalink)
 
     return ok(null, 'Undangan deleted')
   } catch {

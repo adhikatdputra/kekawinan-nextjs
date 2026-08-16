@@ -4,6 +4,7 @@ import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, forbidden, notFound, serverError } from '@/lib/api-response'
 import { resolveMediaUrl } from '@/lib/helpers'
 import { isActiveCollaborator } from '@/lib/undangan-access'
+import { revalidateUndanganById } from '@/lib/queries/revalidate-undangan'
 
 type Params = { params: Promise<{ id: string; kadoId: string }> }
 
@@ -65,6 +66,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
       data,
     })
 
+    await revalidateUndanganById(id)
+
     return ok(resolveKado(updated as unknown as Record<string, unknown>), 'Kado updated successfully')
   } catch {
     return serverError()
@@ -82,6 +85,8 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     if (error) return error
 
     await prisma.kado.delete({ where: { id: kadoId } })
+
+    await revalidateUndanganById(id)
 
     return ok(null, 'Kado deleted successfully')
   } catch {

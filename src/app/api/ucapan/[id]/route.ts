@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
 import { isActiveCollaborator } from '@/lib/undangan-access'
+import { revalidateUndanganById } from '@/lib/queries/revalidate-undangan'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -66,6 +67,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
       },
     })
 
+    await revalidateUndanganById(ucapan.undanganId)
+
     return ok(updated, 'Ucapan updated')
   } catch {
     return serverError()
@@ -79,10 +82,12 @@ export async function DELETE(request: NextRequest, { params }: Params) {
 
   try {
     const { id } = await params
-    const { error } = await getOwnedUcapan(id, auth.id, auth.level)
-    if (error) return error
+    const { ucapan, error } = await getOwnedUcapan(id, auth.id, auth.level)
+    if (error || !ucapan) return error!
 
     await prisma.ucapan.delete({ where: { id } })
+
+    await revalidateUndanganById(ucapan.undanganId)
 
     return ok(null, 'Ucapan deleted')
   } catch {

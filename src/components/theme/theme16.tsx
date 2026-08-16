@@ -617,6 +617,7 @@ export default function Theme16({
         bgButton="bg-theme16-secondary"
         colorButton="text-white"
         colorHeading="text-white"
+        labelColor="text-white"
       />
 
       {/* ── DOA LIST ── */}

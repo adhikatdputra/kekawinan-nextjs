@@ -22,6 +22,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
           where: { isShow: 1 },
           orderBy: { createdAt: 'desc' },
         },
+        kado: { orderBy: { createdAt: 'asc' } },
         theme: true,
       },
     })
@@ -46,6 +47,9 @@ export async function GET(_request: NextRequest, { params }: Params) {
     }
     for (const ls of data.loveStories) {
       if (ls.image) (ls as Record<string, unknown>).image = resolveMediaUrl(ls.image)
+    }
+    for (const k of data.kado) {
+      if (k.thumbnail) (k as Record<string, unknown>).thumbnail = resolveMediaUrl(k.thumbnail)
     }
 
     return ok(data, 'Get undangan success')

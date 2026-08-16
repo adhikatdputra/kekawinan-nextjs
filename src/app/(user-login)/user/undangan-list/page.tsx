@@ -24,13 +24,14 @@ import {
   IconChevronDown,
   IconScan,
   IconCopy,
+  IconCornerRightDown,
+  IconArrowsMaximize,
+  IconArrowsMinimize,
 } from "@tabler/icons-react";
 import PendingNoData from "@/components/ui/custom/pending-no-data";
 import PendingData from "@/components/ui/custom/pending-data";
 import Image from "next/image";
 import Link from "next/link";
-
-import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
   TooltipContent,
@@ -80,11 +81,13 @@ export default function UndanganListPage() {
   const [isOpenTrakteer, setIsOpenTrakteer] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isDialogExpanded, setIsDialogExpanded] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Undangan | null>(null);
   const [duplicateSource, setDuplicateSource] = useState<Undangan | null>(null);
   const [selectedTheme, setSelectedTheme] = useState<Theme | null>(null);
   const [name, setName] = useState("");
   const [permalink, setPermalink] = useState("");
+  const [formErrors, setFormErrors] = useState<{ name?: string; permalink?: string; theme?: string }>({});
 
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [isOpenRedeem, setIsOpenRedeem] = useState(false);
@@ -248,14 +251,39 @@ export default function UndanganListPage() {
 
   const handleCancel = () => {
     setIsOpen(false);
+    setIsDialogExpanded(false);
     setSelectedItem(null);
     setDuplicateSource(null);
     setSelectedTheme(null);
     setName("");
     setPermalink("");
+    setFormErrors({});
   };
 
   const handleSubmit = () => {
+    // Butuh pilih tema saat buat baru / duplikat (bukan edit)
+    const needsTheme = !selectedItem;
+
+    const errors: { name?: string; permalink?: string; theme?: string } = {};
+    if (!name.trim()) errors.name = "Nama undangan wajib diisi";
+    if (!permalink.trim()) errors.permalink = "URL undangan wajib diisi";
+    else if (permalink.trim().length < 3) errors.permalink = "URL undangan minimal 3 karakter";
+    if (needsTheme && !selectedTheme) errors.theme = "Pilih tema terlebih dahulu";
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      toast.error(Object.values(errors)[0] ?? "Lengkapi data undangan terlebih dahulu");
+      return;
+    }
+
+    // Non-admin: pastikan credit cukup untuk tema yang dipilih
+    if (needsTheme && !isAdmin && !canAfford) {
+      toast.error(`Credit tidak cukup. Tema ini butuh ${effectiveCost} credit, kamu punya ${balance}.`);
+      return;
+    }
+
+    setFormErrors({});
+
     if (duplicateSource) {
       duplicateUndangan({ id: duplicateSource.id, data: { name, permalink, themeId: selectedTheme?.id } });
     } else if (selectedItem) {
@@ -279,14 +307,6 @@ export default function UndanganListPage() {
 
   useSession();
   useEffect(() => { setIsLoaded(true); }, []);
-
-  const canCreate = duplicateSource
-    ? !!name && !!permalink && !!selectedTheme
-    : selectedItem
-    ? !!name && !!permalink
-    : isAdmin
-    ? !!name && !!permalink
-    : !!name && !!permalink && !!selectedTheme && canAfford;
 
   return (
     <>
@@ -504,7 +524,7 @@ export default function UndanganListPage() {
                             </TooltipTrigger>
                             <TooltipContent><p>Scanner absensi</p></TooltipContent>
                           </Tooltip>
-                          {isAdmin && (
+                          {(isAdmin || isOwner) && (
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <button onClick={() => openDuplicate(item)} className="p-1.5 rounded-lg text-muted-foreground hover:bg-green-soft-kwn hover:text-green-kwn transition-colors">
@@ -575,7 +595,7 @@ export default function UndanganListPage() {
                                     <IconGift size={16} className="text-gray-400" />
                                     Kado Pernikahan
                                   </Link>
-                                  {isAdmin && (
+                                  {(isAdmin || isOwner) && (
                                     <>
                                       <div className="border-t border-gray-100 my-1" />
                                       <button onClick={() => { setOpenMenuId(null); openDuplicate(item); }}
@@ -642,25 +662,48 @@ export default function UndanganListPage() {
       {/* ── Dialog: Buat / Edit Undangan ────────────────────────────────────── */}
       <Dialog open={isOpen} onOpenChange={handleCancel}>
         <form>
-          <DialogContent className="sm:max-w-[560px]">
+          <DialogContent
+            className={
+              isDialogExpanded
+                ? "sm:max-w-[96vw] w-[96vw] h-[94vh] grid-rows-[auto_1fr_auto]"
+                : "sm:max-w-[560px]"
+            }
+          >
+            {/* Toggle layar penuh — memudahkan lihat-lihat tema */}
+            {!selectedItem && (
+              <button
+                type="button"
+                onClick={() => setIsDialogExpanded((v) => !v)}
+                aria-label={isDialogExpanded ? "Perkecil" : "Layar penuh"}
+                className="absolute top-4 right-12 rounded-sm p-1 text-muted-foreground opacity-70 transition-opacity hover:opacity-100"
+              >
+                {isDialogExpanded ? <IconArrowsMinimize size={16} /> : <IconArrowsMaximize size={16} />}
+              </button>
+            )}
             <DialogHeader>
               <DialogTitle>{selectedItem ? "Edit" : duplicateSource ? "Duplikat" : "Buat"} Undangan</DialogTitle>
               <Separator className="my-2" />
               <DialogDescription />
             </DialogHeader>
-            <div className="overflow-y-auto w-full max-h-[65vh] grid gap-4">
+            <div className={`overflow-y-auto w-full grid gap-4 ${isDialogExpanded ? "min-h-0" : "max-h-[65vh]"}`}>
               <div className="grid gap-3">
                 <Label htmlFor="name">Nama Undangan</Label>
                 <Input
                   id="name"
                   placeholder="Masukkan nama undangan"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    if (formErrors.name) setFormErrors((p) => ({ ...p, name: undefined }));
+                  }}
+                  aria-invalid={!!formErrors.name}
+                  className={formErrors.name ? "border-red-500 focus-visible:ring-red-500" : ""}
                 />
+                {formErrors.name && <p className="text-xs text-red-500">{formErrors.name}</p>}
               </div>
               <div className="grid gap-3">
-                <Label htmlFor="permalink">Permalink</Label>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-border bg-white">
+                <Label htmlFor="permalink">Input URL Undangan kamu <IconCornerRightDown size={16} /></Label>
+                <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border bg-white ${formErrors.permalink ? "border-red-500" : "border-border"}`}>
                   {/* Browser dots */}
                   <div className="flex items-center gap-1.5 shrink-0">
                     <span className="w-3 h-3 rounded-full bg-red-400" />
@@ -674,11 +717,15 @@ export default function UndanganListPage() {
                       type="text"
                       placeholder="romeo-juliet"
                       value={permalink}
-                      onChange={(e) => updatePermalink(e.target.value)}
+                      onChange={(e) => {
+                        updatePermalink(e.target.value);
+                        if (formErrors.permalink) setFormErrors((p) => ({ ...p, permalink: undefined }));
+                      }}
                       className="flex-1 min-w-0 bg-transparent outline-none font-semibold text-green-kwn placeholder:font-normal placeholder:text-muted-foreground/60"
                     />
                   </div>
                 </div>
+                {formErrors.permalink && <p className="text-xs text-red-500">{formErrors.permalink}</p>}
               </div>
 
               {/* Theme picker — hanya saat buat baru (bukan edit) */}
@@ -687,7 +734,7 @@ export default function UndanganListPage() {
                   <Separator className="my-2" />
                   <div className="grid gap-3">
                     <div className="flex items-center justify-between">
-                      <Label>Pilih Tema</Label>
+                      <Label className={formErrors.theme ? "text-red-500" : ""}>Pilih Tema</Label>
                       {!isAdmin && (
                         <span className="text-xs text-muted-foreground">
                           Credit kamu:{" "}
@@ -695,17 +742,28 @@ export default function UndanganListPage() {
                         </span>
                       )}
                     </div>
-                    <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory -mx-1 px-1">
+                    {formErrors.theme && <p className="text-xs text-red-500">{formErrors.theme}</p>}
+                    <div
+                      className={
+                        isDialogExpanded
+                          ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 px-1"
+                          : "flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory -mx-1 px-1"
+                      }
+                    >
                       {themes?.map((item: Theme) => {
                         const cost = item.promo !== null && item.promo !== undefined ? item.promo : item.credit;
                         const affordable = isAdmin || balance >= cost;
                         const isSelected = selectedTheme?.id === item.id;
 
                         return (
-                          <div key={item.id} className="snap-start shrink-0 w-[44%] sm:w-[30%]">
+                          <div key={item.id} className={isDialogExpanded ? "" : "snap-start shrink-0 w-[44%] sm:w-[30%]"}>
                             <button
                               type="button"
-                              onClick={() => affordable && setSelectedTheme(item)}
+                              onClick={() => {
+                                if (!affordable) return;
+                                setSelectedTheme(item);
+                                if (formErrors.theme) setFormErrors((p) => ({ ...p, theme: undefined }));
+                              }}
                               className={`group relative w-full ${!affordable ? "opacity-50 cursor-not-allowed" : ""}`}
                             >
                               <div className={`relative rounded-lg overflow-hidden ${isSelected ? "ring-2 ring-green-kwn ring-offset-1" : "border border-border"}`}>
@@ -774,8 +832,8 @@ export default function UndanganListPage() {
                 <Button variant="outline" onClick={handleCancel}>Batal</Button>
               </DialogClose>
               <Button
-                type="submit"
-                disabled={!canCreate || isPendingCreate || isPendingUpdate || isPendingDuplicate}
+                type="button"
+                disabled={isPendingCreate || isPendingUpdate || isPendingDuplicate}
                 onClick={handleSubmit}
               >
                 {isPendingCreate || isPendingUpdate || isPendingDuplicate

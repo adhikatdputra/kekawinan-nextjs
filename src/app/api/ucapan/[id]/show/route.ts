@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
 import { isActiveCollaborator } from '@/lib/undangan-access'
+import { revalidateUndanganById } from '@/lib/queries/revalidate-undangan'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -37,6 +38,8 @@ export async function PATCH(request: NextRequest, { params }: Params) {
       where: { id },
       data: { isShow },
     })
+
+    await revalidateUndanganById(ucapan.undanganId)
 
     return ok(updated, `Ucapan ${isShow === 1 ? 'shown' : 'hidden'}`)
   } catch {

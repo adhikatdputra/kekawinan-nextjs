@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { ok, badRequest, conflict, notFound, serverError } from '@/lib/api-response'
+import { revalidateUndanganById } from '@/lib/queries/revalidate-undangan'
 
 type Params = { params: Promise<{ kadoId: string }> }
 
@@ -40,6 +41,9 @@ export async function PATCH(request: NextRequest, { params }: Params) {
         isConfirm: 1,
       },
     })
+
+    // Refresh cached invitation payload so the kado list reflects the new status.
+    await revalidateUndanganById(kado.undanganId)
 
     return ok(updated, 'Kado confirmed successfully')
   } catch {

@@ -4,6 +4,7 @@ import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
 import { resolveMediaUrl } from '@/lib/helpers'
 import { isActiveCollaborator } from '@/lib/undangan-access'
+import { revalidateUndanganById } from '@/lib/queries/revalidate-undangan'
 
 type Params = { params: Promise<{ id: string; galleryId: string }> }
 
@@ -60,6 +61,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
       data: { image },
     })
 
+    await revalidateUndanganById(id)
+
     return ok(resolveGallery(updated as unknown as { image: string | null; [key: string]: unknown }), 'Gallery item updated successfully')
   } catch {
     return serverError()
@@ -85,6 +88,8 @@ export async function DELETE(request: NextRequest, { params }: Params) {
         data: { rank: { decrement: 1 } },
       }),
     ])
+
+    await revalidateUndanganById(id)
 
     return ok(null, 'Gallery item deleted successfully')
   } catch {

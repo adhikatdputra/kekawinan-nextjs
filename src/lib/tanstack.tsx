@@ -13,6 +13,11 @@ function makeQueryClient() {
         // With SSR, we usually want to set some default staleTime
         // above 0 to avoid refetching immediately on the client
         staleTime: 60 * 1000,
+        // Public invitation pages are often left open for a long time and
+        // tabbed away from — refetching on focus/reconnect just burns
+        // serverless invocations without giving the guest anything new.
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
       },
     },
   });

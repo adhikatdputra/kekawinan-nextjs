@@ -13,6 +13,7 @@ import {
   IconDownload,
   IconFileSpreadsheet,
   IconTrash,
+  IconCopy,
 } from "@tabler/icons-react";
 import MenuAction from "@/components/ui/custom/menu-action";
 import TablePending from "@/components/ui/custom/table-pending";
@@ -103,6 +104,7 @@ export default function TamuPage() {
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [qrTamu, setQrTamu] = useState<UndanganTamu | null>(null);
+  const [detailItem, setDetailItem] = useState<UndanganTamu | null>(null);
   const [isDownloadingZip, setIsDownloadingZip] = useState(false);
   const qrCanvasRef = useRef<HTMLDivElement>(null);
 
@@ -889,6 +891,7 @@ export default function TamuPage() {
                         </Tooltip>
                       </TooltipProvider>
                       <MenuAction
+                        handleLihat={() => setDetailItem(item)}
                         handleDelete={() => {
                           setIsOpenDelete(true);
                           setSelectedItem(item);
@@ -900,7 +903,7 @@ export default function TamuPage() {
                           setPhone(item.phone);
                           setMaxInvite(item.maxInvite.toString());
                         }}
-                        items={["Hapus", "Edit"]}
+                        items={["Lihat", "Hapus", "Edit"]}
                       />
                     </div>
                   </TableCell>
@@ -1052,6 +1055,73 @@ export default function TamuPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Modal Detail Tamu */}
+      <Dialog open={!!detailItem} onOpenChange={() => setDetailItem(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Detail Tamu</DialogTitle>
+            <DialogDescription>{detailItem?.name}</DialogDescription>
+          </DialogHeader>
+          {detailItem && (
+            <div className="flex flex-col divide-y divide-border/60 text-sm">
+              <DetailRow
+                label="ID Tamu"
+                value={detailItem.id}
+                copyable
+                onCopy={() => {
+                  navigator.clipboard.writeText(detailItem.id);
+                  toast.success("ID Tamu disalin");
+                }}
+              />
+              <DetailRow label="Nama Tamu" value={detailItem.name} />
+              <DetailRow label="No. Whatsapp" value={detailItem.phone || "-"} />
+              <DetailRow
+                label="Total Tamu (Orang)"
+                value={detailItem.maxInvite.toString()}
+              />
+              <DetailRow
+                label="Status Kirim"
+                value={detailItem.sendStatus ? "Sudah dikirim" : "Belum dikirim"}
+              />
+              <DetailRow
+                label="Dilihat"
+                value={detailItem.isRead ? "Sudah" : "Belum"}
+              />
+              <DetailRow
+                label="RSVP"
+                value={detailItem.isConfirm ? "Sudah" : "Belum"}
+              />
+              <DetailRow
+                label="Absensi"
+                value={detailItem.isAttend ? "Hadir" : "Belum"}
+              />
+              <DetailRow
+                label="Hadir Pukul"
+                value={
+                  detailItem.attendedAt
+                    ? new Date(detailItem.attendedAt).toLocaleString("id-ID", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })
+                    : "-"
+                }
+              />
+              <DetailRow
+                label="Dikonfirmasi oleh"
+                value={detailItem.confirmedBy || "-"}
+              />
+              <DetailRow
+                label="Dibuat"
+                value={new Date(detailItem.createdAt).toLocaleString("id-ID", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* Bulk delete confirmation */}
       <AlertDialog open={isOpenBulkDelete} onOpenChange={setIsOpenBulkDelete}>
         <AlertDialogContent>
@@ -1119,6 +1189,37 @@ export default function TamuPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
+  );
+}
+
+function DetailRow({
+  label,
+  value,
+  copyable,
+  onCopy,
+}: {
+  label: string;
+  value: string;
+  copyable?: boolean;
+  onCopy?: () => void;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-3 py-2.5">
+      <span className="text-muted-foreground shrink-0">{label}</span>
+      <div className="flex items-center gap-1.5 min-w-0">
+        <span className="font-medium text-right break-all">{value}</span>
+        {copyable && (
+          <button
+            type="button"
+            onClick={onCopy}
+            className="shrink-0 rounded-md border border-border p-1 text-muted-foreground hover:bg-primary hover:text-white"
+            aria-label={`Salin ${label}`}
+          >
+            <IconCopy size={14} />
+          </button>
+        )}
+      </div>
     </div>
   );
 }

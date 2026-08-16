@@ -4,6 +4,7 @@ import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
 import { resolveMediaUrl } from '@/lib/helpers'
 import { isActiveCollaborator } from '@/lib/undangan-access'
+import { revalidateUndanganById } from '@/lib/queries/revalidate-undangan'
 
 type Params = { params: Promise<{ id: string; storyId: string }> }
 
@@ -48,6 +49,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
       },
     })
 
+    await revalidateUndanganById(id)
+
     return ok(resolveItem(updated as unknown as { image: string | null; [key: string]: unknown }), 'Love story berhasil diperbarui')
   } catch (err) {
     console.error('[love-story PUT]', err)
@@ -72,6 +75,8 @@ export async function DELETE(request: NextRequest, { params }: Params) {
         data: { rank: { decrement: 1 } },
       }),
     ])
+
+    await revalidateUndanganById(id)
 
     return ok(null, 'Love story berhasil dihapus')
   } catch (err) {

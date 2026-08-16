@@ -57,6 +57,7 @@ export interface UndanganDetail {
   ucapan: UndanganUcapan[];
   theme: Theme | null;
   loveStories: LoveStory[];
+  kado: Gift[];
 }
 
 export interface UndanganContent {

@@ -5,6 +5,7 @@ import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, created, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
 import { resolveMediaUrl, paginate, parsePagination } from '@/lib/helpers'
 import { isActiveCollaborator } from '@/lib/undangan-access'
+import { revalidateUndanganById } from '@/lib/queries/revalidate-undangan'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -89,6 +90,8 @@ export async function POST(request: NextRequest, { params }: Params) {
         thumbnail: thumbnail || null,
       },
     })
+
+    await revalidateUndanganById(id)
 
     return created(resolveKado(kado as unknown as Record<string, unknown>), 'Kado created successfully')
   } catch {
