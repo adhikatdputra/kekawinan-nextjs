@@ -65,7 +65,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id">
+    <html lang="id" suppressHydrationWarning>
       <GoogleTagManager gtmId={GTM_ID} />
       <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />
       

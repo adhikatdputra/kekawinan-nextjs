@@ -32,6 +32,7 @@ import PendingNoData from "@/components/ui/custom/pending-no-data";
 import PendingData from "@/components/ui/custom/pending-data";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Tooltip,
   TooltipContent,
@@ -79,6 +80,8 @@ const isShowCredit = false;
 export default function UndanganListPage() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isOpenTrakteer, setIsOpenTrakteer] = useState(false);
+  const [createdUndanganId, setCreatedUndanganId] = useState<string | null>(null);
+  const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
   const [isDialogExpanded, setIsDialogExpanded] = useState(false);
@@ -164,6 +167,7 @@ export default function UndanganListPage() {
         setSelectedItem(null);
         setSelectedTheme(null);
         toast.success("Undangan berhasil dibuat");
+        setCreatedUndanganId(data.data.data?.id ?? null);
         setIsOpenTrakteer(true);
         refetchUndangan();
         refetchCredits();
@@ -290,6 +294,29 @@ export default function UndanganListPage() {
       updateUndangan({ id: selectedItem.id, data: { name, permalink } });
     } else {
       createUndangan({ name, permalink, themeId: selectedTheme?.id });
+    }
+  };
+
+  // Tutup popup sukses → arahkan ke halaman edit konten (cover pembuka)
+  // supaya user langsung isi undangannya, bukan cuma menutup popup.
+  const closeTrakteer = () => {
+    setIsOpenTrakteer(false);
+    if (createdUndanganId) {
+      router.push(`/user/undangan/${createdUndanganId}/cover-pembuka`);
+      setCreatedUndanganId(null);
+    }
+  };
+
+  // Klik tombol dukung: buka Trakteer di tab baru, lalu pindah ke cover-pembuka.
+  // Navigasi current tab ditunda sedikit supaya tab baru sempat terbuka
+  // (kalau router.push jalan di gesture yang sama, browser membatalkan popup).
+  const handleSupportTrakteer = () => {
+    window.open("https://trakteer.id/partnerinaja/tip", "_blank", "noopener,noreferrer");
+    setIsOpenTrakteer(false);
+    const id = createdUndanganId;
+    setCreatedUndanganId(null);
+    if (id) {
+      setTimeout(() => router.push(`/user/undangan/${id}/cover-pembuka`), 150);
     }
   };
 
@@ -865,7 +892,7 @@ export default function UndanganListPage() {
       </AlertDialog>
 
       {/* ── Dialog: Trakteer ────────────────────────────────────────────────── */}
-      <Dialog open={isOpenTrakteer} onOpenChange={() => { setIsOpenTrakteer(false); window.open("https://trakteer.id/partnerinaja/tip", "_blank"); }}>
+      <Dialog open={isOpenTrakteer} onOpenChange={(open) => { if (!open) closeTrakteer(); }}>
         <DialogContent showCloseButton={false}>
           <DialogHeader><DialogTitle /><DialogDescription /></DialogHeader>
           <div className="md:px-8">
@@ -873,15 +900,14 @@ export default function UndanganListPage() {
               <div className="text-3xl font-bold text-black">Selamat kamu berhasil membuat undangan!</div>
               <p className="pt-2">Yuk terus support kami agar dapat terus mengembangkan sistem ini</p>
             </div>
-            <Link
-              href="https://trakteer.id/partnerinaja/tip"
-              target="_blank"
-              className="flex items-center justify-center gap-2 bg-red-700 text-white px-4 py-2 rounded-full"
-              onClick={() => setIsOpenTrakteer(false)}
+            <button
+              type="button"
+              className="w-full flex items-center justify-center gap-2 bg-red-700 text-white px-4 py-2 rounded-full"
+              onClick={handleSupportTrakteer}
             >
               <Image src="https://cdn.trakteer.id/images/embed/trbtn-icon.png" alt="" width={100} height={100} className="w-[16px]" />
               <span>Dukung kami di Trakteer</span>
-            </Link>
+            </button>
           </div>
         </DialogContent>
       </Dialog>

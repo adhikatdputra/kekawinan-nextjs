@@ -109,7 +109,7 @@ export default function UsersPage() {
         search: searchText,
         page: 1,
       }));
-    }, 500)
+    }, 500),
   ).current;
 
   useEffect(() => {
@@ -300,6 +300,7 @@ export default function UsersPage() {
                   deleteUndangan(selectedItem.id);
                 }
               }}
+              className="bg-red-600 hover:bg-red-700"
               disabled={isPendingDelete}
             >
               {isPendingDelete ? (
