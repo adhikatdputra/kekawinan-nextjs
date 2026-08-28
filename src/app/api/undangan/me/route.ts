@@ -28,6 +28,9 @@ export async function GET(request: NextRequest) {
         include: {
           content: { select: { dateWedding: true } },
           theme: { select: { componentName: true } },
+          // Jumlah credit yang sudah terpotong untuk undangan ini — dipakai UI
+          // pemulihan tema untuk tahu tema mana yang sudah terbayar.
+          _count: { select: { userCredits: true } },
         },
       }),
       prisma.undangan.count({ where: ownWhere }),
@@ -42,6 +45,7 @@ export async function GET(request: NextRequest) {
             content: { select: { dateWedding: true } },
             theme: { select: { componentName: true } },
             user: { select: { fullname: true } },
+            _count: { select: { userCredits: true } },
           },
         },
       },

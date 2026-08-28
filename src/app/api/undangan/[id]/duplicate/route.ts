@@ -61,7 +61,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       if (!themeId) return badRequest('Pilih tema terlebih dahulu')
 
       const theme = await prisma.theme.findUnique({ where: { id: themeId } })
-      if (!theme) return badRequest('Tema tidak ditemukan')
+      if (!theme || !theme.isActive || theme.isShowAdmin) return badRequest('Tema tidak ditemukan')
 
       // Harga efektif: gunakan promo jika ada (null = tidak ada promo), fallback ke credit
       const cost = theme.promo !== null ? theme.promo : theme.credit
@@ -85,6 +85,12 @@ export async function POST(request: NextRequest, { params }: Params) {
         packageType = availableCredits[0]?.packageType ?? packageType
         creditIds = availableCredits.map((c) => c.id)
       }
+    }
+
+    // Admin melewati blok credit di atas, jadi themeId-nya belum tervalidasi
+    if (isAdmin && themeId) {
+      const theme = await prisma.theme.findUnique({ where: { id: themeId }, select: { id: true } })
+      if (!theme) return badRequest('Tema tidak ditemukan')
     }
 
     const newId = nanoid()

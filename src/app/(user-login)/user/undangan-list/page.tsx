@@ -29,6 +29,7 @@ import {
   IconArrowsMinimize,
 } from "@tabler/icons-react";
 import PendingNoData from "@/components/ui/custom/pending-no-data";
+import ThemeRequiredDialog from "@/components/pages/undangan/theme-required-dialog";
 import PendingData from "@/components/ui/custom/pending-data";
 import Image from "next/image";
 import Link from "next/link";
@@ -98,6 +99,8 @@ export default function UndanganListPage() {
   const [isOpenPhoneWarning, setIsOpenPhoneWarning] = useState(false);
   const [isIssueDismissed, setIsIssueDismissed] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  // Pemulihan tema — untuk undangan yang themeId-nya kosong
+  const [themeFixTarget, setThemeFixTarget] = useState<Undangan | null>(null);
 
   const { getUser, getUserName } = useAuth();
   const isAdmin = getUser()?.level === "admin" || getUser()?.level === "superadmin";
@@ -643,6 +646,25 @@ export default function UndanganListPage() {
                             )}
                         </div>
                       </div>
+
+                      {/* Tema kosong — halaman publiknya tidak akan tampil sampai temanya dipilih */}
+                      {!item.theme?.componentName && (isOwner || isAdmin) && (
+                        <div className="mt-3 pt-3 border-t border-dashed border-amber-300 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="flex items-start gap-2 min-w-0">
+                            <IconAlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                            <p className="text-xs text-amber-700">
+                              Tema undangan tidak ada, harap pilih tema sekarang. Undangan ini belum bisa dibuka tamu sampai temanya dipilih.
+                            </p>
+                          </div>
+                          <Button
+                            size="sm"
+                            onClick={() => setThemeFixTarget(item)}
+                            className="shrink-0 bg-amber-500 hover:bg-amber-600 text-white"
+                          >
+                            Pilih Tema Sekarang
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -862,6 +884,19 @@ export default function UndanganListPage() {
           </DialogContent>
         </form>
       </Dialog>
+
+      {/* ── Dialog: Pilih Tema (undangan tanpa tema) ────────────────────────── */}
+      {themeFixTarget && (
+        <ThemeRequiredDialog
+          open={!!themeFixTarget}
+          onOpenChange={(open) => { if (!open) setThemeFixTarget(null); }}
+          undanganId={themeFixTarget.id}
+          undanganName={themeFixTarget.name}
+          paidCredits={themeFixTarget._count?.userCredits ?? 0}
+          cancelLabel="Batal"
+          onSuccess={() => { refetchUndangan(); refetchCredits(); }}
+        />
+      )}
 
       {/* ── Dialog: Hapus ───────────────────────────────────────────────────── */}
       <AlertDialog open={isOpenDelete} onOpenChange={setIsOpenDelete}>

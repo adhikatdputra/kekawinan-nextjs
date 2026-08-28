@@ -45,6 +45,9 @@ export async function GET(request: NextRequest, { params }: Params) {
         ucapan: { orderBy: { createdAt: 'desc' } },
         tamu: { orderBy: { createdAt: 'desc' } },
         theme: true,
+        // Credit yang sudah terpotong untuk undangan ini — dipakai dialog
+        // pemilihan tema supaya user tidak ditagih dua kali.
+        _count: { select: { userCredits: true } },
       },
     })
 
@@ -75,7 +78,9 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
   try {
     const { id } = await params
-    const { error, undangan } = await getAccessibleUndangan(id, auth.id, auth.level)
+    // Nama, permalink, status, dan tema adalah identitas undangan — hanya pemilik
+    // (atau admin) yang boleh mengubahnya, bukan kolaborator MEMBER/CREW.
+    const { error, undangan } = await getOwnedUndangan(id, auth.id, auth.level)
     if (error || !undangan) return error!
 
     const body = await request.json()
@@ -94,6 +99,23 @@ export async function PUT(request: NextRequest, { params }: Params) {
       if (taken) return conflict('Permalink is already taken')
     }
 
+    // Tema hanya berubah kalau memang dikirim. Body tanpa themeId (mis. dialog
+    // edit nama/permalink) TIDAK boleh mengosongkan tema — undangan publik jadi
+    // stuck loading kalau componentName-nya hilang.
+    let nextThemeId = undangan.themeId
+    if (themeId && themeId !== undangan.themeId) {
+      // Ganti tema = beda biaya credit, dan credit tema lama sudah terpakai.
+      // Jalur resmi untuk pindah tema adalah duplicate (yang memotong credit).
+      if (!isAdminLevel(auth.level)) {
+        return forbidden(
+          'Tema tidak bisa diganti setelah undangan dibuat. Gunakan fitur duplikat undangan untuk memakai tema lain.',
+        )
+      }
+      const theme = await prisma.theme.findUnique({ where: { id: themeId }, select: { id: true } })
+      if (!theme) return badRequest('Tema tidak ditemukan')
+      nextThemeId = themeId
+    }
+
     const updated = await prisma.undangan.update({
       where: { id },
       data: {
@@ -101,7 +123,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
         name,
         status: status ?? undangan.status,
         expired: expired ? new Date(expired) : undangan.expired,
-        themeId: themeId ?? null,
+        themeId: nextThemeId,
       },
     })
 

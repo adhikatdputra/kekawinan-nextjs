@@ -20,6 +20,9 @@ export interface Undangan {
   themeId: string;
   createdAt: string;
   updatedAt: string;
+  theme?: { componentName: string | null } | null;
+  // Jumlah credit yang sudah terpotong untuk undangan ini
+  _count?: { userCredits: number };
   // Collaborator info (set when this undangan comes from a collaboration)
   collaboratorRole?: "OWNER" | "MEMBER" | "CREW";
   invitedByName?: string | null;
@@ -56,6 +59,7 @@ export interface UndanganDetail {
   gallery: UndanganGaleri[];
   ucapan: UndanganUcapan[];
   theme: Theme | null;
+  _count?: { userCredits: number };
   loveStories: LoveStory[];
   kado: Gift[];
 }

@@ -84,6 +84,12 @@ export async function POST(request: NextRequest) {
     // ── Admin path: bypass credit check ──────────────────────────────────────
     if (isAdmin) {
       const { themeId, packageType } = body
+
+      if (themeId) {
+        const theme = await prisma.theme.findUnique({ where: { id: themeId }, select: { id: true } })
+        if (!theme) return badRequest('Tema tidak ditemukan')
+      }
+
       const [undangan] = await prisma.$transaction([
         prisma.undangan.create({
           data: {
@@ -107,8 +113,11 @@ export async function POST(request: NextRequest) {
 
     if (!themeId) return badRequest('Pilih tema terlebih dahulu')
 
+    // Harus tema yang memang dipublikasikan untuk user — samakan dengan filter
+    // di GET /api/theme/public, supaya tema nonaktif/khusus admin tidak bisa
+    // dipakai hanya dengan menebak id-nya.
     const theme = await prisma.theme.findUnique({ where: { id: themeId } })
-    if (!theme) return badRequest('Tema tidak ditemukan')
+    if (!theme || !theme.isActive || theme.isShowAdmin) return badRequest('Tema tidak ditemukan')
 
     // Harga efektif: gunakan promo jika ada (null = tidak ada promo), fallback ke credit
     const cost = theme.promo !== null ? theme.promo : theme.credit

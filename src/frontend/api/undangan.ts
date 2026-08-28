@@ -23,6 +23,10 @@ const undanganApi = {
   deleteUndangan: (id: string) => {
     return axios.delete(`/undangan/${id}`);
   },
+  // Pasang tema pada undangan yang temanya kosong (bukan ganti tema)
+  setUndanganTheme: (id: string, themeId: string) => {
+    return axios.put(`/undangan/${id}/theme`, { themeId });
+  },
   duplicateUndangan: (id: string, formData: UndanganBody) => {
     return axios.post(`/undangan/${id}/duplicate`, formData);
   },
