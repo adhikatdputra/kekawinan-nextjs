@@ -40,7 +40,10 @@ export async function GET(request: NextRequest, { params }: Params) {
       where: { id },
       include: {
         content: true,
-        gifts: true,
+        gifts: {
+          include: { bank: true },
+          orderBy: { createdAt: 'asc' },
+        },
         gallery: { orderBy: { rank: 'asc' } },
         ucapan: { orderBy: { createdAt: 'desc' } },
         tamu: { orderBy: { createdAt: 'desc' } },
@@ -63,6 +66,12 @@ export async function GET(request: NextRequest, { params }: Params) {
     if (data?.theme) {
       const t = data.theme as Record<string, unknown>
       t.thumbnail = resolveMediaUrl(t.thumbnail as string)
+    }
+    for (const gift of data?.gifts ?? []) {
+      if (gift.bank) {
+        const bank = gift.bank as Record<string, unknown>
+        bank.icon = resolveMediaUrl(bank.icon as string)
+      }
     }
 
     return ok(data, 'Get undangan success')

@@ -12,7 +12,10 @@ async function queryPublicUndanganBySlug(permalink: string) {
     where: { permalink },
     include: {
       content: true,
-      gifts: true,
+      gifts: {
+        include: { bank: true },
+        orderBy: { createdAt: 'asc' },
+      },
       gallery: { orderBy: { rank: 'asc' } },
       loveStories: { orderBy: { rank: 'asc' } },
       ucapan: {
@@ -40,6 +43,12 @@ async function queryPublicUndanganBySlug(permalink: string) {
   }
   for (const g of data.gallery) {
     (g as Record<string, unknown>).image = resolveMediaUrl(g.image)
+  }
+  for (const gift of data.gifts) {
+    if (gift.bank) {
+      const bank = gift.bank as Record<string, unknown>
+      bank.icon = resolveMediaUrl(bank.icon as string)
+    }
   }
   for (const ls of data.loveStories) {
     if (ls.image) (ls as Record<string, unknown>).image = resolveMediaUrl(ls.image)

@@ -20,17 +20,10 @@ import {
 import { toast } from "react-hot-toast";
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
-// Bold bank-style gradients (dark base → vivid accent)
-const CARD_GRADIENTS = [
-  "from-[#1E3A8A] via-[#1D4ED8] to-[#2563EB]",   // BCA-ish deep blue
-  "from-[#14532D] via-[#166534] to-[#0D9488]",   // BNI-ish forest to teal
-  "from-[#7F1D1D] via-[#B91C1C] to-[#DC2626]",   // Mandiri-ish deep red
-  "from-[#78350F] via-[#B45309] to-[#D97706]",   // BSI-ish amber gold
-  "from-[#4C1D95] via-[#6D28D9] to-[#7C3AED]",   // Premium deep violet
-];
+import { getBankGradient } from "@/lib/bank-colors";
 
 // SVG circuit/maze pattern (inline, tile-based)
 function CircuitPattern({ opacity = 0.18 }: { opacity?: number }) {
@@ -79,21 +72,23 @@ function CircuitPattern({ opacity = 0.18 }: { opacity?: number }) {
 
 function GiftCard({
   gift,
-  index,
   copiedId,
   onCopy,
 }: {
   gift: UndanganGift;
-  index: number;
   copiedId: string | null;
   onCopy: (gift: UndanganGift) => void;
 }) {
-  const gradient = CARD_GRADIENTS[index % CARD_GRADIENTS.length];
+  const bank = gift.bank;
+  const bankName = bank?.name ?? gift.bankName ?? "Bank";
 
   return (
     <div
-      className={`relative rounded-2xl overflow-hidden bg-gradient-to-r ${gradient} shadow-lg`}
-      style={{ aspectRatio: "1.586 / 1" }}
+      className="relative rounded-2xl overflow-hidden shadow-lg"
+      style={{
+        aspectRatio: "1.586 / 1",
+        backgroundImage: getBankGradient(bank?.color),
+      }}
     >
       <CircuitPattern />
 
@@ -112,13 +107,28 @@ function GiftCard({
 
           {/* Bank name — frosted block matching chip style */}
           <div className="flex-1 min-w-0 flex justify-end">
-            <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-md px-3 py-1.5 max-w-[70%]">
-              <p className="text-[8px] text-white/50 uppercase tracking-widest font-medium leading-none mb-0.5">
-                Bank
-              </p>
-              <p className="text-xs font-bold text-white leading-tight truncate">
-                {gift.bankName}
-              </p>
+            <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-md px-2.5 py-1.5 max-w-[74%] flex items-center gap-2">
+              <div className="relative w-7 h-7 rounded bg-white/90 overflow-hidden flex items-center justify-center shrink-0">
+                {bank?.icon ? (
+                  <Image
+                    src={bank.icon}
+                    alt={bankName}
+                    fill
+                    sizes="28px"
+                    className="object-contain p-1"
+                  />
+                ) : (
+                  <IconCreditCard size={15} className="text-slate-600" />
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="text-[8px] text-white/50 uppercase tracking-widest font-medium leading-none mb-0.5">
+                  Bank
+                </p>
+                <p className="text-xs font-bold text-white leading-tight truncate">
+                  {bankName}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -223,7 +233,6 @@ export default function DialogGift({
               <div className="relative px-5">
                 <GiftCard
                   gift={gifts[activeIndex]}
-                  index={activeIndex}
                   copiedId={copiedId}
                   onCopy={handleCopy}
                 />

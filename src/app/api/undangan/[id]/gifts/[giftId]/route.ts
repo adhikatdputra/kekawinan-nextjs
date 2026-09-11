@@ -4,13 +4,19 @@ import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
 import { isActiveCollaborator } from '@/lib/undangan-access'
 import { revalidateUndanganById } from '@/lib/queries/revalidate-undangan'
+import { resolveMediaUrl } from '@/lib/helpers'
 
 type Params = { params: Promise<{ id: string; giftId: string }> }
+
+function resolveGiftBankIcon<T extends { bank?: { icon: string | null } | null }>(gift: T) {
+  if (!gift.bank) return gift
+  return { ...gift, bank: { ...gift.bank, icon: resolveMediaUrl(gift.bank.icon) } }
+}
 
 async function getOwnedGift(giftId: string, undanganId: string, userId: string, level: string) {
   const gift = await prisma.undanganGift.findUnique({
     where: { id: giftId },
-    include: { undangan: { select: { userId: true } } },
+    include: { bank: true, undangan: { select: { userId: true } } },
   })
   if (!gift) return { gift: null, error: notFound('Gift not found') }
   if (gift.undanganId !== undanganId) return { gift: null, error: notFound('Gift not found') }
@@ -30,7 +36,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     const { gift, error } = await getOwnedGift(giftId, id, auth.id, auth.level)
     if (error) return error
 
-    return ok(gift, 'Get gift success')
+    return ok(resolveGiftBankIcon(gift), 'Get gift success')
   } catch {
     return serverError()
   }
@@ -47,27 +53,36 @@ export async function PUT(request: NextRequest, { params }: Params) {
     if (error) return error
 
     const body = await request.json()
-    const { bankName, name, bankNumber, nameAddress, phone, address } = body
+    const { bankId, bankName, name, bankNumber, nameAddress, phone, address } = body
+    const normalizedBankId = typeof bankId === 'string' && bankId.trim() ? bankId.trim() : null
+    const selectedBank = normalizedBankId
+      ? await prisma.bank.findUnique({ where: { id: normalizedBankId } })
+      : null
 
-    if (!bankName || !name || !bankNumber) {
-      return badRequest('bankName, name, and bankNumber are required')
+    if (normalizedBankId && !selectedBank) {
+      return badRequest('bankId is invalid')
+    }
+    if ((!selectedBank && !bankName) || !name || !bankNumber) {
+      return badRequest('bankId or bankName, name, and bankNumber are required')
     }
 
     const updated = await prisma.undanganGift.update({
       where: { id: giftId },
       data: {
-        bankName: bankName.trim(),
+        bankId: selectedBank?.id ?? null,
+        bankName: selectedBank?.name ?? bankName.trim(),
         name: name.trim(),
         bankNumber: String(bankNumber).trim(),
         nameAddress: nameAddress?.trim() ?? null,
         phone: phone?.trim() ?? null,
         address: address?.trim() ?? null,
       },
+      include: { bank: true },
     })
 
     await revalidateUndanganById(id)
 
-    return ok(updated, 'Gift updated successfully')
+    return ok(resolveGiftBankIcon(updated), 'Gift updated successfully')
   } catch {
     return serverError()
   }

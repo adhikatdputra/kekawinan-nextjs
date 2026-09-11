@@ -12,13 +12,42 @@ export async function GET(_request: NextRequest, { params }: Params) {
 
     const kado = await prisma.kado.findUnique({
       where: { id: kadoId },
-      include: { undangan: { select: { status: true } } },
+      include: {
+        undangan: {
+          select: {
+            status: true,
+            gifts: {
+              where: {
+                OR: [
+                  { nameAddress: { not: null } },
+                  { phone: { not: null } },
+                  { address: { not: null } },
+                ],
+              },
+              select: {
+                nameAddress: true,
+                phone: true,
+                address: true,
+              },
+              orderBy: { createdAt: 'asc' },
+              take: 1,
+            },
+          },
+        },
+      },
     })
     if (!kado) return notFound('Kado not found')
     if (kado.undangan.status !== 'ACTIVE') return notFound('Kado not found')
 
+    const { undangan, ...kadoData } = kado
+    const recipientAddress = undangan.gifts[0] ?? null
+
     return ok(
-      { ...kado, thumbnail: resolveMediaUrl(kado.thumbnail) },
+      {
+        ...kadoData,
+        thumbnail: resolveMediaUrl(kado.thumbnail),
+        recipientAddress,
+      },
       'Get kado success',
     )
   } catch {

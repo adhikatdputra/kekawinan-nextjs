@@ -164,6 +164,7 @@ model UndanganContent {
 model UndanganGift {
   id          String   @id @db.VarChar(64)
   undanganId  String   @db.VarChar(64)
+  bankId      String?  @db.VarChar(64)
   bankName    String?  @db.VarChar(255)
   name        String?  @db.VarChar(255)
   bankNumber  String?  @db.VarChar(50)
@@ -172,8 +173,10 @@ model UndanganGift {
   address     String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  bank        Bank?    @relation(fields: [bankId], references: [id], onDelete: SetNull)
   undangan    Undangan @relation(fields: [undanganId], references: [id], onDelete: Cascade)
 
+  @@index([bankId])
   @@map("tbl_undangan_gift")
 }
 
@@ -297,6 +300,7 @@ model Bank {
   color     String?  @db.VarChar(50)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  gifts     UndanganGift[]
 
   @@map("tbl_bank")
 }

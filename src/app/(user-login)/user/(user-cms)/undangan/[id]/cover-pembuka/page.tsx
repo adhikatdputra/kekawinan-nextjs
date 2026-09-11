@@ -22,6 +22,14 @@ import "react-clock/dist/Clock.css";
 
 type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
+type ApiError = { response?: { data?: { message?: string } } };
+
+const MAX_MUSIC_SIZE_MB = 10;
+const MAX_MUSIC_SIZE_BYTES = MAX_MUSIC_SIZE_MB * 1024 * 1024;
+
+function formatFileSize(bytes: number) {
+  return `${(bytes / 1024 / 1024).toFixed(1)}MB`;
+}
 
 export default function CoverPembukaPage() {
   const params = useParams();
@@ -38,6 +46,7 @@ export default function CoverPembukaPage() {
   const [stream_link, setStreamLink] = useState<string>("");
   const [music, setMusic] = useState<File | string | null>(null);
   const [is_music, setIsMusic] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [date_wedding, setDateWedding] = useState<Value | null>(new Date());
 
   const { data: undanganContent, refetch } = useQuery({
@@ -61,34 +70,72 @@ export default function CoverPembukaPage() {
     onError: () => {
       toast.error("Data gagal diubah");
     },
+    onSettled: () => {
+      setIsSaving(false);
+    },
   });
+
+  const handleMusicChange = (file: File | null) => {
+    if (!file) {
+      setMusic(null);
+      return;
+    }
+
+    if (file.size > MAX_MUSIC_SIZE_BYTES) {
+      toast.error(
+        `Ukuran musik terlalu besar (${formatFileSize(file.size)}). Maksimal ${MAX_MUSIC_SIZE_MB}MB.`
+      );
+      setMusic(null);
+      return;
+    }
+
+    setMusic(file);
+  };
 
   const handleUpdateUndanganContent = async () => {
     let imgThumbnailUrl = img_thumbnail;
     let imgBgUrl = img_bg;
     let musicUrl = undanganContent?.music || "";
 
-    if (img_thumbnail_upload) {
-      const res = await uploadApi.uploadImage(img_thumbnail_upload, "kekawinan/thumbnail");
-      imgThumbnailUrl = res.data.data.url;
-    }
-    if (img_bg_upload) {
-      const res = await uploadApi.uploadImage(img_bg_upload, "kekawinan/cover");
-      imgBgUrl = res.data.data.url;
-    }
-    if (music instanceof File) {
-      const res = await uploadApi.uploadImage(music, "kekawinan/music");
-      musicUrl = res.data.data.url;
+    if (music instanceof File && music.size > MAX_MUSIC_SIZE_BYTES) {
+      toast.error(
+        `Ukuran musik terlalu besar (${formatFileSize(music.size)}). Maksimal ${MAX_MUSIC_SIZE_MB}MB.`
+      );
+      return;
     }
 
-    updateUndanganContent({
-      title,
-      streamLink: stream_link,
-      dateWedding: date_wedding ? new Date(date_wedding.toString()).toISOString() : null,
-      imgThumbnail: imgThumbnailUrl,
-      imgBg: imgBgUrl,
-      music: musicUrl,
-    });
+    setIsSaving(true);
+    try {
+      if (img_thumbnail_upload) {
+        const res = await uploadApi.uploadImage(img_thumbnail_upload, "kekawinan/thumbnail");
+        imgThumbnailUrl = res.data.data.url;
+      }
+      if (img_bg_upload) {
+        const res = await uploadApi.uploadImage(img_bg_upload, "kekawinan/cover");
+        imgBgUrl = res.data.data.url;
+      }
+      if (music instanceof File) {
+        const res = await uploadApi.uploadImage(music, "kekawinan/music");
+        musicUrl = res.data.data.url;
+      }
+
+      updateUndanganContent({
+        title,
+        streamLink: stream_link,
+        dateWedding: date_wedding ? new Date(date_wedding.toString()).toISOString() : null,
+        imgThumbnail: imgThumbnailUrl,
+        imgBg: imgBgUrl,
+        music: musicUrl,
+      });
+    } catch (error) {
+      const message = (error as ApiError)?.response?.data?.message;
+      toast.error(
+        message?.toLowerCase().includes("file size")
+          ? `Ukuran musik terlalu besar. Maksimal ${MAX_MUSIC_SIZE_MB}MB.`
+          : message ?? "Gagal mengupload musik"
+      );
+      setIsSaving(false);
+    }
   };
 
   useEffect(() => {
@@ -227,7 +274,10 @@ export default function CoverPembukaPage() {
                 type="file"
                 accept="audio/*"
                 id="music"
-                onChange={(e) => setMusic(e.target.files?.[0] || null)}
+                onChange={(e) => {
+                  handleMusicChange(e.target.files?.[0] || null);
+                  e.target.value = "";
+                }}
                 placeholder="Masukkan link music"
                 className="h-10"
               />
@@ -249,8 +299,8 @@ export default function CoverPembukaPage() {
         </div>
       </div>
       <div>
-        <Button onClick={handleUpdateUndanganContent} disabled={isUpdating}>
-          {isUpdating ? (
+        <Button onClick={handleUpdateUndanganContent} disabled={isSaving || isUpdating}>
+          {isSaving || isUpdating ? (
             <>
               <Loader2 className="animate-spin" />
               <span>Menyimpan...</span>

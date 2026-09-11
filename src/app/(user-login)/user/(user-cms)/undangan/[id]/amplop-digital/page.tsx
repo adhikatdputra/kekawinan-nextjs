@@ -37,14 +37,16 @@ import {
 import toast from "react-hot-toast";
 import { Loader2, Plus, Pencil, Trash2 } from "lucide-react";
 import { UndanganGift } from "@/frontend/interface/undangan";
+import { getBankPalette } from "@/lib/bank-colors";
 
 interface GiftForm {
+  bankId: string;
   bankName: string;
   bankNumber: string;
   name: string;
 }
 
-const emptyForm: GiftForm = { bankName: "", bankNumber: "", name: "" };
+const emptyForm: GiftForm = { bankId: "", bankName: "", bankNumber: "", name: "" };
 
 export default function AmplopDigitalPage() {
   const params = useParams();
@@ -138,15 +140,26 @@ export default function AmplopDigitalPage() {
 
   const openEdit = (gift: UndanganGift) => {
     setSelectedGift(gift);
-    setForm({ bankName: gift.bankName, bankNumber: gift.bankNumber, name: gift.name });
+    setForm({
+      bankId: gift.bankId ?? gift.bank?.id ?? "",
+      bankName: gift.bank?.name ?? gift.bankName,
+      bankNumber: gift.bankNumber,
+      name: gift.name,
+    });
     setIsOpenForm(true);
   };
 
+  const findBankOption = (bankId?: string | null, bankName?: string | null) =>
+    banks.find((bank) => bank.id === bankId) ?? banks.find((bank) => bank.name === bankName);
+
   const handleSubmit = () => {
-    if (!form.bankName || !form.bankNumber || !form.name) return;
+    const selectedBankOption = findBankOption(form.bankId, form.bankName);
+    const bankName = selectedBankOption?.name ?? form.bankName;
+    if (!bankName || !form.bankNumber || !form.name) return;
     // Always include current address data so dialog-gift can always find it
     const payload = {
-      bankName: form.bankName,
+      bankId: selectedBankOption?.id ?? (form.bankId || null),
+      bankName,
       bankNumber: form.bankNumber,
       name: form.name,
       nameAddress: name_address || null,
@@ -171,6 +184,7 @@ export default function AmplopDigitalPage() {
       await Promise.all(
         gifts.map((g) =>
           undanganContentApi.updateGift(id, g.id, {
+            bankId: g.bankId ?? g.bank?.id ?? null,
             bankName: g.bankName,
             bankNumber: g.bankNumber,
             name: g.name,
@@ -191,8 +205,8 @@ export default function AmplopDigitalPage() {
 
   const isBusy = isCreating || isUpdating;
 
-  const getBankOption = (bankName: string) =>
-    banks.find((b) => b.name === bankName);
+  const getBankOption = (gift: UndanganGift) =>
+    gift.bank ?? findBankOption(gift.bankId, gift.bankName);
 
   return (
     <div className="flex flex-col gap-8">
@@ -223,13 +237,13 @@ export default function AmplopDigitalPage() {
           ) : (
             <div className="flex flex-col gap-3">
               {gifts.map((gift) => {
-                const bank = getBankOption(gift.bankName);
+                const bank = getBankOption(gift);
+                const palette = getBankPalette(bank?.color);
                 return (
                   <div
                     key={gift.id}
-                    className={`flex items-center justify-between border border-border rounded-xl p-4 gap-3 ${
-                      bank?.color ? `bg-${bank.color}-50` : "bg-muted/30"
-                    }`}
+                    className="flex items-center justify-between border rounded-xl p-4 gap-3"
+                    style={{ backgroundColor: palette.tint, borderColor: palette.border }}
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       {bank?.icon ? (
@@ -238,13 +252,17 @@ export default function AmplopDigitalPage() {
                         </div>
                       ) : (
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                          bank?.color ? `bg-${bank.color}-100 text-${bank.color}-700` : "bg-muted text-muted-foreground"
-                        }`}>
-                          {gift.bankName?.slice(0, 3).toUpperCase() ?? "---"}
+                          bank ? "" : "bg-muted text-muted-foreground"
+                        }`} style={bank ? { backgroundColor: palette.soft, color: palette.text } : undefined}>
+                          {bank ? (
+                            bank.code.slice(0, 3).toUpperCase()
+                          ) : (
+                            gift.bankName?.slice(0, 3).toUpperCase() ?? "---"
+                          )}
                         </div>
                       )}
                       <div className="min-w-0">
-                        <p className="font-semibold text-sm truncate">{gift.bankName}</p>
+                        <p className="font-semibold text-sm truncate">{bank?.name ?? gift.bankName}</p>
                         <p className="text-sm text-muted-foreground font-mono">{gift.bankNumber}</p>
                         <p className="text-xs text-muted-foreground">{gift.name}</p>
                       </div>
@@ -339,15 +357,18 @@ export default function AmplopDigitalPage() {
               <Label>Bank / eWallet <span className="text-red-500">*</span></Label>
               {banks.length > 0 ? (
                 <Select
-                  value={form.bankName}
-                  onValueChange={(val) => setForm((f) => ({ ...f, bankName: val }))}
+                  value={form.bankId || findBankOption(form.bankId, form.bankName)?.id || ""}
+                  onValueChange={(val) => {
+                    const bank = banks.find((item) => item.id === val);
+                    setForm((f) => ({ ...f, bankId: val, bankName: bank?.name ?? f.bankName }));
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Pilih bank / eWallet..." />
                   </SelectTrigger>
                   <SelectContent>
                     {banks.map((bank) => (
-                      <SelectItem key={bank.id} value={bank.name}>
+                      <SelectItem key={bank.id} value={bank.id}>
                         <div className="flex items-center gap-2">
                           {bank.icon ? (
                             <div className="relative w-5 h-5 flex-shrink-0">
@@ -355,9 +376,12 @@ export default function AmplopDigitalPage() {
                             </div>
                           ) : (
                             <div className={`w-5 h-5 rounded text-[10px] font-bold flex items-center justify-center flex-shrink-0 ${
-                              bank.color ? `bg-${bank.color}-100 text-${bank.color}-700` : "bg-muted text-muted-foreground"
-                            }`}>
-                              {bank.code.slice(0, 2)}
+                              bank.color ? "" : "bg-muted text-muted-foreground"
+                            }`} style={bank.color ? {
+                              backgroundColor: getBankPalette(bank.color).soft,
+                              color: getBankPalette(bank.color).text,
+                            } : undefined}>
+                              {bank.code.slice(0, 2).toUpperCase()}
                             </div>
                           )}
                           <span>{bank.name}</span>
@@ -400,7 +424,7 @@ export default function AmplopDigitalPage() {
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={isBusy || !form.bankName || !form.bankNumber || !form.name}
+              disabled={isBusy || (!form.bankId && !form.bankName) || !form.bankNumber || !form.name}
             >
               {isBusy ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /><span>Menyimpan...</span></>

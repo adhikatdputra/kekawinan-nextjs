@@ -98,12 +98,20 @@ export interface UndanganContent {
 export interface UndanganGift {
   id: string;
   undanganId: string;
+  bankId: string | null;
   bankName: string;
   name: string;
   bankNumber: string;
   nameAddress: string;
   phone: string;
   address: string;
+  bank?: {
+    id: string;
+    name: string;
+    code: string;
+    icon: string | null;
+    color: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -204,6 +212,11 @@ export interface Gift {
   name: string;
   phone: string;
   isConfirm: number;
+  recipientAddress?: {
+    nameAddress: string | null;
+    phone: string | null;
+    address: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
 }
