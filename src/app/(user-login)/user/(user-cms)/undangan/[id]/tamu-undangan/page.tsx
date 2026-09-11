@@ -257,20 +257,45 @@ export default function TamuPage() {
     );
   };
 
+  const buildInvitationMessage = (item: UndanganTamu) => {
+    const tamu = item.name.replace("&", "dan");
+    const pengantin = undangan?.content?.title?.replace("&", "dan") ?? "";
+    const tglwaktu = undangan?.content?.resepsiTime ?? "";
+    const tempat = undangan?.content?.resepsiPlace ?? "";
+    const link = undangan?.permalink ?? "";
+
+    return `Bismillahirrahmanirrahim
+Assalamu'alaikum Warahmatullahi Wabarakatuh
+
+Yth. Bpk/Ibu/Sdr/i *${tamu}*,
+
+Dengan mengharap ridha dan rahmat Allah SWT, serta tanpa mengurangi rasa hormat. Perkenankan kami mengundang Bpk/Ibu/Sdr/i untuk hadir di acara pernikahan kami:
+
+*Pernikahan ${pengantin}*
+*Tanggal:* ${tglwaktu}
+*Lokasi:* ${tempat}
+
+Merupakan suatu kehormatan bagi kami apabila Bpk/Ibu/Sdr/i dapat menghadiri/ menyaksikan prosesi pernikahan kami, serta jangan lupa konfirmasi kehadiranmu ya pada tautan dibawah ini:
+
+https://kekawinan.com/${link}/${item.id}
+
+Kami juga mengharapkan ucapan, harapan, serta doa Bpk/Ibu/Sdr/i untuk kami.
+
+Atas perhatiannya kami ucapkan terimakasih.`;
+  };
+
+  const handleCopyInvitationMessage = async (item: UndanganTamu) => {
+    try {
+      await navigator.clipboard.writeText(buildInvitationMessage(item));
+      toast.success("Teks undangan disalin");
+    } catch {
+      toast.error("Gagal menyalin teks undangan");
+    }
+  };
+
   const handleSendWhatsapp = (item: UndanganTamu) => {
     const phone = item.phone;
-
-    const name = item.name;
-    const tamu = name.replace("&", "dan");
-
-    const title = undangan?.content?.title;
-    const pengantin = title.replace("&", "dan");
-
-    const tglwaktu = encodeURI(undangan?.content?.resepsiTime);
-    const tempat = encodeURI(undangan?.content?.resepsiPlace);
-    const link = encodeURI(undangan?.permalink);
-
-    const msg = `Bismillahirrahmanirrahim%0AAssalamu'alaikum Warahmatullahi Wabarakatuh%0A%0AYth. Bpk/Ibu/Sdr/i *${tamu}*,%0A%0ADengan mengharap ridha dan rahmat Allah SWT, serta tanpa mengurangi rasa hormat. Perkenankan kami mengundang Bpk/Ibu/Sdr/i untuk hadir di acara pernikahan kami:%0A%0A*Pernikahan ${pengantin}*%0A*Tanggal:* ${tglwaktu}%0A*Lokasi:* ${tempat}%0A%0AMerupakan suatu kehormatan bagi kami apabila Bpk/Ibu/Sdr/i dapat menghadiri/ menyaksikan prosesi pernikahan kami, serta jangan lupa konfirmasi kehadiranmu ya pada tautan dibawah ini:%0A%0Ahttps://kekawinan.com/${link}/${item.id}%0A%0AKami juga mengharapkan ucapan, harapan, serta doa Bpk/Ibu/Sdr/i untuk kami.%0A%0AAtas perhatiannya kami ucapkan terimakasih.`;
+    const msg = encodeURIComponent(buildInvitationMessage(item));
 
     sendWhatsappTamu(item.id, {
       onSuccess: () => {
@@ -865,9 +890,7 @@ export default function TamuPage() {
                         <Tooltip>
                           <TooltipTrigger
                             onClick={() => {
-                              if (!item.sendStatus) {
-                                handleSendWhatsapp(item);
-                              }
+                              handleSendWhatsapp(item);
                             }}
                             className={`${
                               !item.sendStatus
@@ -887,6 +910,21 @@ export default function TamuPage() {
                                 ? "Undangan sudah dikirim"
                                 : "Kirim Undangan melalui Whatsapp"}
                             </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger
+                            onClick={() => {
+                              handleCopyInvitationMessage(item);
+                            }}
+                            className="cursor-pointer border border-border rounded-md p-1 bg-white"
+                          >
+                            <IconCopy size={18} />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Copy Text Undangan</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>

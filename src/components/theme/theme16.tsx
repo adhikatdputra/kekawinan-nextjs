@@ -592,13 +592,17 @@ export default function Theme16({
           viewport={{ once: false }}
           className="flex flex-col items-center gap-2 mb-10"
         >
-          <span style={{ color: GOLD }}>✦</span>
-          <h2
-            className="font-glitten text-3xl text-center"
-            style={{ color: GOLD }}
-          >
-            Galeri Kami
-          </h2>
+          {undanganData.gallery?.length > 0 && (
+            <div>
+              <span style={{ color: GOLD }}>✦</span>
+              <h2
+                className="font-glitten text-3xl text-center"
+                style={{ color: GOLD }}
+              >
+                Galeri Kami
+              </h2>
+            </div>
+          )}
           <div className="h-px w-12" style={{ backgroundColor: `${GOLD}60` }} />
         </motion.div>
 

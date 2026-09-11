@@ -2,7 +2,7 @@
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import giftApi from "@/frontend/api/gift";
 import GiftStore from "@/frontend/store/gift-store";
 import { Gift } from "@/frontend/interface/undangan";
@@ -12,7 +12,15 @@ import Link from "next/link";
 import { formatNumber } from "@/helper/number";
 import { Input } from "@/components/ui/input";
 import NotFound from "@/components/card/not-found";
-import { IconArrowLeft, IconCheck, IconExternalLink, IconGift } from "@tabler/icons-react";
+import {
+  IconArrowLeft,
+  IconCheck,
+  IconExternalLink,
+  IconGift,
+  IconMapPin,
+  IconPhone,
+  IconUser,
+} from "@tabler/icons-react";
 import { motion } from "motion/react";
 
 import {
@@ -73,6 +81,11 @@ export default function GiftDetailView({ id }: { id: string }) {
     );
 
   const confirmed = !!giftData.isConfirm;
+  const recipient = giftData.recipientAddress?.nameAddress ||
+    giftData.recipientAddress?.phone ||
+    giftData.recipientAddress?.address
+    ? giftData.recipientAddress
+    : null;
 
   return (
     <>
@@ -184,6 +197,8 @@ export default function GiftDetailView({ id }: { id: string }) {
           </motion.div>
         )}
 
+        {recipient && <RecipientAddressCard recipient={recipient} />}
+
         {/* Spacer */}
         <div className="flex-1" />
 
@@ -265,5 +280,83 @@ export default function GiftDetailView({ id }: { id: string }) {
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+function RecipientAddressCard({
+  recipient,
+}: {
+  recipient: NonNullable<Gift["recipientAddress"]>;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.45 }}
+      className="mx-5 mt-3 bg-white rounded-2xl p-4 shadow-sm border border-green-kwn/10"
+    >
+      <div className="flex items-center gap-2 pb-3 border-b border-gray-100">
+        <div className="w-8 h-8 rounded-xl bg-green-kwn/10 flex items-center justify-center shrink-0">
+          <IconMapPin size={15} className="text-green-kwn" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-bold text-gray-900">Alamat Pengiriman Kado</p>
+          <p className="text-[11px] text-gray-400">Detail penerima hadiah fisik</p>
+        </div>
+      </div>
+
+      <div className="pt-3 flex flex-col gap-2.5">
+        {recipient.nameAddress && (
+          <RecipientInfoRow
+            icon={<IconUser size={14} />}
+            label="Penerima"
+            value={recipient.nameAddress}
+          />
+        )}
+        {recipient.phone && (
+          <RecipientInfoRow
+            icon={<IconPhone size={14} />}
+            label="Telepon"
+            value={recipient.phone}
+          />
+        )}
+        {recipient.address && (
+          <RecipientInfoRow
+            icon={<IconMapPin size={14} />}
+            label="Alamat"
+            value={recipient.address}
+            multiline
+          />
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
+function RecipientInfoRow({
+  icon,
+  label,
+  value,
+  multiline = false,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+  multiline?: boolean;
+}) {
+  return (
+    <div className="flex items-start gap-2.5">
+      <div className="w-7 h-7 rounded-full bg-[#F0F7F3] text-green-kwn flex items-center justify-center shrink-0">
+        {icon}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
+          {label}
+        </p>
+        <p className={`text-sm text-gray-700 font-medium ${multiline ? "leading-relaxed" : "truncate"}`}>
+          {value}
+        </p>
+      </div>
+    </div>
   );
 }

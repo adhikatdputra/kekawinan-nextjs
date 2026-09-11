@@ -13,7 +13,11 @@ import Link from "next/link";
 import { formatNumber } from "@/helper/number";
 import { Skeleton } from "@/components/ui/skeleton";
 import NotFound from "@/components/card/not-found";
-import { IconGift, IconCheck, IconArrowRight, IconSparkles } from "@tabler/icons-react";
+import {
+  IconGift,
+  IconCheck,
+  IconArrowRight,
+} from "@tabler/icons-react";
 
 export default function GiftView({ slug }: { slug: string }) {
   const router = useRouter();
@@ -244,7 +248,6 @@ function GiftList({
 }) {
   const available = giftList.filter((g) => !g.isConfirm).length;
   const taken = giftList.filter((g) => g.isConfirm).length;
-
   return (
     <div className="max-w-[450px] mx-auto min-h-screen flex flex-col bg-[#F0F7F3]">
       {/* Sticky header */}
@@ -277,7 +280,7 @@ function GiftList({
       </div>
 
       {/* Product grid */}
-      <div className="px-5 pb-10">
+      <div className="px-5 pb-10 flex flex-col gap-4">
         {isLoading ? (
           <div className="grid grid-cols-2 gap-3">
             {Array(4).fill(null).map((_, i) => <GiftCardLoading key={i} />)}
