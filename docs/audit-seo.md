@@ -182,14 +182,36 @@ Halaman undangan pasangan (`kekawinan.com/nama-nama`) **memang tidak perlu ranki
 
 ## Checklist eksekusi
 
-- [ ] SSR/SSG halaman `/themeN/demo` + H1 + deskripsi unik per tema
-- [ ] Link kartu tema di homepage ke halaman demo
-- [ ] Buat halaman hub `/tema`
-- [ ] `notFound()` untuk slug undangan yang tidak ada (status 404)
-- [ ] Hapus `SearchAction`, validasi `AggregateRating`
-- [ ] Render jawaban FAQ di HTML
-- [ ] Buat `/privacy` dan `/terms`, perbaiki link footer
-- [ ] Update sitemap (tambah `/about`, `lastmod` dinamis)
-- [ ] Redirect 1 hop di Cloudflare
-- [ ] Verifikasi GSC, submit sitemap, request indexing
+**Status per 30 Oktober 2026.** Item kode di bawah sudah dikerjakan dan lolos typecheck, tetapi belum di-commit, belum di-deploy, dan belum dicek ulang dengan curl sebagai Googlebot di production.
+
+- [x] SSR halaman `/themeN/demo` + H1 + deskripsi unik per tema
+  - Nama, deskripsi, meta description, dan keywords tema disimpan di tabel `tbl_theme` (kolom baru `description`, `metaDescription`, `keywords`), bisa diedit dari `/admin/theme`.
+  - 16 tema sudah diisi lewat `pnpm db:seed-themes`. Nama tema di `themes-meta.ts` ternyata tidak cocok dengan desainnya, jadi diganti dan file itu dihapus. Draf teks: `docs/draf-deskripsi-tema.md`.
+  - Dipilih SSR + cache (`unstable_cache`), bukan SSG, karena route `[slug]/[id_tamu]` juga dipakai undangan asli.
+  - Desktop menampilkan undangan di bingkai HP (iframe `?embed=1`).
+- [x] Link kartu tema di homepage ke halaman demo (daftar tema diambil di server, link ada di HTML awal)
+- [x] Buat halaman hub `/tema`, ditautkan dari navbar, footer, dan section tema di homepage
+- [ ] Slug deskriptif (`/tema/romantic-floral`) dengan 301 dari URL lama. Opsional, belum dikerjakan
+- [x] `notFound()` untuk slug undangan yang tidak ada (status 404)
+  - `/slug` sekarang membalas 404 kalau undangan tidak ada, dan 308 (permanen) ke `/slug/demo` kalau ada.
+  - `/slug/xxx` membalas 404 kalau undangan tidak ada atau tidak aktif.
+- [x] Hapus `SearchAction`, hapus `AggregateRating` (angka 5/600 tidak bisa dibuktikan). Offer `price: 0` dengan deskripsi "Gratis selamanya" tetap dipertahankan
+- [x] `BreadcrumbList` di halaman demo tema (Beranda › Tema › nama tema)
+- [ ] Validasi structured data di Rich Results Test setelah deploy
+- [x] Render jawaban FAQ di HTML (`/faq` dan FAQ homepage; jawaban tertutup tetap ada di DOM dengan tinggi 0)
+- [x] Buat halaman legal dan perbaiki link footer. Path-nya `/kebijakan-privasi` dan `/syarat-ketentuan`, bukan `/privacy` dan `/terms`
+- [x] Update sitemap: tambah `/about` dan `/tema`, daftar tema dari DB dengan `lastmod` dari `updatedAt`, halaman statis tanpa `lastmod` palsu
+- [x] Hapus baris `host` di `robots.txt`
+- [x] `aria-hidden` untuk teks marquee yang berulang
+- [ ] Redirect 1 hop di Cloudflare (di luar kode)
+- [ ] Verifikasi GSC, submit sitemap, request indexing untuk homepage, `/tema`, dan halaman demo (setelah deploy)
 - [ ] Rencana konten blog & backlink
+
+### Temuan tambahan selama eksekusi
+
+- [x] Undangan demo `theme10` sampai `theme16` sudah lewat masa aktif. Diselesaikan di kode: undangan demo tema (permalink = componentName) tidak pernah dianggap kedaluwarsa, dilewati oleh `remove-expired`, dan slug-nya dicadangkan sehingga tidak bisa diambil user lain.
+- [x] Klaim "30+ tema" (marquee, badge hero, kartu fitur) diganti "Tema Eksklusif" tanpa angka, karena tema akan terus bertambah. FAQ tetap "16+" dengan contoh gaya memakai nama tema yang baru. ("Gratis Selamanya" sudah dikonfirmasi pemilik sebagai model bisnis, jadi aman.)
+- [x] FAQ disesuaikan: masa aktif 3 bulan, setelah itu undangan tidak bisa dibuka dan slug bisa dipakai pengguna lain. Kode sekarang benar-benar menerapkannya (sebelumnya undangan kedaluwarsa tetap tampil sampai admin menjalankan "remove expired").
+- [x] Jeda buatan 3 detik (`setTimeout(3000)`) di `undangan-view.tsx` dihapus; loading hanya tampil selama komponen tema dimuat.
+- [x] `/tema`, `/faq`, `/about`, dan halaman legal sekarang punya gambar share (`DEFAULT_OG_IMAGE`), sebelumnya hilang karena `openGraph` per halaman menimpa milik root layout.
+- [x] Metadata share undangan (WhatsApp): judul "Undangan Pernikahan {nama}", deskripsi dengan tanggal, gambar thumbnail 1200×630 JPG lewat Cloudinary.

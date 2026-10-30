@@ -2,6 +2,8 @@ import { NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { ok, notFound, serverError } from '@/lib/api-response'
 import { resolveMediaUrl } from '@/lib/helpers'
+import { PUBLIC_THEME_SELECT } from '@/lib/queries/undangan-public'
+import { isUndanganVisible } from '@/lib/undangan-expiry'
 
 type Params = { params: Promise<{ permalink: string }> }
 
@@ -13,10 +15,10 @@ export async function GET(_request: NextRequest, { params }: Params) {
 
     const data = await prisma.undangan.findUnique({
       where: { permalink },
-      include: { theme: true },
+      include: { theme: { select: PUBLIC_THEME_SELECT } },
     })
 
-    if (!data || data.status !== 'ACTIVE') return notFound('Undangan not found')
+    if (!data || !isUndanganVisible(data)) return notFound('Undangan not found')
 
     if (data.theme) {
       const t = data.theme as Record<string, unknown>

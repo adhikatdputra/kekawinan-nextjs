@@ -12,7 +12,7 @@ Nama di `src/frontend/constants/themes-meta.ts` banyak yang tidak cocok dengan d
 | theme1 | Romantic Floral | Krem/nude, daun eucalyptus, bingkai lengkung | Nude Eucalyptus |
 | theme2 | Modern Minimalist | Hijau olive, cover amplop | Sage Envelope |
 | theme3 | Classic Elegant | Blush pink, mawar | Blush Rose |
-| theme4 | Rustic Garden | Hijau sage, daun menjuntai | Sage Garden |
+| theme4 | Rustic Garden | Hijau sage, daun menjuntai | Rustic Sage Garden ("rustic" dipertahankan, lihat catatan GSC) |
 | theme5 | Elegant Gold | Biru royal dan putih | Royal Blue |
 | theme6 | Boho Chic | Lilac, bunga lavender | Lilac Bloom |
 | theme7 | Tropical Paradise | Pink pastel, cover amplop | Pink Envelope |
@@ -92,17 +92,19 @@ Tema ini cocok untuk pasangan yang ingin nuansa feminin dan romantis tanpa warna
 
 ---
 
-## theme4 · Sage Garden
+## theme4 · Rustic Sage Garden
 
-**Keyword:** undangan pernikahan hijau, undangan digital tema garden
-**Meta description:** Contoh undangan pernikahan digital warna hijau sage dengan dedaunan dan bunga putih, bernuansa taman. Lihat demonya di Kekawinan.
+**Keyword:** undangan rustic, contoh undangan rustic, desain undangan rustic, undangan pernikahan hijau sage
+**Meta description:** Contoh undangan pernikahan digital tema rustic garden warna hijau sage, dengan dedaunan dan bunga putih. Lihat demonya di Kekawinan.
+
+> Catatan GSC (Agustus sampai Oktober 2026): keluarga query "rustic" adalah satu-satunya keyword non-brand yang muncul, di posisi 21 sampai 35. Karena itu kata "rustic" dipertahankan di nama tema ini.
 
 **Deskripsi:**
-Sage Garden dihiasi dedaunan hijau yang menjuntai dari sudut halaman dan bunga putih di atas kartu acara. Warna dasarnya hijau sage dan putih, dengan foto cover yang diberi bayangan gelap supaya nama kalian tetap terbaca jelas.
+Rustic Sage Garden membawa gaya undangan rustic bernuansa taman: dedaunan hijau menjuntai dari sudut halaman dan bunga putih menghiasi kartu acara. Warna dasarnya hijau sage dan putih, dengan foto cover yang diberi bayangan gelap supaya nama kalian tetap terbaca jelas.
 
 Kartu akad dan resepsi berwarna putih di atas latar foto, dengan tombol Google Maps, konfirmasi kehadiran, dan live streaming berwarna hijau.
 
-Cocok untuk acara outdoor, garden party, atau pasangan yang ingin undangan bernuansa alam.
+Cocok untuk acara outdoor, garden party, atau pasangan yang mencari undangan rustic dengan warna hijau yang lembut.
 
 ---
 

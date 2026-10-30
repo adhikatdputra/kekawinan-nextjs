@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
 import { resolveMediaUrl } from '@/lib/helpers'
+import { parseThemeSeoFields, revalidateTheme } from '@/lib/queries/revalidate-theme'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -50,7 +51,15 @@ export async function PUT(request: NextRequest, { params }: Params) {
     }
     if ('isShowAdmin' in body) data.isShowAdmin = body.isShowAdmin === true
 
+    const seo = parseThemeSeoFields(body)
+    if ('error' in seo) return badRequest(seo.error)
+    Object.assign(data, seo.data)
+
     const updated = await prisma.theme.update({ where: { id }, data })
+
+    // Old name too, in case componentName changed and the old demo page is cached
+    revalidateTheme(theme.componentName)
+    if (updated.componentName !== theme.componentName) revalidateTheme(updated.componentName)
 
     return ok({ ...updated, thumbnail: resolveMediaUrl(updated.thumbnail) }, 'Theme updated successfully')
   } catch (err) {
@@ -71,6 +80,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     if (!theme) return notFound('Theme not found')
 
     await prisma.theme.delete({ where: { id } })
+    revalidateTheme(theme.componentName)
 
     return ok(null, 'Theme deleted successfully')
   } catch {

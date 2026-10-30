@@ -191,7 +191,7 @@ export default function Banner() {
                 <div className="absolute bottom-0 left-0 w-40 h-40 bg-emerald-200/40 rounded-full blur-2xl" />
               </div>
 
-              {/* Badge: 30+ Tema — top right */}
+              {/* Badge: tema — top right (no count: themes are added over time) */}
               <motion.div
                 initial={{ opacity: 0, y: -16 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -204,7 +204,7 @@ export default function Banner() {
                 </div>
                 <div>
                   <p className="text-[11px] font-bold text-gray-900 leading-none">
-                    30+ Tema Eksklusif
+                    Tema Eksklusif
                   </p>
                   <p className="text-[10px] text-gray-400">Selalu diperbarui</p>
                 </div>

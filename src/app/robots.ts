@@ -7,10 +7,12 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: ["/"],
-        disallow: ["/user/", "/admin/", "/auth/"],
+        // /auth/ is not blocked: its pages carry a noindex meta tag, and Google
+        // can only see that tag if it may crawl the page. Blocking it here kept
+        // /auth/login in search results.
+        disallow: ["/user/", "/admin/"],
       },
     ],
     sitemap: "https://www.kekawinan.com/sitemap.xml",
-    host: "https://www.kekawinan.com",
   };
 }

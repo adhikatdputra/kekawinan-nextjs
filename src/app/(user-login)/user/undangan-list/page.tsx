@@ -101,6 +101,9 @@ export default function UndanganListPage() {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   // Pemulihan tema — untuk undangan yang themeId-nya kosong
   const [themeFixTarget, setThemeFixTarget] = useState<Undangan | null>(null);
+  // Admin: perpanjang masa aktif undangan yang sudah expired
+  const [extendTarget, setExtendTarget] = useState<Undangan | null>(null);
+  const [extendDate, setExtendDate] = useState("");
 
   const { getUser, getUserName } = useAuth();
   const isAdmin = getUser()?.level === "admin" || getUser()?.level === "superadmin";
@@ -162,6 +165,24 @@ export default function UndanganListPage() {
     },
   });
 
+  const { mutate: extendUndangan, isPending: isPendingExtend } = useMutation({
+    mutationFn: ({ item, date }: { item: Undangan; date: string }) =>
+      undanganApi.updateUndangan(item.id, {
+        permalink: item.permalink,
+        name: item.name,
+        // Aktif sampai akhir hari yang dipilih (WIB)
+        expired: new Date(`${date}T23:59:59+07:00`).toISOString(),
+      }),
+    onSuccess: () => {
+      toast.success("Masa aktif undangan diperpanjang");
+      setExtendTarget(null);
+      refetchUndangan();
+    },
+    onError: (err: { response?: { data?: { message?: string } } }) => {
+      toast.error(err?.response?.data?.message ?? "Gagal memperpanjang masa aktif");
+    },
+  });
+
   const { mutate: createUndangan, isPending: isPendingCreate } = useMutation({
     mutationFn: (data: UndanganBody) => undanganApi.createUndangan(data),
     onSuccess: (data) => {
@@ -220,7 +241,20 @@ export default function UndanganListPage() {
 
   // ── Helpers ───────────────────────────────────────────────────────────────────
 
-  const isExpired = (expired: string) => new Date(expired) < new Date();
+  // Demo tema (permalink = componentName) tidak pernah kedaluwarsa
+  const isExpired = (item: Undangan) =>
+    !!item.expired &&
+    new Date(item.expired) < new Date() &&
+    item.theme?.componentName?.toLowerCase() !== item.permalink;
+
+  const toDateInput = (date: Date) => date.toISOString().slice(0, 10);
+
+  const openExtend = (item: Undangan) => {
+    const threeMonths = new Date();
+    threeMonths.setMonth(threeMonths.getMonth() + 3);
+    setExtendDate(toDateInput(threeMonths));
+    setExtendTarget(item);
+  };
 
   const updatePermalink = (input: string) =>
     setPermalink(input.replace(/\s+/g, "-").replace(/[^\w-]+/g, "").toLowerCase());
@@ -480,9 +514,19 @@ export default function UndanganListPage() {
                         <div className="flex flex-col gap-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-semibold text-base">{item.name}</span>
-                            {isExpired(item.expired ?? "") && (
-                              <span className="text-xs bg-red-100 text-red-600 border border-red-200 px-2 py-0.5 rounded-full">Expired</span>
-                            )}
+                            {isExpired(item) &&
+                              (isAdmin ? (
+                                <button
+                                  type="button"
+                                  onClick={() => openExtend(item)}
+                                  title="Perpanjang masa aktif"
+                                  className="text-xs bg-red-100 text-red-600 border border-red-200 px-2 py-0.5 rounded-full hover:bg-red-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500 transition-colors"
+                                >
+                                  Expired
+                                </button>
+                              ) : (
+                                <span className="text-xs bg-red-100 text-red-600 border border-red-200 px-2 py-0.5 rounded-full">Expired</span>
+                              ))}
                           </div>
                           <div className="flex items-center gap-2 flex-wrap">
                             {/* Role chip */}
@@ -935,6 +979,50 @@ export default function UndanganListPage() {
               <span>Dukung kami di Trakteer</span>
             </button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Dialog: Perpanjang Masa Aktif (admin) ───────────────────────────── */}
+      <Dialog open={!!extendTarget} onOpenChange={(open) => { if (!open) setExtendTarget(null); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Perpanjang masa aktif</DialogTitle>
+            <DialogDescription>
+              {extendTarget?.name} berakhir pada{" "}
+              {extendTarget?.expired
+                ? new Date(extendTarget.expired).toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                    timeZone: "Asia/Jakarta",
+                  })
+                : "-"}
+              . Pilih tanggal baru, undangan aktif sampai akhir hari itu.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-2 py-1">
+            <Label htmlFor="extendDate">Aktif sampai</Label>
+            <Input
+              id="extendDate"
+              type="date"
+              min={toDateInput(new Date(Date.now() + 24 * 60 * 60 * 1000))}
+              value={extendDate}
+              onChange={(e) => setExtendDate(e.target.value)}
+            />
+          </div>
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" onClick={() => setExtendTarget(null)}>
+              Batal
+            </Button>
+            <Button
+              disabled={!extendDate || isPendingExtend}
+              onClick={() => extendTarget && extendUndangan({ item: extendTarget, date: extendDate })}
+            >
+              {isPendingExtend ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /><span>Menyimpan...</span></>
+              ) : "Simpan"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

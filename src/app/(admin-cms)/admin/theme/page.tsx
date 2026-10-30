@@ -8,6 +8,7 @@ import MenuAction from "@/components/ui/custom/menu-action";
 import TablePending from "@/components/ui/custom/table-pending";
 import TableNoData from "@/components/ui/custom/table-no-data";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import Image from "next/image";
@@ -82,6 +83,9 @@ export default function ThemeAdminPage() {
   const [promoStr, setPromoStr] = useState(""); // empty = no promo, "0" = free
   const [isActive, setIsActive] = useState(true);
   const [isShowAdmin, setIsShowAdmin] = useState(false);
+  const [description, setDescription] = useState("");
+  const [metaDescription, setMetaDescription] = useState("");
+  const [keywordsStr, setKeywordsStr] = useState("");
 
   const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(10);
@@ -116,6 +120,9 @@ export default function ThemeAdminPage() {
     setPromoStr("");
     setIsActive(true);
     setIsShowAdmin(false);
+    setDescription("");
+    setMetaDescription("");
+    setKeywordsStr("");
   };
 
   const setDataEdit = (item: Theme) => {
@@ -127,6 +134,9 @@ export default function ThemeAdminPage() {
     setPromoStr(item.promo !== null && item.promo !== undefined ? String(item.promo) : "");
     setIsActive(item.isActive ?? true);
     setIsShowAdmin(item.isShowAdmin ?? false);
+    setDescription(item.description ?? "");
+    setMetaDescription(item.metaDescription ?? "");
+    setKeywordsStr((item.keywords ?? []).join(", "));
     setSelectedItem(item);
   };
 
@@ -169,6 +179,9 @@ export default function ThemeAdminPage() {
       promo: promoStr === "" ? null : Number(promoStr),
       isActive,
       isShowAdmin,
+      description,
+      metaDescription,
+      keywords: keywordsStr,
     };
 
     if (selectedItem) {
@@ -348,7 +361,7 @@ export default function ThemeAdminPage() {
           if (!open) { setSelectedItem(null); resetForm(); }
         }}
       >
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{selectedItem ? "Edit" : "Tambah"} Tema</DialogTitle>
             <DialogDescription />
@@ -470,6 +483,52 @@ export default function ThemeAdminPage() {
                 <p className="text-xs text-muted-foreground mt-0.5">
                   Tema custom yang hanya bisa dilihat oleh admin/superadmin. Berguna untuk tema yang dibuat khusus untuk klien.
                 </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-4 border-t pt-4">
+              <div>
+                <p className="text-sm font-semibold">Halaman demo</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Tampil di /{componentName ? componentName.toLowerCase() : "themeN"}/demo dan dibaca Google. Kosongkan kalau tema ini tidak ditampilkan ke publik.
+                </p>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="themeDescription">Deskripsi</Label>
+                <Textarea
+                  id="themeDescription"
+                  rows={8}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Ceritakan warna, ornamen, dan bentuk cover tema ini. Pisahkan paragraf dengan baris kosong."
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="themeMetaDescription">Meta description</Label>
+                <Textarea
+                  id="themeMetaDescription"
+                  rows={3}
+                  maxLength={255}
+                  value={metaDescription}
+                  onChange={(e) => setMetaDescription(e.target.value)}
+                  placeholder="Ringkasan satu atau dua kalimat yang muncul di hasil pencarian Google."
+                />
+                <p className={`text-xs ${metaDescription.length > 155 ? "text-amber-600" : "text-muted-foreground"}`}>
+                  {metaDescription.length}/155 karakter. Google biasanya memotong teks setelah sekitar 155 karakter.
+                </p>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="themeKeywords">Keywords</Label>
+                <Input
+                  id="themeKeywords"
+                  value={keywordsStr}
+                  onChange={(e) => setKeywordsStr(e.target.value)}
+                  placeholder="undangan pernikahan hijau, undangan digital garden"
+                />
+                <p className="text-xs text-muted-foreground">Pisahkan dengan koma.</p>
               </div>
             </div>
           </div>

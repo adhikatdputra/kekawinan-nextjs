@@ -1,10 +1,24 @@
 import { unstable_cache } from 'next/cache'
+import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { resolveMediaUrl } from '@/lib/helpers'
+import { isUndanganVisible } from '@/lib/undangan-expiry'
 
 // Cache tag helper — shared with the revalidation helper so mutations can
 // invalidate the exact cache entry for a given invitation.
 export const undanganCacheTag = (permalink: string) => `undangan:${permalink}`
+
+// Theme columns a guest-facing invitation needs. Long SEO text (description,
+// metaDescription, keywords) is left out: only the theme demo pages use it, and
+// they read it separately via getThemeDemoContent.
+export const PUBLIC_THEME_SELECT = {
+  id: true,
+  name: true,
+  componentName: true,
+  thumbnail: true,
+  isActive: true,
+  isShowAdmin: true,
+} satisfies Prisma.ThemeSelect
 
 // Raw DB read. Kept separate so it can be wrapped by unstable_cache.
 async function queryPublicUndanganBySlug(permalink: string) {
@@ -23,7 +37,7 @@ async function queryPublicUndanganBySlug(permalink: string) {
         orderBy: { createdAt: 'desc' },
       },
       kado: { orderBy: { createdAt: 'asc' } },
-      theme: true,
+      theme: { select: PUBLIC_THEME_SELECT },
     },
   })
 
@@ -73,10 +87,15 @@ async function queryPublicUndanganBySlug(permalink: string) {
  * Returns the same { success, data, message } shape as the API route so that
  * TanStack Query hydration is compatible with the client-side axios fetcher.
  */
-export function getPublicUndanganBySlug(permalink: string) {
-  return unstable_cache(
+export async function getPublicUndanganBySlug(permalink: string) {
+  const result = await unstable_cache(
     () => queryPublicUndanganBySlug(permalink),
     ['undangan-public', permalink],
     { tags: [undanganCacheTag(permalink)], revalidate: 3600 },
   )()
+
+  // Expiry is checked on every read, outside the cache: a cached entry can be
+  // up to an hour old and must not keep an expired invitation visible.
+  if (!result || !isUndanganVisible(result.data)) return null
+  return result
 }

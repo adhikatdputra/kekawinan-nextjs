@@ -3,6 +3,7 @@ import { nanoid } from 'nanoid'
 import { prisma } from '@/lib/prisma'
 import { created, badRequest, notFound, serverError } from '@/lib/api-response'
 import { revalidateUndanganById } from '@/lib/queries/revalidate-undangan'
+import { isUndanganVisible } from '@/lib/undangan-expiry'
 
 const VALID_ATTEND = ['Yes', 'No']
 
@@ -29,10 +30,15 @@ export async function POST(request: NextRequest) {
     // Verify undangan exists and is active
     const undangan = await prisma.undangan.findUnique({
       where: { id: undanganId },
-      select: { status: true },
+      select: {
+        status: true,
+        expired: true,
+        permalink: true,
+        theme: { select: { componentName: true } },
+      },
     })
     if (!undangan) return notFound('Undangan not found')
-    if (undangan.status !== 'ACTIVE') {
+    if (!isUndanganVisible(undangan)) {
       return badRequest('This invitation is no longer active')
     }
 

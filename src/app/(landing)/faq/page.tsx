@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DEFAULT_OG_IMAGE } from "@/frontend/constants/meta";
 import FaqPageContent from "@/components/pages/faq/faq-page-content";
 
 export const metadata: Metadata = {
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
     description:
       "Jawaban lengkap seputar membuat undangan pernikahan digital gratis di Kekawinan.",
     url: "https://www.kekawinan.com/faq",
+    images: [DEFAULT_OG_IMAGE],
   },
 };
 
@@ -34,7 +36,7 @@ const allFaqs = [
       },
       {
         q: "Berapa lama undangan saya bisa diakses?",
-        a: "Undangan akan tetap aktif dan bisa diakses selama kamu memiliki akun Kekawinan. Tidak ada batas waktu atau tanggal kedaluwarsa.",
+        a: "Undangan aktif selama 3 bulan sejak dibuat, atau sampai 2 minggu setelah hari pernikahan kalau tanggal itu lebih lama. Tanggal berakhirnya bisa kamu lihat di dashboard. Setelah masa aktif habis, undangan tidak bisa dibuka lagi oleh tamu dan link-nya bisa dipakai pengguna lain. Simpan data tamu dan ucapan yang ingin kamu arsipkan sebelum masa aktif habis.",
       },
     ],
   },
@@ -51,7 +53,7 @@ const allFaqs = [
       },
       {
         q: "Berapa banyak tema undangan yang tersedia?",
-        a: "Tersedia 16+ tema undangan eksklusif yang bisa dicoba gratis — dari modern minimalis, romantic floral, classic elegant, dark romance, hingga terracotta earthy. Tim kami terus menambahkan tema baru.",
+        a: "Tersedia 16+ tema undangan eksklusif yang bisa dicoba gratis, dari nuansa nude dan rustic garden, warna lembut seperti blush pink dan lavender, sampai tema gelap seperti midnight blue dan emerald gold. Semua tema bisa kamu lihat di halaman Tema, dan tim kami terus menambahkan tema baru.",
       },
       {
         q: "Apakah saya bisa mengubah isi undangan setelah dikirim ke tamu?",
@@ -138,7 +140,7 @@ const allFaqs = [
       },
       {
         q: "Apakah link undangan bisa dikustomisasi?",
-        a: "Ya, kamu bisa mengatur permalink (slug) undanganmu sendiri — misalnya kekawinan.com/nama-pasangan. Permalink bersifat unik dan tidak bisa digunakan dua kali.",
+        a: "Ya, kamu bisa mengatur permalink (slug) undanganmu sendiri — misalnya kekawinan.com/nama-pasangan. Selama undanganmu masih aktif, permalink itu hanya milikmu. Setelah masa aktifnya habis, permalink bisa dipakai pengguna lain.",
       },
     ],
   },

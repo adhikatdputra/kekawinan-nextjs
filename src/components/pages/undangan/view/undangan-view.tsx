@@ -12,6 +12,7 @@ import {
 import { toast } from "react-hot-toast";
 import Loading from "@/components/layouts/loading";
 import NotFound from "@/components/card/not-found";
+import UndanganDesktopBackdrop from "./undangan-desktop-backdrop";
 
 // Lagi Testing -> Delete Soon
 // import Theme16 from "@/components/theme/theme16";
@@ -184,9 +185,9 @@ export default function UndanganView({
         const component = await import(
           `@/components/theme/${name.toLowerCase()}`
         );
-        setTimeout(() => {
-          setThemeComponent(() => component.default);
-        }, 3000);
+        // Show the theme as soon as it's loaded. A fixed 3s delay used to sit
+        // here, which only held guests on the loading screen and hurt LCP.
+        setThemeComponent(() => component.default);
       } catch (err) {
         console.error("Theme not found:", name);
         console.error("Error:", err);
@@ -222,25 +223,42 @@ export default function UndanganView({
       />
     );
 
-  return (
-    <div className="max-w-[450px] mx-auto overflow-x-hidden">
-      {ThemeComponent && undanganData ? (
-        <ThemeComponent
-          undanganData={undanganData}
-          tamuData={tamu}
-          ucapan={ucapan}
-          isPlayMusic={isPlayMusic}
-          isSubmitting={isSubmitting}
-          onSubmitUcapan={onSubmitUcapan}
-          onPlayMusic={handlePlayMusic}
-          giftLength={undanganData?.kado?.length ?? 0}
-          slug={slug}
-        />
-      ) : (
-        <Loading />
-      )}
+  const content = undanganData.content;
+  const couple =
+    content?.title?.trim() ||
+    [content?.nameFemale, content?.nameMale].filter(Boolean).join(" & ");
 
-      {music && <audio id="music" src={music} autoPlay={isPlayMusic} />}
-    </div>
+  // Desktop: invitation column pinned to the right (so the theme's fixed
+  // music/gift buttons sit on it), cover photo + names fill the left.
+  // Below lg: the column stays centered as before.
+  return (
+    <>
+      {/* Shown while the theme loads too, so the left half isn't blank */}
+      <UndanganDesktopBackdrop
+        componentName={undanganData.theme?.componentName}
+        imgBg={content?.imgBg}
+        couple={couple}
+        dateWedding={content?.dateWedding}
+      />
+      <div className="max-w-[450px] mx-auto lg:mr-0 lg:w-[450px] overflow-x-hidden">
+        {ThemeComponent && undanganData ? (
+          <ThemeComponent
+            undanganData={undanganData}
+            tamuData={tamu}
+            ucapan={ucapan}
+            isPlayMusic={isPlayMusic}
+            isSubmitting={isSubmitting}
+            onSubmitUcapan={onSubmitUcapan}
+            onPlayMusic={handlePlayMusic}
+            giftLength={undanganData?.kado?.length ?? 0}
+            slug={slug}
+          />
+        ) : (
+          <Loading />
+        )}
+
+        {music && <audio id="music" src={music} autoPlay={isPlayMusic} />}
+      </div>
+    </>
   );
 }

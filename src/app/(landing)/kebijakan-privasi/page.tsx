@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DEFAULT_OG_IMAGE } from "@/frontend/constants/meta";
 import LegalDocument, {
   type LegalSection,
 } from "@/components/pages/legal/legal-document";
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
     description:
       "Data apa yang dikumpulkan Kekawinan, untuk apa dipakai, dan bagaimana kamu bisa meminta data dihapus.",
     url: "https://www.kekawinan.com/kebijakan-privasi",
+    images: [DEFAULT_OG_IMAGE],
   },
 };
 

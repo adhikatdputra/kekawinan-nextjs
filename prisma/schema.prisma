@@ -44,18 +44,22 @@ model ThemeComponent {
 }
 
 model Theme {
-  id            String     @id @db.VarChar(64)
-  name          String?    @db.VarChar(255)
-  thumbnail     String?
-  componentName String?
-  linkUrl       String?
-  credit        Int        @default(0)
-  promo         Int?
-  isActive      Boolean    @default(true)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  isShowAdmin   Boolean    @default(false)
-  undangan      Undangan[]
+  id              String     @id @db.VarChar(64)
+  name            String?    @db.VarChar(255)
+  thumbnail       String?
+  componentName   String?
+  linkUrl         String?
+  credit          Int        @default(0)
+  promo           Int?
+  isActive        Boolean    @default(true)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  isShowAdmin     Boolean    @default(false)
+  // SEO halaman demo tema (/themeN/demo)
+  description     String?
+  metaDescription String?    @db.VarChar(255)
+  keywords        String[]   @default([])
+  undangan        Undangan[]
 
   @@map("tbl_theme")
 }
@@ -101,7 +105,7 @@ model Tamu {
   attendedAt      DateTime?
   confirmedBy     String?   @db.VarChar(255)
   isAttend        Int       @default(0)
-  attendCount     Int?                        // jumlah orang yang benar-benar hadir (diinput crew saat scan)
+  attendCount     Int? // jumlah orang yang benar-benar hadir (diinput crew saat scan)
   confirmedByUser User?     @relation("AttendanceConfirmedBy", fields: [confirmedBy], references: [id])
   undangan        Undangan  @relation(fields: [undanganId], references: [id], onDelete: Cascade)
   ucapan          Ucapan?
@@ -293,13 +297,13 @@ model UserCredit {
 }
 
 model Bank {
-  id        String   @id @db.VarChar(64)
-  name      String   @db.VarChar(255)
-  code      String   @unique @db.VarChar(50)
+  id        String         @id @db.VarChar(64)
+  name      String         @db.VarChar(255)
+  code      String         @unique @db.VarChar(50)
   icon      String?
-  color     String?  @db.VarChar(50)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  color     String?        @db.VarChar(50)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
   gifts     UndanganGift[]
 
   @@map("tbl_bank")

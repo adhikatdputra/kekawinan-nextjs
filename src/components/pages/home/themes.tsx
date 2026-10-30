@@ -1,8 +1,6 @@
 "use client";
 
 import { motion } from "motion/react";
-import { useQuery } from "@tanstack/react-query";
-import themeApi from "@/frontend/api/theme";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -14,17 +12,11 @@ import { Autoplay, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 
-interface Theme {
-  thumbnail: string;
-  componentName: string;
-}
+import type { PublicTheme } from "@/lib/queries/themes-public";
 
-export default function Themes() {
-  const { data: themes, isLoading } = useQuery({
-    queryKey: ["themes"],
-    queryFn: () => themeApi.getTheme(),
-    select: (data) => data.data.data?.rows,
-  });
+// Themes come from the server (see app/(landing)/page.tsx) so the demo links
+// are in the initial HTML for crawlers, not fetched after hydration.
+export default function Themes({ themes }: { themes: PublicTheme[] }) {
 
   return (
     <section
@@ -124,17 +116,17 @@ export default function Themes() {
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
           viewport={{ once: true }}
         >
-          {themes?.map((theme: Theme, index: number) => (
+          {themes.map((theme) => (
             <Link
-              key={index}
-              href={`/${theme?.componentName.toLowerCase()}/demo`}
+              key={theme.id}
+              href={`/${theme.slug}/demo`}
               target="_blank"
               className="w-[calc(16.66%-14px)] min-w-[120px]"
             >
               <div className="relative group rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                 <Image
-                  src={theme?.thumbnail}
-                  alt={`Template undangan digital pernikahan ${theme?.componentName}`}
+                  src={theme.thumbnail ?? "/images/imgplace.png"}
+                  alt={`Template undangan digital pernikahan ${theme.name ?? theme.componentName}`}
                   className="w-full h-auto"
                   width={200}
                   height={300}
@@ -157,7 +149,7 @@ export default function Themes() {
           viewport={{ once: true }}
           className="pt-4 md:hidden"
         >
-          {!isLoading && themes?.length > 0 && (
+          {themes.length > 0 && (
             <Swiper
               loop={true}
               modules={[Autoplay, Navigation]}
@@ -173,16 +165,16 @@ export default function Themes() {
                 } as React.CSSProperties
               }
             >
-              {themes?.map((theme: Theme, index: number) => (
-                <SwiperSlide key={index}>
+              {themes.map((theme) => (
+                <SwiperSlide key={theme.id}>
                   <Link
-                    href={`/${theme?.componentName.toLowerCase()}/demo`}
+                    href={`/${theme.slug}/demo`}
                     target="_blank"
                   >
                     <div className="relative group rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
                       <Image
-                        src={theme?.thumbnail}
-                        alt={`Template undangan digital ${theme?.componentName}`}
+                        src={theme.thumbnail ?? "/images/imgplace.png"}
+                        alt={`Template undangan digital ${theme.name ?? theme.componentName}`}
                         className="w-full h-auto"
                         width={200}
                         height={300}
@@ -217,6 +209,14 @@ export default function Themes() {
               <ArrowRight className="w-4 h-4" />
             </Button>
           </Link>
+          <p className="mt-4">
+            <Link
+              href="/tema"
+              className="text-sm text-gray-600 underline underline-offset-4 hover:text-green-kwn"
+            >
+              Lihat semua tema beserta deskripsinya
+            </Link>
+          </p>
         </motion.div>
       </div>
     </section>

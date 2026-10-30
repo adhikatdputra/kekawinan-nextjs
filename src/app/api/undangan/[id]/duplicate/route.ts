@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { created, badRequest, conflict, forbidden, notFound, serverError } from '@/lib/api-response'
 import { isValidPermalink } from '@/lib/helpers'
+import { claimPermalink } from '@/lib/claim-permalink'
+import { defaultExpiredDate, expiryWithWedding } from '@/lib/undangan-expiry'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -31,8 +33,8 @@ export async function POST(request: NextRequest, { params }: Params) {
       return badRequest('Permalink may only contain letters, numbers, hyphens, and underscores (min 3 chars)')
     }
 
-    const existing = await prisma.undangan.findFirst({ where: { permalink } })
-    if (existing) return conflict('Permalink is already taken')
+    const claim = await claimPermalink(permalink, { isAdmin: isAdminLevel(auth.level) })
+    if (!claim.ok) return conflict('Permalink is already taken')
 
     const source = await prisma.undangan.findUnique({
       where: { id },
@@ -94,7 +96,8 @@ export async function POST(request: NextRequest, { params }: Params) {
     }
 
     const newId = nanoid()
-    const expiredDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) // 3 months default
+    // The copied content keeps its wedding date, so apply the same rule
+    const expiredDate = expiryWithWedding(defaultExpiredDate(), source.content?.dateWedding, new Date()) as Date
 
     const ops = []
 

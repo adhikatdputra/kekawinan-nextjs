@@ -38,6 +38,9 @@ export interface Theme {
   promo: number | null;
   isActive: boolean;
   isShowAdmin?: boolean;
+  description?: string | null;
+  metaDescription?: string | null;
+  keywords?: string[];
   createdAt: string;
   updatedAt: string;
   _count?: { undangan: number };

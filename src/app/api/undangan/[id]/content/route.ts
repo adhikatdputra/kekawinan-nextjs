@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
-import { ok, forbidden, notFound, serverError } from '@/lib/api-response'
+import { ok, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
 import { resolveMediaUrl } from '@/lib/helpers'
 import { isActiveCollaborator } from '@/lib/undangan-access'
 import { revalidateUndanganById } from '@/lib/queries/revalidate-undangan'
+import { expiryWithWedding, maxWeddingDate } from '@/lib/undangan-expiry'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -57,8 +58,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
   try {
     const { id } = await params
-    const { error } = await getOwnedUndangan(id, auth.id, auth.level)
-    if (error) return error
+    const { error, undangan } = await getOwnedUndangan(id, auth.id, auth.level)
+    if (error || !undangan) return error!
 
     const content = await prisma.undanganContent.findUnique({ where: { undanganId: id } })
     if (!content) return notFound('Content not found')
@@ -87,7 +88,15 @@ export async function PUT(request: NextRequest, { params }: Params) {
     }
 
     if ('dateWedding' in body) {
-      data.dateWedding = body.dateWedding ? new Date(body.dateWedding) : null
+      const dateWedding = body.dateWedding ? new Date(body.dateWedding) : null
+      if (dateWedding && Number.isNaN(dateWedding.getTime())) {
+        return badRequest('Tanggal pernikahan tidak valid')
+      }
+      // Admin boleh mengisi tanggal di luar batas (mis. untuk undangan demo)
+      if (dateWedding && !isAdminLevel(auth.level) && dateWedding > maxWeddingDate(undangan.createdAt)) {
+        return badRequest('Tanggal pernikahan maksimal 1 tahun sejak undangan dibuat')
+      }
+      data.dateWedding = dateWedding
     }
     if ('isCovid' in body) {
       data.isCovid = body.isCovid !== undefined ? Number(body.isCovid) : null
@@ -97,6 +106,14 @@ export async function PUT(request: NextRequest, { params }: Params) {
       where: { undanganId: id },
       data,
     })
+
+    // Keep the invitation alive until 2 weeks after the wedding
+    if (updated.dateWedding) {
+      const next = expiryWithWedding(undangan.expired, updated.dateWedding, undangan.createdAt)
+      if (next && next.getTime() !== undangan.expired?.getTime()) {
+        await prisma.undangan.update({ where: { id }, data: { expired: next } })
+      }
+    }
 
     await revalidateUndanganById(id)
 

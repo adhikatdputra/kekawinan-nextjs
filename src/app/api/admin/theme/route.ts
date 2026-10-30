@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, created, badRequest, forbidden, serverError } from '@/lib/api-response'
 import { resolveMediaUrl, paginate, parsePagination } from '@/lib/helpers'
+import { parseThemeSeoFields, revalidateTheme } from '@/lib/queries/revalidate-theme'
 
 // GET /api/admin/theme — paginated theme list (all, including inactive)
 export async function GET(request: NextRequest) {
@@ -55,6 +56,9 @@ export async function POST(request: NextRequest) {
       return badRequest('name, componentName, and linkUrl are required')
     }
 
+    const seo = parseThemeSeoFields(body)
+    if ('error' in seo) return badRequest(seo.error)
+
     const theme = await prisma.theme.create({
       data: {
         id: nanoid(),
@@ -66,8 +70,11 @@ export async function POST(request: NextRequest) {
         promo: promo !== undefined && promo !== null ? Number(promo) : null,
         isActive: true,
         isShowAdmin: isShowAdmin === true,
+        ...seo.data,
       },
     })
+
+    revalidateTheme(theme.componentName)
 
     return created({ ...theme, thumbnail: resolveMediaUrl(theme.thumbnail) }, 'Theme created successfully')
   } catch {

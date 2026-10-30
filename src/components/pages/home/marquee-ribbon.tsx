@@ -5,7 +5,7 @@ import { Heart } from "lucide-react";
 const items = [
   "Undangan Digital",
   "Gratis Selamanya",
-  "30+ Tema Eksklusif",
+  "Tema Eksklusif",
   "Kirim via WhatsApp",
   "RSVP Online",
   "Musik Favorit",
@@ -15,23 +15,31 @@ const items = [
   "Kolaborator",
 ];
 
+// The list is repeated so the loop looks seamless. Only the first copy in the
+// first row is exposed to screen readers and crawlers; the rest is visual.
 function MarqueeRow({
   direction = "left",
   dark = false,
+  decorative = false,
 }: {
   direction?: "left" | "right";
   dark?: boolean;
+  decorative?: boolean;
 }) {
   const repeated = [...items, ...items, ...items, ...items];
   const animClass =
     direction === "left" ? "animate-marquee-left" : "animate-marquee-right";
 
   return (
-    <div className={`overflow-hidden py-3 ${dark ? "bg-green-kwn" : "bg-white/80"}`}>
+    <div
+      className={`overflow-hidden py-3 ${dark ? "bg-green-kwn" : "bg-white/80"}`}
+      aria-hidden={decorative || undefined}
+    >
       <div className={`flex whitespace-nowrap ${animClass}`}>
         {repeated.map((item, i) => (
           <span
             key={i}
+            aria-hidden={(!decorative && i >= items.length) || undefined}
             className={`inline-flex items-center gap-2 mx-5 text-xs font-semibold uppercase tracking-widest ${
               dark ? "text-white" : "text-green-kwn"
             }`}
@@ -62,7 +70,7 @@ export default function MarqueeRibbon() {
       >
         <div className="flex flex-col gap-0.5">
           <MarqueeRow direction="left" dark />
-          <MarqueeRow direction="right" />
+          <MarqueeRow direction="right" decorative />
         </div>
       </div>
     </div>

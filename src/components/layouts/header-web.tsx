@@ -22,6 +22,7 @@ import { useQuery } from "@tanstack/react-query";
 import creditsApi from "@/frontend/api/credits";
 
 const navLinks = [
+  { href: "/tema", label: "Tema" },
   { href: "/about", label: "Tentang Kami" },
   { href: "/faq", label: "FAQ" },
 ];

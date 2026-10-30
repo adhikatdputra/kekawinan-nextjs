@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import { Plus, Minus, Search, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -242,6 +242,8 @@ export default function FaqPageContent({
                                 onClick={() =>
                                   setOpenKey(isOpen ? null : key)
                                 }
+                                aria-expanded={isOpen}
+                                aria-controls={`faq-answer-${key}`}
                                 className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left"
                               >
                                 <span
@@ -268,24 +270,27 @@ export default function FaqPageContent({
                                 </span>
                               </button>
 
-                              <AnimatePresence initial={false}>
-                                {isOpen && (
-                                  <motion.div
-                                    key="answer"
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: "auto", opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    transition={{
-                                      duration: 0.25,
-                                      ease: "easeInOut",
-                                    }}
-                                  >
-                                    <p className="px-5 pb-5 text-sm text-gray-600 leading-relaxed">
-                                      {item.a}
-                                    </p>
-                                  </motion.div>
-                                )}
-                              </AnimatePresence>
+                              {/* Always rendered (collapsed to height 0) so every
+                                  answer is in the server HTML for search engines */}
+                              <motion.div
+                                id={`faq-answer-${key}`}
+                                initial={false}
+                                animate={
+                                  isOpen
+                                    ? { height: "auto", opacity: 1 }
+                                    : { height: 0, opacity: 0 }
+                                }
+                                transition={{
+                                  duration: 0.25,
+                                  ease: "easeInOut",
+                                }}
+                                className="overflow-hidden"
+                                inert={!isOpen}
+                              >
+                                <p className="px-5 pb-5 text-sm text-gray-600 leading-relaxed">
+                                  {item.a}
+                                </p>
+                              </motion.div>
                             </motion.div>
                           );
                         })}

@@ -1,3 +1,12 @@
+// Default share image. A page that sets its own `openGraph` replaces the root
+// layout's openGraph entirely (images included), so it must add this back.
+export const DEFAULT_OG_IMAGE = {
+  url: "https://www.kekawinan.com/images/og-image.png",
+  width: 1200,
+  height: 630,
+  alt: "Kekawinan - Buat Undangan Pernikahan Digital Gratis & Mudah",
+};
+
 export const home = {
   title: "Kekawinan | Buat Undangan Pernikahan Digital Gratis & Mudah",
   description:

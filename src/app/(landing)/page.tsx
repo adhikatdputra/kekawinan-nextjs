@@ -8,6 +8,7 @@ import Themes from "@/components/pages/home/themes";
 import Testimoni from "@/components/pages/home/testimoni";
 import CustomUndangan from "@/components/pages/home/custom-undangan";
 import HomeFaq from "@/components/pages/home/faq";
+import { getPublicThemes } from "@/lib/queries/themes-public";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -19,11 +20,6 @@ const jsonLd = {
       name: "Kekawinan",
       description: "Platform undangan pernikahan digital gratis untuk pasangan Indonesia",
       inLanguage: "id",
-      potentialAction: {
-        "@type": "SearchAction",
-        target: "https://www.kekawinan.com/auth/register",
-        "query-input": "required name=search_term_string",
-      },
     },
     {
       "@type": "Organization",
@@ -49,18 +45,13 @@ const jsonLd = {
         priceCurrency: "IDR",
         description: "Gratis selamanya",
       },
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "5",
-        ratingCount: "600",
-        bestRating: "5",
-        worstRating: "1",
-      },
     },
   ],
 };
 
-export default function Homepage() {
+export default async function Homepage() {
+  const themes = await getPublicThemes();
+
   return (
     <>
       <script
@@ -74,7 +65,7 @@ export default function Homepage() {
         <GiftFeature />
         <Permalink />
         <CreateUndangan />
-        <Themes />
+        <Themes themes={themes} />
         <Testimoni />
         <HomeFaq />
         <CustomUndangan />

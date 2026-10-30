@@ -5,6 +5,7 @@ import { ok, badRequest, forbidden, notFound, conflict, serverError } from '@/li
 import { isValidPermalink, resolveMediaUrl } from '@/lib/helpers'
 import { isActiveCollaborator } from '@/lib/undangan-access'
 import { revalidateUndanganByPermalink } from '@/lib/queries/revalidate-undangan'
+import { claimPermalink } from '@/lib/claim-permalink'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -102,10 +103,12 @@ export async function PUT(request: NextRequest, { params }: Params) {
       return badRequest('Permalink may only contain letters, numbers, hyphens, and underscores')
     }
 
-    // Check permalink uniqueness only if it changed
+    const isAdmin = isAdminLevel(auth.level)
+
+    // Check permalink availability only if it changed
     if (permalink !== undangan.permalink) {
-      const taken = await prisma.undangan.findFirst({ where: { permalink } })
-      if (taken) return conflict('Permalink is already taken')
+      const claim = await claimPermalink(permalink, { isAdmin })
+      if (!claim.ok) return conflict('Permalink is already taken')
     }
 
     // Tema hanya berubah kalau memang dikirim. Body tanpa themeId (mis. dialog
@@ -131,7 +134,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
         permalink,
         name,
         status: status ?? undangan.status,
-        expired: expired ? new Date(expired) : undangan.expired,
+        // Masa aktif hanya bisa diubah admin, supaya batas 3 bulan tetap berlaku
+        expired: isAdmin && expired ? new Date(expired) : undangan.expired,
         themeId: nextThemeId,
       },
     })

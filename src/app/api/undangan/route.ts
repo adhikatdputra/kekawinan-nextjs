@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, created, badRequest, conflict, forbidden, serverError } from '@/lib/api-response'
 import { paginate, parsePagination, isValidPermalink } from '@/lib/helpers'
+import { claimPermalink } from '@/lib/claim-permalink'
+import { defaultExpiredDate } from '@/lib/undangan-expiry'
 
 // GET /api/undangan
 // - User: returns only their own undangans
@@ -73,13 +75,12 @@ export async function POST(request: NextRequest) {
       return badRequest('Permalink may only contain letters, numbers, hyphens, and underscores (min 3 chars)')
     }
 
-    const existing = await prisma.undangan.findFirst({ where: { permalink } })
-    if (existing) return conflict('Permalink is already taken')
+    const claim = await claimPermalink(permalink, { isAdmin })
+    if (!claim.ok) return conflict('Permalink is already taken')
 
     const undanganId = nanoid()
-    const expiredDate = expired
-      ? new Date(expired)
-      : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) // 3 months default
+    // Only admins may set a custom expiry; everyone else gets the standard term
+    const expiredDate = isAdmin && expired ? new Date(expired) : defaultExpiredDate()
 
     // ── Admin path: bypass credit check ──────────────────────────────────────
     if (isAdmin) {

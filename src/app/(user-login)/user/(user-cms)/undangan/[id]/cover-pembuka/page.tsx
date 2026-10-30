@@ -14,6 +14,7 @@ import ImageUpload from "@/components/ui/custom/image-uploader";
 import Link from "next/link";
 import { IconCalendar, IconX } from "@tabler/icons-react";
 import { formatDateIdWithTime } from "@/helper/date";
+import { useAuth } from "@/frontend/composable/useAuth";
 
 import DateTimePicker from "react-datetime-picker";
 import "react-datetime-picker/dist/DateTimePicker.css";
@@ -48,6 +49,8 @@ export default function CoverPembukaPage() {
   const [is_music, setIsMusic] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [date_wedding, setDateWedding] = useState<Value | null>(new Date());
+  const { getUser } = useAuth();
+  const isAdmin = getUser()?.level === "admin" || getUser()?.level === "superadmin";
 
   const { data: undanganContent, refetch } = useQuery({
     queryKey: ["undangan-content", id],
@@ -67,8 +70,8 @@ export default function CoverPembukaPage() {
         toast.error(response.message);
       }
     },
-    onError: () => {
-      toast.error("Data gagal diubah");
+    onError: (err: { response?: { data?: { message?: string } } }) => {
+      toast.error(err?.response?.data?.message ?? "Data gagal diubah");
     },
     onSettled: () => {
       setIsSaving(false);
@@ -177,6 +180,12 @@ export default function CoverPembukaPage() {
                 value={date_wedding}
                 locale="id"
                 format="dd MMMM yyyy HH:mm"
+                // Batas 1 tahun sejak undangan dibuat (server juga mengecek)
+                maxDate={
+                  !isAdmin && undanganContent?.createdAt
+                    ? new Date(new Date(undanganContent.createdAt).getTime() + 365 * 24 * 60 * 60 * 1000)
+                    : undefined
+                }
                 calendarIcon={<IconCalendar />}
                 clearIcon={<IconX size={16} />}
                 className="h-10"
@@ -186,6 +195,10 @@ export default function CoverPembukaPage() {
                   {formatDateIdWithTime(date_wedding.toString())} WIB
                 </p>
               )}
+              <p className="text-xs text-muted-foreground mt-1">
+                Undangan aktif setidaknya sampai 2 minggu setelah tanggal ini. Tanggal
+                paling jauh 1 tahun sejak undangan dibuat.
+              </p>
             </div>
           </div>
           <div className="grid gap-2">

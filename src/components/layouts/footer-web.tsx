@@ -4,7 +4,7 @@ import Link from "next/link";
 const links = {
   Produk: [
     { label: "Buat Undangan", href: "/auth/login" },
-    { label: "Pilih Tema", href: "#themes" },
+    { label: "Pilih Tema", href: "/tema" },
     { label: "Fitur Lengkap", href: "#features" },
     { label: "Custom Design", href: "https://wa.me/085772193242" },
   ],

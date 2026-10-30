@@ -13,7 +13,7 @@ import "swiper/css";
 const features = [
   {
     tag: "Desain",
-    name: "30+ Tema Undangan Eksklusif",
+    name: "Tema Undangan Eksklusif",
     desc: "Pilih dari template modern, klasik, rustic, hingga floral — selalu hadir tema baru, gratis.",
     img: "/images/features/THEME.jpg",
     isNew: false,

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DEFAULT_OG_IMAGE } from "@/frontend/constants/meta";
 import AboutPageContent from "@/components/pages/about/about-page-content";
 
 export const metadata: Metadata = {
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
     description:
       "Cerita di balik Kekawinan — undangan pernikahan digital gratis, indah, dan mudah untuk semua pasangan Indonesia.",
     url: "https://www.kekawinan.com/about",
+    images: [DEFAULT_OG_IMAGE],
   },
 };
 

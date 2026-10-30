@@ -13,10 +13,19 @@ export async function POST(request: NextRequest) {
   if (!isAdminLevel(auth.level)) return forbidden('Admin access required')
 
   try {
+    // Theme demos (permalink = lowercased componentName) back /tema and the
+    // sitemap, so they are never removed. Theme count is small and bounded.
+    const themes = await prisma.theme.findMany({
+      where: { componentName: { not: null } },
+      select: { componentName: true },
+    })
+    const demoPermalinks = themes.map((t) => (t.componentName as string).toLowerCase())
+
     const expired = await prisma.undangan.findMany({
       where: {
         expired: { lte: new Date() },
         status: 'ACTIVE',
+        permalink: { notIn: demoPermalinks },
       },
       select: { id: true },
       take: 50,

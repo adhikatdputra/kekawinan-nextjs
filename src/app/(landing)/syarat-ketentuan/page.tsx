@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DEFAULT_OG_IMAGE } from "@/frontend/constants/meta";
 import Link from "next/link";
 import LegalDocument, {
   type LegalSection,
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
     description:
       "Aturan pemakaian Kekawinan: akun, isi undangan, credit, masa aktif undangan, dan batas tanggung jawab.",
     url: "https://www.kekawinan.com/syarat-ketentuan",
+    images: [DEFAULT_OG_IMAGE],
   },
 };
 
@@ -117,8 +119,10 @@ const sections: LegalSection[] = [
     title: "Masa aktif undangan",
     body: (
       <p>
-        Masa aktif standar undangan adalah 3 bulan sejak undangan dibuat, dan
-        tanggal berakhirnya tampil di dashboard undangan. Setelah
+        Undangan aktif selama 3 bulan sejak dibuat, atau sampai 2 minggu
+        setelah tanggal pernikahan yang kamu isi kalau tanggal itu lebih lama.
+        Tanggal pernikahan bisa diisi paling jauh 1 tahun sejak undangan dibuat.
+        Tanggal berakhirnya tampil di dashboard undangan. Setelah
         masa aktif habis, undangan dinonaktifkan dan link-nya berhenti bisa
         dibuka. Alamat link undangan tersebut juga dilepas dan bisa dipakai
         pengguna lain. Simpan data tamu atau ucapan yang ingin kamu arsipkan
