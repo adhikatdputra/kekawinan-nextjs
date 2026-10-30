@@ -11,8 +11,8 @@ const links = {
   Perusahaan: [
     { label: "Tentang Kami", href: "/about" },
     { label: "Testimoni", href: "#testimoni" },
-    { label: "Kebijakan Privasi", href: "/" },
-    { label: "Syarat & Ketentuan", href: "/" },
+    { label: "Kebijakan Privasi", href: "/kebijakan-privasi" },
+    { label: "Syarat & Ketentuan", href: "/syarat-ketentuan" },
   ],
   Bantuan: [
     { label: "Hubungi Kami", href: "https://wa.me/085772193242" },

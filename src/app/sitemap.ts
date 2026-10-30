@@ -11,6 +11,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }> = [
     { path: "/", priority: 1.0, changeFrequency: "weekly" },
     { path: "/faq", priority: 0.7, changeFrequency: "monthly" },
+    { path: "/kebijakan-privasi", priority: 0.3, changeFrequency: "yearly" },
+    { path: "/syarat-ketentuan", priority: 0.3, changeFrequency: "yearly" },
     { path: "/theme1/demo", priority: 0.8, changeFrequency: "monthly" },
     { path: "/theme2/demo", priority: 0.8, changeFrequency: "monthly" },
     { path: "/theme3/demo", priority: 0.8, changeFrequency: "monthly" },
