@@ -42,3 +42,37 @@
   .people img.coupleMascot { width: 84px; right: -30px; }
   .people .blue img.coupleMascot { left: -30px; }
 }
+
+.heroPortrait {
+  position: relative;
+  width: min(76%, 300px);
+  margin: 30px auto 40px;
+}
+.heroPhoto {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 5 / 6;
+  object-fit: cover;
+  object-position: center;
+  border: 6px solid #fffdf5;
+  border-radius: 160px 160px 28px 28px;
+}
+.heroGroom, .heroBride {
+  position: absolute;
+  bottom: -18px;
+  width: 46%;
+  height: auto;
+  pointer-events: none;
+}
+.heroGroom { left: -24%; }
+.heroBride { right: -24%; }
+
+.button, .link { transition: transform 180ms ease, box-shadow 180ms ease; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .button:hover, .link:hover { transform: translateY(-3px); box-shadow: 0 5px 0 #17243b; }
+}
+.button:active, .link:active { transform: translateY(0); box-shadow: none; }
+@media (prefers-reduced-motion: reduce) {
+  .button, .link { transition: none; }
+}
