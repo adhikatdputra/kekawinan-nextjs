@@ -1,0 +1,44 @@
+.theme{background:#fffdf5;color:#17243b;overflow:hidden;font-size:15px;line-height:1.7}.theme h1,.theme h2,.theme h3{font-family:var(--font-recoleta-alt),Georgia,serif;font-weight:800;line-height:1.12;overflow-wrap:anywhere}.theme h1{font-size:clamp(2.8rem,10vw,4.7rem);color:#2459ce;margin:20px 0}.theme h2{font-size:2.6rem;margin:14px 0 24px}.theme h3{font-size:1.9rem;margin:18px 0}.cover,.hero{min-height:100svh;padding:44px 24px 48px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}.cover{background:#fffdf5}.hero{background:#e8efff}.eyebrow{font-size:11px;font-weight:800;letter-spacing:.18em}.sticker{margin-top:24px;background:#f7cf4d;border-radius:50%;padding:12px 23px;transform:rotate(-6deg);font-weight:700}.duo{width:100%;max-width:420px;height:auto;margin:12px auto;animation:hello .8s ease-out both}.guest{margin:0 0 20px}.guest p{font-size:12px}.guest strong{font-size:20px}.button,.link{background:#2459ce!important;color:white!important;border-radius:999px!important;min-height:48px;padding:12px 28px!important;font-weight:700;white-space:normal}.date{font-weight:700}.down{margin-top:28px;color:#2459ce;text-decoration:underline;text-underline-offset:5px;min-height:44px}.section{padding:64px 24px;text-align:center}.people{margin-top:36px}.people article{padding:30px 24px;border-radius:120px 120px 28px 28px}.people img{width:160px;height:190px;object-fit:cover;border-radius:100px;margin:auto;border:6px solid #fffdf5}.pink{background:#f7c5e4}.blue{background:#c8ddfa}.amp{font:italic 60px Georgia;display:block;color:#2459ce;margin:8px}.yellow{background:#f7d664}.event{border-top:2px dashed #17243b55;padding:24px 0;margin-top:24px}.event p{margin-top:12px}.link{display:block;margin:14px auto 0;width:fit-content}.rsvp{background:#e5f3ea;padding:48px 24px 0;text-align:center}.rsvp>img{width:150px;height:auto;margin:0 auto 24px}.note{text-align:left;border-bottom:1px solid #17243b33;padding:22px 0;overflow-wrap:anywhere}.note strong{color:#2459ce}.note p{margin-top:8px}.footer{background:#f7c5e4;text-align:center;padding:60px 24px 100px}.footer img{margin:32px auto 0}.theme a:focus-visible,.theme button:focus-visible{outline:3px solid #17243b;outline-offset:5px}@keyframes hello{from{transform:translateY(14px) rotate(-3deg)}to{transform:translateY(0) rotate(0)}}@media(prefers-reduced-motion:reduce){.duo{animation:none}}@media(max-width:360px){.section{padding:48px 18px}.theme h2{font-size:2.1rem}}
+
+.countdownWrap { margin: 28px 0 36px; }
+.countdown { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.countdown > div { padding: 18px 4px 12px; border-radius: 24px 24px 14px 14px; background: #fffdf5; }
+.countdown > div:nth-child(2) { background: #f7c5e4; }
+.countdown > div:nth-child(3) { background: #c8ddfa; }
+.countdown > div:nth-child(4) { background: #c8ecd7; }
+.countdown strong { display: block; font-size: clamp(1.5rem, 6vw, 2.5rem); line-height: 1.2; font-variant-numeric: tabular-nums; }
+.countdown span { display: block; margin-top: 6px; font-size: 12px; font-weight: 700; }
+.countdownWrap > p { margin-top: 16px; }
+.characterDecoration { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 30px auto 18px; max-width: 340px; pointer-events: none; }
+.characterDecoration img { width: 64%; height: auto; margin: 0; }
+.characterDecoration span { font-size: 36px; color: #2459ce; transform: rotate(-14deg); }
+.characterDecoration span:last-child { color: #9a225b; transform: rotate(14deg); }
+.footer .characterDecoration { max-width: 390px; margin-top: 0; }
+@media (max-width: 360px) { .countdown { gap: 5px; } .countdown > div { padding-inline: 2px; } }
+
+.portraitGroup {
+  position: relative;
+  width: 160px;
+  min-height: 190px;
+  margin: 0 auto 28px;
+}
+.people img.coupleMascot {
+  position: absolute;
+  bottom: -8px;
+  right: -48px;
+  width: 100px;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  margin: 0;
+  object-fit: contain;
+  pointer-events: none;
+}
+.people .blue img.coupleMascot {
+  right: auto;
+  left: -48px;
+}
+@media (max-width: 360px) {
+  .people img.coupleMascot { width: 84px; right: -30px; }
+  .people .blue img.coupleMascot { left: -30px; }
+}

@@ -16,7 +16,7 @@ type Props = {
     slug: string;
     id_tamu: string;
   }>;
-  searchParams: Promise<{ embed?: string }>;
+  searchParams: Promise<{ embed?: string; preview?: string }>;
 };
 
 type UndanganResult = Awaited<ReturnType<typeof fetchUndanganBySlug>>;
@@ -137,7 +137,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function UndanganPage({ params, searchParams }: Props) {
   const { slug, id_tamu } = await params;
-  const { embed } = await searchParams;
+  const { embed, preview } = await searchParams;
 
   // Real 404 status for unknown or inactive invitations (was a 200 soft 404)
   const data = await fetchUndanganBySlug(slug);
@@ -152,7 +152,8 @@ export default async function UndanganPage({ params, searchParams }: Props) {
 
   const view = (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <UndanganView slug={slug} id_tamu={id_tamu} />
+      {/* ?preview=1 is the editor's side preview: keep it silent */}
+      <UndanganView slug={slug} id_tamu={id_tamu} muted={preview === "1"} />
     </HydrationBoundary>
   );
 

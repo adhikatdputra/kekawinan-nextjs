@@ -4,10 +4,12 @@ import { undanganCacheTag } from '@/lib/queries/undangan-public'
 
 // Invalidate the cached public invitation data so the next visitor sees fresh
 // content. Call this from any mutation that changes what a guest sees.
-// Next 16 requires a cacheLife profile as the second arg; 'max' is the
-// recommended value for on-demand purges (see the revalidateTag deprecation note).
+// { expire: 0 } instead of 'max': with 'max' the first request after an edit
+// is still served the old data (stale-while-revalidate), so the owner's
+// preview would always lag one save behind. The number of DB reads is the
+// same; only that one request waits for fresh data.
 export function revalidateUndanganByPermalink(permalink: string) {
-  revalidateTag(undanganCacheTag(permalink), 'max')
+  revalidateTag(undanganCacheTag(permalink), { expire: 0 })
 }
 
 // Same, but for mutations that only know the invitation id (most CMS endpoints).

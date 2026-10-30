@@ -109,7 +109,7 @@ export default function Theme11({
                 Undangan Pernikahan
               </span>
             </div>
-            <h1 className="text-4xl font-bold text-white font-recoleta-alt leading-tight mt-1">
+            <h1 className="text-center text-4xl font-bold text-white font-recoleta-alt leading-tight mt-1">
               {undanganData?.content?.title}
             </h1>
             <p className="text-white/50 text-xs tracking-[0.2em] uppercase">

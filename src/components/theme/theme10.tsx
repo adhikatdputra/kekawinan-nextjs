@@ -100,7 +100,7 @@ export default function Theme10({
             <Badge className="text-xs rounded-full bg-white/90 text-theme10-secondary px-4 font-medium">
               Undangan Pernikahan
             </Badge>
-            <h1 className="text-4xl font-semibold text-white mt-2 font-recoleta-alt leading-tight drop-shadow-md">
+            <h1 className="text-center text-4xl font-semibold text-white mt-2 font-recoleta-alt leading-tight drop-shadow-md">
               {undanganData?.content?.title}
             </h1>
             <p className="text-white/90 text-sm mt-1 tracking-widest uppercase">

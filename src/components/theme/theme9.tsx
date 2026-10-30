@@ -107,7 +107,7 @@ export default function Theme9({
             }}
             viewport={{ once: false }}
           >
-            <h1 className="text-4xl font-semibold text-white mt-4">
+            <h1 className="text-center text-4xl font-semibold text-white mt-4">
               {undanganData?.content?.title}
             </h1>
           </motion.div>
@@ -189,7 +189,7 @@ export default function Theme9({
             }}
             viewport={{ once: false }}
           >
-            <h2 className="text-4xl font-semibold text-white font-recoleta-alt">
+            <h2 className="text-center text-4xl font-semibold text-white font-recoleta-alt">
               {undangan?.content?.title}
             </h2>
           </motion.div>

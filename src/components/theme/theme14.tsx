@@ -194,7 +194,7 @@ export default function Theme14({
           <p className="text-white/60 text-[10px] uppercase tracking-[0.32em] font-medium">
             Undangan Pernikahan
           </p>
-          <h1 className="text-[2.8rem] font-bold text-white font-recoleta-alt leading-tight">
+          <h1 className="text-center text-[2.8rem] font-bold text-white font-recoleta-alt leading-tight">
             {undanganData?.content?.title}
           </h1>
           <p className="text-white/60 text-xs tracking-widest">
@@ -292,7 +292,7 @@ export default function Theme14({
                 Undangan Pernikahan
               </span>
             </div>
-            <h2 className="text-4xl font-bold font-recoleta-alt text-gray-900 leading-tight">
+            <h2 className="text-center text-4xl font-bold font-recoleta-alt text-gray-900 leading-tight">
               {undangan?.content?.title}
             </h2>
             <p className="text-gray-500 text-sm tracking-wider">

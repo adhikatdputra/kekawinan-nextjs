@@ -37,9 +37,11 @@ interface ThemeComponentProps {
 export default function UndanganView({
   slug,
   id_tamu,
+  muted = false,
 }: {
   slug: string;
   id_tamu: string;
+  muted?: boolean;
 }) {
   const router = useRouter();
 
@@ -257,7 +259,7 @@ export default function UndanganView({
           <Loading />
         )}
 
-        {music && <audio id="music" src={music} autoPlay={isPlayMusic} />}
+        {music && <audio id="music" src={music} autoPlay={isPlayMusic} muted={muted} />}
       </div>
     </>
   );

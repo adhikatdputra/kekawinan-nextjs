@@ -193,7 +193,7 @@ export default function Theme15({
             Wedding Invitation
           </p>
           <h1
-            className="text-5xl font-bold leading-tight mt-1 font-recoleta-alt"
+            className="text-center text-5xl font-bold leading-tight mt-1 font-recoleta-alt"
             style={{ color: GOLD, textShadow: `0 2px 8px rgba(0,0,0,0.2)` }}
           >
             {undanganData?.content?.title}
@@ -319,7 +319,7 @@ export default function Theme15({
                 Undangan Pernikahan
               </span>
             </div>
-            <h2 className="text-4xl font-bold font-recoleta-alt text-white leading-tight">
+            <h2 className="text-center text-4xl font-bold font-recoleta-alt text-white leading-tight">
               {undangan?.content?.title}
             </h2>
             <p className="text-sm tracking-wider" style={{ color: "rgba(255,255,255,0.65)" }}>

@@ -162,7 +162,7 @@ export default function Theme12({
             )}
 
             <div className="flex flex-col items-center gap-1 mt-1">
-              <h1 className="text-4xl font-bold text-white font-recoleta-alt leading-tight">
+              <h1 className="text-center text-4xl font-bold text-white font-recoleta-alt leading-tight">
                 {undanganData?.content?.title}
               </h1>
               <p className="text-white/40 text-xs tracking-[0.2em] uppercase">
@@ -291,7 +291,7 @@ export default function Theme12({
 
           {/* Couple name */}
           <h2
-            className="text-[2.6rem] font-bold font-recoleta-alt leading-tight"
+            className="text-center text-[2.6rem] font-bold font-recoleta-alt leading-tight"
             style={{ background: "linear-gradient(135deg, #ffffff 30%, #DDD6FE 70%, #F9A8D4 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
           >
             {undangan?.content?.title}

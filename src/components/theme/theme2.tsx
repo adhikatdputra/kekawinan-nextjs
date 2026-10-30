@@ -107,7 +107,7 @@ export default function Theme2({
             }}
             viewport={{ once: false }}
           >
-            <h1 className="text-4xl font-glitten text-white mt-4">
+            <h1 className="text-center text-4xl font-glitten text-white mt-4">
               {undanganData?.content?.title}
             </h1>
           </motion.div>
@@ -195,7 +195,7 @@ export default function Theme2({
             }}
             viewport={{ once: false }}
           >
-            <h2 className="text-4xl text-white font-glitten">
+            <h2 className="text-center text-4xl text-white font-glitten">
               {undangan?.content?.title}
             </h2>
           </motion.div>

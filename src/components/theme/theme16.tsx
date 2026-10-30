@@ -255,7 +255,7 @@ export default function Theme16({
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.4 }}
             viewport={{ once: false }}
-            className="font-glitten text-5xl text-white leading-tight"
+            className="text-center font-glitten text-5xl text-white leading-tight"
           >
             {undangan?.content?.title}
           </motion.h1>
