@@ -1,0 +1,30 @@
+.page { background: #fffdf5; }
+/* Clears the fixed site header */
+.hero { padding-top: 144px; }
+.family { position: relative; isolation: isolate; min-height: 380px; }
+.familyBackdrop { position: absolute; inset: 3% 3% 0; border-radius: 48% 48% 24px 24px; background: #f5d76c; z-index: -1; }
+.host { position: absolute; width: 64%; top: 0; left: 15%; }
+.courier { position: absolute; width: 48%; left: -5%; bottom: -12px; }
+.gift { position: absolute; width: 46%; right: -4%; bottom: -12px; }
+.story { background: #eef3fc; }
+.storyLayout { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; }
+.prose { font-size: 17px; line-height: 1.9; }
+.prose p + p { margin-top: 22px; }
+.values { background: #fffdf5; }
+.valueList { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 64px; margin-top: 40px; }
+.valueList article { border-top: 1px solid #183c3030; padding: 28px 0; }
+.valueList h3 { font-size: 21px; font-weight: 700; margin-bottom: 12px; }
+.valueList p { line-height: 1.8; color: #52675d; }
+.productSection { background: #e9f2e6; }
+.closing { background: #f9e6ee; }
+.closingInner { display: flex; justify-content: center; align-items: center; gap: 64px; }
+.closingCharacter { width: 220px; flex-shrink: 0; }
+@media(max-width: 1000px) { .family { min-height: 320px; } .storyLayout { gap: 40px; } }
+@media(max-width: 760px) {
+  .family { width: min(380px, 90%); min-height: 330px; margin: 16px auto; }
+  .storyLayout, .valueList { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .valueList { gap: 0; }
+  .prose { font-size: 16px; }
+  .closingInner { flex-direction: column; align-items: flex-start; gap: 28px; }
+  .closingCharacter { width: 140px; }
+}

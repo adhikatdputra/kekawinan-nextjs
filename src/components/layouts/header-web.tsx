@@ -3,11 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "../ui/button";
+import { usePathname } from "next/navigation";
 import {
-  IconLogin2,
   IconLogout2,
-  IconMenu4,
+  IconMenu2,
   IconX,
   IconUser,
   IconCoin,
@@ -27,6 +26,13 @@ const navLinks = [
   { href: "/faq", label: "FAQ" },
 ];
 
+const focusRing =
+  "focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-brand-focus";
+
+function isActive(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 function UserAvatar({ name }: { name: string }) {
   const initials = name
     .split(" ")
@@ -34,9 +40,9 @@ function UserAvatar({ name }: { name: string }) {
     .map((w) => w[0]?.toUpperCase() ?? "")
     .join("");
   return (
-    <div className="w-8 h-8 rounded-full bg-green-kwn text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+    <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-green text-xs font-bold text-white">
       {initials || <IconUser size={14} />}
-    </div>
+    </span>
   );
 }
 
@@ -49,6 +55,7 @@ function UserDropdown({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const { isAuthenticated, getUser } = useAuth();
   const userLevel = getUser()?.level;
   const isAdmin = userLevel === "admin" || userLevel === "superadmin";
@@ -62,76 +69,85 @@ function UserDropdown({
   const balance: number = creditData?.data?.data?.balance ?? 0;
 
   useEffect(() => {
+    if (!open) return;
     function handleClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === "Escape") {
         setOpen(false);
+        triggerRef.current?.focus();
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [open]);
+
+  const itemClass = `flex min-h-11 items-center gap-3 px-4 text-sm text-brand-ink transition-colors hover:bg-brand-mint ${focusRing} focus-visible:outline-offset-[-3px]`;
 
   return (
     <div ref={ref} className="relative">
       <button
+        ref={triggerRef}
+        type="button"
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 rounded-full border border-green-200/60 bg-white/80 backdrop-blur-sm px-3 py-1.5 hover:bg-green-soft-kwn transition-all shadow-sm"
+        aria-expanded={open}
+        aria-controls="user-menu"
+        className={`flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-brand-line bg-white px-2.5 transition-colors hover:bg-brand-mint ${focusRing}`}
       >
         <UserAvatar name={name} />
-        <span className="hidden md:block text-sm font-semibold text-gray-800 max-w-[110px] truncate">
+        <span className="hidden max-w-[120px] truncate text-sm font-bold text-brand-ink md:block">
           {name}
         </span>
-        <div className="hidden md:flex items-center gap-1 bg-green-soft-kwn rounded-full px-2 py-0.5">
-          <IconCoin size={13} className="text-green-kwn" />
-          <span className="text-xs font-bold text-green-kwn">{balance}</span>
-        </div>
+        <span className="hidden items-center gap-1 rounded-lg bg-brand-mint px-2 py-0.5 text-xs font-bold text-brand-green md:flex">
+          <IconCoin size={13} aria-hidden="true" />
+          {balance}
+          <span className="sr-only">credit</span>
+        </span>
         <IconChevronDown
           size={14}
-          className={`text-gray-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          aria-hidden="true"
+          className={`text-brand-muted transition-transform duration-200 ${open ? "rotate-180" : ""}`}
         />
+        <span className="sr-only">Menu akun</span>
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-52 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100/80 py-2 z-50">
-          <div className="flex items-center gap-2 px-4 py-2 border-b border-gray-100 md:hidden">
-            <IconCoin size={14} className="text-green-kwn" />
-            <span className="text-xs text-gray-500">Credit</span>
-            <span className="ml-auto text-sm font-bold text-green-kwn">{balance}</span>
+        // Only floating surface in the header, so it alone carries a shadow
+        <div
+          id="user-menu"
+          className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-brand-line bg-white py-1.5 shadow-lg"
+        >
+          <div className="flex items-center gap-2 border-b border-brand-line px-4 py-2.5 md:hidden">
+            <IconCoin size={14} className="text-brand-green" aria-hidden="true" />
+            <span className="text-xs text-brand-muted">Credit</span>
+            <span className="ml-auto text-sm font-bold text-brand-green">{balance}</span>
           </div>
           {[
             { href: "/user/undangan-list", icon: IconLayoutDashboard, label: "Dashboard" },
-            { href: "/user/profile", icon: IconUser, label: "Profile" },
-            { href: "/user/credit", icon: IconCreditCard, label: "Credit" },
+            { href: "/user/profile", icon: IconUser, label: "Profil" },
+            { href: "/user/credit", icon: IconCreditCard, label: "Credit & voucher" },
+            ...(isAdmin ? [{ href: "/admin/users", icon: IconShield, label: "Admin" }] : []),
           ].map(({ href, icon: Icon, label }) => (
-            <Link
-              key={href}
-              href={href}
-              onClick={() => setOpen(false)}
-              className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-green-soft-kwn hover:text-green-kwn transition-colors"
-            >
-              <Icon size={16} />
+            <Link key={href} href={href} onClick={() => setOpen(false)} className={itemClass}>
+              <Icon size={17} className="text-brand-leaf" aria-hidden="true" />
               {label}
             </Link>
           ))}
-          {isAdmin && (
-            <Link
-              href="/admin/users"
-              onClick={() => setOpen(false)}
-              className="flex items-center gap-3 px-4 py-2.5 text-sm text-green-700 hover:bg-green-soft-kwn hover:text-green-kwn transition-colors font-medium"
-            >
-              <IconShield size={16} />
-              Admin
-            </Link>
-          )}
-          <div className="border-t border-gray-100 mt-1 pt-1">
+          <div className="mt-1 border-t border-brand-line pt-1">
             <button
+              type="button"
               onClick={() => {
                 setOpen(false);
                 onLogout();
               }}
-              className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"
+              className={`w-full cursor-pointer ${itemClass} text-brand-rose hover:bg-brand-pink`}
             >
-              <IconLogout2 size={16} />
+              <IconLogout2 size={17} aria-hidden="true" />
               Keluar
             </button>
           </div>
@@ -145,116 +161,129 @@ export default function HeaderWeb() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
   const { isAuthenticated, getUserName } = useAuth();
   const { logout } = useAuthStore();
 
   useEffect(() => {
     setIsLoaded(true);
     const handleScroll = () => setScrolled(window.scrollY > 16);
+    handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Close the mobile menu after navigating or on Escape
+  useEffect(() => setIsOpen(false), [pathname]);
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setIsOpen(false);
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [isOpen]);
+
   const username = getUserName() ?? "";
+  const loggedIn = isLoaded && isAuthenticated();
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${
-        scrolled
-          ? "bg-white/92 backdrop-blur-md shadow-sm border-b border-green-100/50"
-          : "bg-white/75 backdrop-blur-sm"
+      className={`fixed inset-x-0 top-0 z-50 border-b bg-brand-cream text-brand-ink transition-colors duration-300 ${
+        scrolled || isOpen ? "border-brand-line" : "border-transparent"
       }`}
     >
-      <div className="container py-3.5">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex-shrink-0">
-            <Image
-              src="/images/kekawinan-logo.png"
-              alt="Kekawinan"
-              width={400}
-              height={400}
-              className="w-[150px] md:w-[170px] h-auto"
-              priority
-            />
-          </Link>
+      <div className="container flex items-center justify-between gap-4 py-3.5">
+        <Link href="/" className={`shrink-0 rounded-md ${focusRing}`}>
+          <Image
+            src="/images/kekawinan-logo.png"
+            alt="Kekawinan, kembali ke beranda"
+            width={400}
+            height={400}
+            className="h-auto w-[150px] md:w-[170px]"
+            priority
+          />
+        </Link>
 
-          {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
+        <nav aria-label="Navigasi utama" className="hidden items-center gap-8 md:flex">
+          {navLinks.map((link) => {
+            const active = isActive(pathname, link.href);
+            return (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-semibold text-gray-700 hover:text-green-kwn transition-colors"
+                aria-current={active ? "page" : undefined}
+                className={`py-2 text-[15px] font-bold underline-offset-8 transition-colors hover:text-brand-leaf hover:underline ${
+                  active ? "text-brand-green underline decoration-brand-yellow decoration-[3px]" : ""
+                } ${focusRing}`}
               >
                 {link.label}
               </Link>
-            ))}
-          </nav>
+            );
+          })}
+        </nav>
 
-          {/* Right side */}
-          <div className="flex items-center gap-2.5">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden w-9 h-9 rounded-xl border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors order-last"
-            >
-              {isOpen ? <IconX size={18} /> : <IconMenu4 size={18} />}
-            </button>
-            {isLoaded &&
-              (isAuthenticated() ? (
-                <UserDropdown name={username} onLogout={logout} />
-              ) : (
-                <>
-                  <Link href="/auth/login" className="hidden md:block">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="border-green-200 text-green-700 hover:bg-green-soft-kwn hover:border-green-300"
-                    >
-                      Masuk
-                    </Button>
-                  </Link>
-                  <Link href="/auth/login">
-                    <Button
-                      size="sm"
-                      className="text-white bg-green-kwn hover:bg-green-kwn/90 shadow-sm shadow-green-200/40"
-                    >
-                      <IconLogin2 size={15} />
-                      Daftar Gratis
-                    </Button>
-                  </Link>
-                </>
-              ))}
-          </div>
+        <div className="flex items-center gap-3">
+          {isLoaded &&
+            (loggedIn ? (
+              <UserDropdown name={username} onLogout={logout} />
+            ) : (
+              <>
+                <Link
+                  href="/auth/login"
+                  className={`hidden min-h-11 items-center px-1 text-[15px] font-bold text-brand-green underline underline-offset-[6px] md:inline-flex ${focusRing}`}
+                >
+                  Masuk
+                </Link>
+                <Link
+                  href="/auth/register"
+                  className={`inline-flex min-h-11 items-center rounded-xl bg-brand-green px-4 text-sm font-bold text-white transition-colors hover:bg-brand-green-dark md:px-5 md:text-[15px] ${focusRing}`}
+                >
+                  Daftar gratis
+                </Link>
+              </>
+            ))}
+          <button
+            type="button"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-expanded={isOpen}
+            aria-controls="mobile-menu"
+            aria-label={isOpen ? "Tutup menu" : "Buka menu"}
+            className={`grid size-11 cursor-pointer place-items-center rounded-xl border border-brand-line bg-white transition-colors hover:bg-brand-mint md:hidden ${focusRing}`}
+          >
+            {isOpen ? <IconX size={20} aria-hidden="true" /> : <IconMenu2 size={20} aria-hidden="true" />}
+          </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
       {isLoaded && isOpen && (
-        <div className="md:hidden bg-white/98 backdrop-blur-md border-t border-green-100/50 py-4 px-4 flex flex-col gap-1">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setIsOpen(false)}
-              className="px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700 hover:bg-green-soft-kwn hover:text-green-kwn transition-colors"
-            >
-              {link.label}
-            </Link>
-          ))}
-          {!isAuthenticated() && (
+        <nav
+          id="mobile-menu"
+          aria-label="Navigasi utama"
+          className="container flex flex-col border-t border-brand-line pt-2 pb-5 md:hidden"
+        >
+          {navLinks.map((link) => {
+            const active = isActive(pathname, link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={active ? "page" : undefined}
+                className={`flex min-h-12 items-center border-b border-brand-line/70 text-base font-bold ${
+                  active ? "text-brand-green" : ""
+                } ${focusRing}`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+          {!loggedIn && (
             <Link
               href="/auth/login"
-              onClick={() => setIsOpen(false)}
-              className="mt-2"
+              className={`mt-4 inline-flex min-h-12 items-center justify-center rounded-xl border border-brand-green text-[15px] font-bold text-brand-green ${focusRing}`}
             >
-              <Button className="text-white w-full bg-green-kwn hover:bg-green-kwn/90">
-                <IconLogin2 size={16} />
-                Daftar Gratis Sekarang
-              </Button>
+              Masuk ke akun
             </Link>
           )}
-        </div>
+        </nav>
       )}
     </header>
   );

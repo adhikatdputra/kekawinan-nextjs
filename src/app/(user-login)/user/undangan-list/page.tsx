@@ -28,7 +28,8 @@ import {
   IconArrowsMaximize,
   IconArrowsMinimize,
 } from "@tabler/icons-react";
-import PendingNoData from "@/components/ui/custom/pending-no-data";
+import { BrandCharacter } from "@/components/pages/home/brand-visual";
+import styles from "./undangan-list.module.css";
 import ThemeRequiredDialog from "@/components/pages/undangan/theme-required-dialog";
 import PendingData from "@/components/ui/custom/pending-data";
 import Image from "next/image";
@@ -365,57 +366,23 @@ export default function UndanganListPage() {
 
   return (
     <>
-      {/* Hero */}
-      <div className="relative overflow-hidden bg-green-soft-kwn min-h-[350px] md:min-h-[400px] flex items-center pt-14">
-        {/* Dot pattern */}
-        <svg className="absolute inset-0 w-full h-full opacity-25 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="hero-dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-              <circle cx="2" cy="2" r="1.2" fill="#4A763E" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#hero-dots)" />
-        </svg>
-
-        {/* Right image */}
-        <div className="hidden md:block absolute right-0 top-0 bottom-0 w-[55%]">
-          <Image
-            src="/images/bg-main.jpg"
-            alt="Banner"
-            fill
-            className="object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-green-soft-kwn via-green-soft-kwn/40 to-transparent" />
-        </div>
-
-        {/* Content */}
-        <div className="container relative z-10 py-8 md:py-10">
-          {isLoaded && (
-            <div className="max-w-lg">
-              <p className="text-green-kwn/80 text-sm font-medium mb-1">Selamat datang kembali 👋</p>
-              <h1 className="text-gray-900 text-3xl md:text-4xl font-bold leading-tight">
-                Halo, <span className="text-green-kwn">{getUserName()}</span>
-              </h1>
-              <p className="mt-2 text-gray-500 text-sm">Buat dan kelola undangan pernikahanmu dengan mudah.</p>
-              <div className="mt-6 flex gap-3 flex-wrap items-center">
-                {isShowCredit && !isAdmin && (
-                  <Button variant="outline" size="lg" className="bg-white/80 border-green-kwn/30 hover:bg-white" onClick={() => setIsOpenRedeem(true)}>
-                    <IconTicket size={18} />
-                    Tukar Kode
-                  </Button>
-                )}
-                <Button onClick={openCreate} className="bg-green-kwn hover:bg-green-kwn/90 text-white shadow-md">
-                  <IconPlus size={18} />
-                  Buat Undangan
-                </Button>
-              </div>
+      <main className={styles.page}>
+      <header className={styles.hero}>
+        <div className={styles.heroInner}>
+          <div className={styles.welcome}>
+            <p className={styles.eyebrow}>Ruang persiapan kalian</p>
+            <h1>Halo{isLoaded && getUserName() ? <>, <span>{getUserName()}</span></> : ""}.</h1>
+            <p>Lanjutkan cerita kalian, siapkan detail acara, dan undang orang-orang tersayang.</p>
+            <div className={styles.heroActions}>
+              <Button onClick={openCreate} className={styles.createButton}><IconPlus size={18} />Buat undangan</Button>
+              {isShowCredit && !isAdmin && <Button variant="outline" onClick={() => setIsOpenRedeem(true)}><IconTicket size={18} />Tukar kode</Button>}
             </div>
-          )}
+          </div>
+          <div className={styles.heroArt} aria-hidden="true"><div className={styles.artBackdrop} /><BrandCharacter character="host" className={styles.host} /><BrandCharacter character="courier" className={styles.courier} /></div>
         </div>
-      </div>
-
-      <div className="py-12 max-w-[900px] mx-auto">
-        <div className="container flex flex-col gap-10">
+      </header>
+      <div className={styles.listArea}>
+        <div className="flex flex-col gap-10">
 
           {/* ── Credit Balance ──────────────────────────────────────────────── */}
           {isShowCredit && !isAdmin && (
@@ -465,11 +432,11 @@ export default function UndanganListPage() {
 
           {/* ── Daftar Undangan ─────────────────────────────────────────────── */}
           <div className="flex flex-col gap-4">
-            <h2 className="text-2xl font-bold">Daftar Undangan</h2>
+            <div className={styles.listHeading}><div><h2>Undangan kalian</h2><p>Pilih undangan untuk mengatur konten, tamu, dan kado.</p></div><Link href="/faq" className={styles.helpLink}>Butuh bantuan?</Link></div>
             {isLoadingUndangan ? (
               <PendingData />
             ) : (undangan?.length ?? 0) === 0 ? (
-              <PendingNoData message="Kamu belum memiliki undangan" slot={null} />
+              <div className={styles.empty}><BrandCharacter character="courier" className={styles.emptyCharacter} /><h3>Cerita kalian mulai di sini.</h3><p>Buat undangan pertama, pilih tema, lalu isi detail hari bahagia kalian.</p><Button className={styles.createButton} onClick={openCreate}><IconPlus size={18} />Buat undangan pertama</Button></div>
             ) : (
               <div className="flex flex-col gap-4">
                 {undangan?.map((item: Undangan) => {
@@ -507,13 +474,13 @@ export default function UndanganListPage() {
                   return (
                     <div
                       key={item.id}
-                      className={`bg-white rounded-2xl border border-border border-l-4 ${roleConfig.accent} shadow-sm hover:shadow-md hover:bg-green-soft-kwn/20 transition-all duration-200 p-4`}
+                      className={styles.invitationCard}
                     >
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                         {/* Left: name + meta */}
                         <div className="flex flex-col gap-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-semibold text-base">{item.name}</span>
+                            <Link href={`/user/undangan/${item.id}/overview`} aria-label="Dashboard undangan" className={styles.invitationName}>{item.name}</Link>
                             {isExpired(item) &&
                               (isAdmin ? (
                                 <button
@@ -528,6 +495,7 @@ export default function UndanganListPage() {
                                 <span className="text-xs bg-red-100 text-red-600 border border-red-200 px-2 py-0.5 rounded-full">Expired</span>
                               ))}
                           </div>
+                          <p className={styles.permalink}>kekawinan.com/{item.permalink}</p>
                           <div className="flex items-center gap-2 flex-wrap">
                             {/* Role chip */}
                             <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${roleConfig.chip}`}>
@@ -546,7 +514,7 @@ export default function UndanganListPage() {
                         <div className="border-t border-border sm:hidden" />
 
                         {/* Right: actions — Desktop */}
-                        <div className="hidden sm:flex items-center gap-1 shrink-0 flex-wrap">
+                        <div className={`hidden sm:flex items-center gap-1 shrink-0 flex-wrap ${styles.desktopActions}`}>
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Link href={`/${item.permalink}/demo`} target="_blank" className="inline-flex items-center gap-1 text-xs font-medium text-green-kwn border border-green-kwn/40 hover:bg-green-kwn hover:text-white px-2 py-1 rounded-lg transition-colors">
@@ -559,7 +527,7 @@ export default function UndanganListPage() {
                           <div className="w-px h-5 bg-border mx-1" />
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Link href={`/user/undangan/${item.id}/overview`} className="p-1.5 rounded-lg text-muted-foreground hover:bg-gray-100 hover:text-foreground transition-colors">
+                              <Link href={`/user/undangan/${item.id}/overview`} aria-label="Dashboard undangan" className="p-1.5 rounded-lg text-muted-foreground hover:bg-gray-100 hover:text-foreground transition-colors">
                                 <IconAdjustments size={17} />
                               </Link>
                             </TooltipTrigger>
@@ -567,7 +535,7 @@ export default function UndanganListPage() {
                           </Tooltip>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Link href={`/user/undangan/${item.id}/tamu-undangan`} className="p-1.5 rounded-lg text-muted-foreground hover:bg-gray-100 hover:text-foreground transition-colors">
+                              <Link href={`/user/undangan/${item.id}/tamu-undangan`} aria-label="Tamu undangan" className="p-1.5 rounded-lg text-muted-foreground hover:bg-gray-100 hover:text-foreground transition-colors">
                                 <IconUsers size={17} />
                               </Link>
                             </TooltipTrigger>
@@ -575,7 +543,7 @@ export default function UndanganListPage() {
                           </Tooltip>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Link href={`/user/undangan/${item.id}/kado-pernikahan`} className="p-1.5 rounded-lg text-muted-foreground hover:bg-gray-100 hover:text-foreground transition-colors">
+                              <Link href={`/user/undangan/${item.id}/kado-pernikahan`} aria-label="Kado pernikahan" className="p-1.5 rounded-lg text-muted-foreground hover:bg-gray-100 hover:text-foreground transition-colors">
                                 <IconGift size={17} />
                               </Link>
                             </TooltipTrigger>
@@ -583,7 +551,7 @@ export default function UndanganListPage() {
                           </Tooltip>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Link href={`/${item.permalink}/scanner`} target="_blank" className="p-1.5 rounded-lg text-muted-foreground hover:bg-gray-100 hover:text-foreground transition-colors">
+                              <Link href={`/${item.permalink}/scanner`} target="_blank" aria-label="Scanner absensi" className="p-1.5 rounded-lg text-muted-foreground hover:bg-gray-100 hover:text-foreground transition-colors">
                                 <IconScan size={17} />
                               </Link>
                             </TooltipTrigger>
@@ -592,7 +560,7 @@ export default function UndanganListPage() {
                           {(isAdmin || isOwner) && (
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <button onClick={() => openDuplicate(item)} className="p-1.5 rounded-lg text-muted-foreground hover:bg-green-soft-kwn hover:text-green-kwn transition-colors">
+                                <button aria-label="Duplikat undangan" onClick={() => openDuplicate(item)} className="p-1.5 rounded-lg text-muted-foreground hover:bg-green-soft-kwn hover:text-green-kwn transition-colors">
                                   <IconCopy size={17} />
                                 </button>
                               </TooltipTrigger>
@@ -604,7 +572,7 @@ export default function UndanganListPage() {
                               <div className="w-px h-5 bg-border mx-1" />
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <button onClick={() => openEdit(item)} className="p-1.5 rounded-lg text-muted-foreground hover:bg-yellow-50 hover:text-yellow-700 transition-colors">
+                                  <button aria-label="Edit undangan" onClick={() => openEdit(item)} className="p-1.5 rounded-lg text-muted-foreground hover:bg-yellow-50 hover:text-yellow-700 transition-colors">
                                     <IconEdit size={17} />
                                   </button>
                                 </TooltipTrigger>
@@ -612,7 +580,7 @@ export default function UndanganListPage() {
                               </Tooltip>
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <button onClick={() => { setSelectedItem(item); setIsOpenDelete(true); }} className="p-1.5 rounded-lg text-muted-foreground hover:bg-red-50 hover:text-red-600 transition-colors">
+                                  <button aria-label="Hapus undangan" onClick={() => { setSelectedItem(item); setIsOpenDelete(true); }} className="p-1.5 rounded-lg text-muted-foreground hover:bg-red-50 hover:text-red-600 transition-colors">
                                     <IconTrash size={17} />
                                   </button>
                                 </TooltipTrigger>
@@ -633,10 +601,11 @@ export default function UndanganListPage() {
                             Scan
                           </Link>
                           <button
+                            aria-expanded={openMenuId === item.id}
                             onClick={() => setOpenMenuId(openMenuId === item.id ? null : item.id)}
                             className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 px-2.5 py-1 rounded-lg transition-colors"
                           >
-                            Action
+                            Kelola
                             <IconChevronDown size={13} className={`transition-transform ${openMenuId === item.id ? "rotate-180" : ""}`} />
                           </button>
                           {openMenuId === item.id && (
@@ -718,6 +687,7 @@ export default function UndanganListPage() {
         </div>
       </div>
 
+      </main>
       {/* ── Dialog: Tukar Kode ──────────────────────────────────────────────── */}
       <Dialog open={isOpenRedeem} onOpenChange={(open) => { setIsOpenRedeem(open); if (!open) setRedeemCode(""); }}>
         <DialogContent className="max-w-sm">

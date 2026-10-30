@@ -2,6 +2,36 @@
 
 Tidak perlu menjalankan pnpm build, pnpm run dev dan claude-in-chrome kalau tidak disuruh
 
+# Styling
+
+Pakai Tailwind. **Jangan membuat file `*.module.css` baru.**
+
+- Warna brand dari redesign homepage sudah jadi token Tailwind di
+  `src/app/globals.css` (`@theme`): `brand-ink`, `brand-muted`, `brand-green`,
+  `brand-green-dark`, `brand-leaf`, `brand-line`, `brand-cream`, `brand-mint`,
+  `brand-pink`, `brand-pink-deep`, `brand-rose`, `brand-sky`, `brand-yellow`,
+  `brand-focus`. Pakai `bg-brand-cream`, `text-brand-ink`, dst. alih-alih
+  hex arbitrer. Kalau butuh warna baru yang dipakai ulang, tambahkan tokennya di
+  sana.
+- Font judul: `font-recoleta-alt`.
+- Animasi hormati reduced motion (`motion-safe:` / `motion-reduce:`).
+- Contoh halaman yang sudah pakai pola ini: `src/app/(user-login)/user/credit/page.tsx`.
+
+Sisa `*.module.css` yang masih harus dimigrasi ke Tailwind (hapus filenya setelah
+selesai dan coret dari daftar ini):
+
+- `src/app/(landing)/tema/tema.module.css`
+- `src/app/(user-login)/user/undangan-list/undangan-list.module.css`
+- `src/components/pages/about/about.module.css`
+- `src/components/pages/auth/auth-shell.module.css`
+- `src/components/pages/faq/faq.module.css`
+- `src/components/pages/gift-detail/view/gift-detail.module.css`
+- `src/components/pages/gift/view/gift.module.css`
+- `src/components/pages/home/features.module.css`
+- `src/components/pages/home/home-brand.module.css` (dipakai bersama banyak
+  halaman, migrasikan terakhir)
+- `src/components/theme/theme17.module.css`
+
 # Hemat egress
 
 Repo ini pernah menembus kuota egress free plan Supabase (5,79 GB) padahal

@@ -1,0 +1,36 @@
+.page { min-height: 100svh; display: grid; grid-template-columns: 1fr 1fr; color: #183c30; background: #fffdf5; }
+.aside { padding: 40px 56px; background: #e9f2e6; display: flex; flex-direction: column; justify-content: space-between; gap: 36px; }
+.pink { background: #f9e6ee; }
+.blue { background: #eef3fc; }
+.logo { width: 200px; display: block; }
+.logo img, .mobileLogo img { width: 100%; height: auto; }
+.story { width: min(460px, 100%); margin: auto; }
+.story h2 { font-family: var(--font-recoleta-alt), Georgia, serif; font-size: clamp(2.5rem, 3.6vw, 3.8rem); line-height: 1.13; font-weight: 700; margin: 16px 0 24px; letter-spacing: -.025em; }
+.story p { line-height: 1.8; }
+.story > p:first-child { font-size: 14px; font-weight: 700; }
+.story > p:last-of-type { max-width: 390px; color: #52675d; }
+.art { position: relative; isolation: isolate; width: min(360px, 95%); height: 290px; margin: 32px auto 0; }
+.backdrop { position: absolute; inset: 5% 3% 0; background: #f5d76c; border-radius: 48% 48% 20px 20px; z-index: -1; }
+.host { position: absolute; width: 68%; left: -7%; bottom: 0; }
+.companion { position: absolute; width: 55%; right: -5%; bottom: -8px; }
+.asideFoot { font-size: 12px; color: #52675d; }
+.panel { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 40px; min-width: 0; }
+.formContent { width: min(420px, 100%); }
+.formContent h1, .formContent h2 { font-family: var(--font-recoleta-alt), Georgia, serif; font-size: 32px; line-height: 1.2; color: #183c30; }
+.formContent p { line-height: 1.7; }
+.formContent input { background: white; border-color: #a8b8ae; box-shadow: none; font-size: 16px; }
+.formContent button:not([type="button"]), .formContent :global(button[data-slot="button"]) { background: #215b3b; color: white; box-shadow: none; min-height: 48px; }
+.formContent button:disabled { opacity: .55; }
+.formContent button[type="button"]:not(:global([data-slot="button"])) { min-width: 44px; min-height: 44px; }
+.back { margin-top: 32px; min-height: 44px; display: flex; align-items: center; font-size: 13px; color: #52675d; text-decoration: underline; text-underline-offset: 4px; }
+.page a:focus-visible, .page button:focus-visible, .page input:focus-visible { outline: 3px solid #2459ce; outline-offset: 4px; }
+.mobileLogo, .mobileCharacter { display: none; }
+@media(max-width: 1000px) { .aside { padding: 32px; } .art { height: 230px; } }
+@media(max-width: 760px) {
+  .page { grid-template-columns: minmax(0, 1fr); }
+  .aside { display: none; }
+  .panel { padding: 32px 24px; min-height: 100svh; }
+  .mobileLogo { display: block; width: 180px; margin-bottom: 20px; }
+  .mobileCharacter { display: block; width: 80px; margin-bottom: 20px; }
+  .formContent h1 { font-size: 30px; }
+}

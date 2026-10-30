@@ -1,0 +1,39 @@
+.page { background: #fffdf5; color: #183c30; min-height: 80vh; padding-top: 88px; }
+.hero { background: #e9f2e6; padding: 48px 24px; }
+.heroInner { width: min(1160px, 100%); margin: auto; display: grid; grid-template-columns: 1.5fr 1fr; align-items: center; gap: 64px; }
+.eyebrow { font-size: 14px; font-weight: 700; margin-bottom: 14px; }
+.welcome h1 { font-family: var(--font-recoleta-alt), Georgia, serif; font-size: clamp(2rem, 3.5vw, 3.4rem); font-weight: 700; line-height: 1.2; letter-spacing: -.025em; overflow-wrap: anywhere; }
+.welcome h1 span { color: #34734c; }
+.welcome > p:last-of-type { margin-top: 18px; max-width: 520px; line-height: 1.8; color: #52675d; }
+.heroActions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+.createButton { background: #215b3b; color: white; border-radius: 12px; min-height: 48px; padding-inline: 22px; }
+.createButton:hover { background: #163f2a; }
+.heroArt { position: relative; width: 100%; max-width: 340px; min-height: 240px; margin: auto; isolation: isolate; }
+.artBackdrop { position: absolute; inset: 8% 4% 0; background: #f5d76c; border-radius: 48% 48% 20px 20px; z-index: -1; }
+.host { position: absolute; width: 67%; left: -8%; bottom: 0; }
+.courier { position: absolute; width: 58%; right: -5%; bottom: -5px; }
+.listArea { width: min(1160px, 100%); margin: auto; padding: 48px 24px 80px; }
+.listHeading { display: flex; gap: 20px; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+.listHeading h2 { font-size: 26px; font-weight: 700; }
+.listHeading p { margin-top: 8px; font-size: 14px; line-height: 1.7; color: #52675d; }
+.helpLink { font-size: 14px; text-decoration: underline; text-underline-offset: 4px; flex-shrink: 0; }
+.invitationCard { background: white; border: 1px solid #d7e2d8; border-radius: 16px; padding: 24px; }
+.invitationName { font-size: 18px; font-weight: 700; overflow-wrap: anywhere; }
+.invitationName:hover { text-decoration: underline; text-underline-offset: 4px; }
+.permalink { font-size: 12px; line-height: 1.7; color: #52675d; overflow-wrap: anywhere; margin-bottom: 6px; }
+.desktopActions > a, .desktopActions > button { min-width: 40px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+.empty { padding: 40px 24px; text-align: center; background: #eef3fc; border-radius: 20px; }
+.emptyCharacter { width: 140px; margin: 0 auto 24px; }
+.empty h3 { font-size: 24px; font-weight: 700; }
+.empty p { color: #52675d; line-height: 1.8; margin: 14px auto 24px; max-width: 420px; }
+.page a:focus-visible, .page button:focus-visible { outline: 3px solid #2459ce; outline-offset: 4px; }
+@media(max-width: 1000px) { .heroInner { gap: 32px; } .invitationCard > div:first-child { flex-wrap: wrap; } }
+@media(max-width: 640px) {
+  .hero { padding: 36px 24px; }
+  .heroInner { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .heroArt { width: 210px; min-height: 160px; order: -1; }
+  .listArea { padding-top: 32px; }
+  .listHeading { flex-direction: column; gap: 12px; }
+  .invitationCard { padding: 20px; }
+  .invitationCard button, .invitationCard a { min-height: 44px; }
+}

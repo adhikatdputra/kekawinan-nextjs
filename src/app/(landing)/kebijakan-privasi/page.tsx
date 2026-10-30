@@ -4,7 +4,7 @@ import LegalDocument, {
   type LegalSection,
 } from "@/components/pages/legal/legal-document";
 
-const WHATSAPP_URL = "https://wa.me/085772193242";
+import { WHATSAPP_URL } from "@/frontend/constants/contact";
 
 export const metadata: Metadata = {
   title: "Kebijakan Privasi | Kekawinan",

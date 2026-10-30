@@ -21,8 +21,9 @@ import {
   IconPhone,
   IconUser,
 } from "@tabler/icons-react";
-import { motion } from "motion/react";
-
+import { motion, MotionConfig } from "motion/react";
+import { BrandCharacter } from "@/components/pages/home/brand-visual";
+import styles from "./gift-detail.module.css";
 import {
   Dialog,
   DialogContent,
@@ -31,332 +32,140 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-export default function GiftDetailView({ id }: { id: string }) {
+export default function GiftDetailView({ id, slug, tamuId }: { id: string; slug: string; tamuId?: string }) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-
   const { confirm } = GiftStore();
   const { mutate: confirmGift, isPending: isPendingConfirm } = confirm;
 
-  const {
-    data: giftData,
-    isError,
-    isLoading,
-    refetch,
-  } = useQuery({
+  const { data: giftData, isError, isLoading, refetch } = useQuery({
     queryKey: ["gift-detail", id],
     queryFn: () => giftApi.getPublicDetail(id),
     select: (data) => data.data.data as Gift,
   });
 
   const handleConfirm = () => {
-    confirmGift(
-      { id, data: { name, phone } },
-      {
-        onSuccess: () => {
-          refetch();
-          // Refresh the kado list so its status stays in sync with this detail.
-          queryClient.invalidateQueries({ queryKey: ["undangan-user-page"] });
-          setIsOpen(false);
-        },
-      }
-    );
+    confirmGift({ id, data: { name, phone } }, {
+      onSuccess: () => {
+        refetch();
+        queryClient.invalidateQueries({ queryKey: ["undangan-user-page"] });
+        setIsOpen(false);
+      },
+    });
   };
 
   useEffect(() => {
     if (isError) router.push("/");
-  }, [isError]);
+  }, [isError, router]);
 
   if (isLoading) return <Loading />;
-
-  if (!giftData)
-    return (
-      <NotFound
-        title="Waduh, kado ini nggak ada!"
-        description="Mungkin kamu salah klik link ini, atau kado ini sudah tidak tersedia."
-      />
-    );
+  if (!giftData) return <NotFound title="Waduh, kado ini nggak ada!" description="Mungkin kamu salah klik link ini, atau kado ini sudah tidak tersedia." />;
 
   const confirmed = !!giftData.isConfirm;
-  const recipient = giftData.recipientAddress?.nameAddress ||
-    giftData.recipientAddress?.phone ||
-    giftData.recipientAddress?.address
+  const recipient = giftData.recipientAddress?.nameAddress || giftData.recipientAddress?.phone || giftData.recipientAddress?.address
     ? giftData.recipientAddress
     : null;
+  const returnHref = `/${slug}/gift?view=list${tamuId ? `&id=${encodeURIComponent(tamuId)}` : ""}`;
+  const invitationHref = tamuId ? `/${slug}/${tamuId}` : `/${slug}/demo`;
 
   return (
-    <>
-      <div className="max-w-[450px] mx-auto min-h-screen bg-[#F0F7F3] flex flex-col">
+    <MotionConfig reducedMotion="user">
+      <main className={styles.page}>
+        <div className={styles.shell}>
+          <header className={styles.topbar}>
+            <Link href={returnHref} className={styles.backLink}><IconArrowLeft size={19} aria-hidden="true" /> Kembali ke daftar kado</Link>
+            <Link href="/" className={styles.wordmark}><Image src="/images/kekawinan-logo.png" alt="Kekawinan" width={160} height={46} /></Link>
+          </header>
 
-        {/* Back button */}
-        <div className="px-5 pt-6 pb-2">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-gray-500 text-sm font-medium hover:text-gray-800 transition-colors"
-          >
-            <IconArrowLeft size={18} />
-            Kembali
-          </button>
+          <div className={styles.columns}>
+            <motion.section className={styles.visual} aria-label={`Foto ${giftData.title}`} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .45 }}>
+              <div className={styles.photoFrame}>
+                <Image src={giftData.thumbnail || "/images/imgplace.png"} alt={giftData.title} width={900} height={900} priority sizes="(max-width: 760px) 100vw, 54vw" className={`${styles.photo} ${confirmed ? styles.photoConfirmed : ""}`} />
+                {confirmed && <div className={styles.confirmedOverlay}><span><IconCheck size={17} /> Sudah dipilih</span></div>}
+                <BrandCharacter character={confirmed ? "host" : "gift"} className={styles.character} />
+              </div>
+              <p className={styles.photoCaption}><IconGift size={16} aria-hidden="true" /> Satu pilihan kecil, banyak arti.</p>
+            </motion.section>
+
+            <motion.div className={styles.details} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .45, delay: .08 }}>
+              <p className={styles.eyebrow}>{confirmed ? "Cerita bahagia bertambah" : "Pilihan kado untuk mereka"}</p>
+              <h1>{giftData.title}</h1>
+              {giftData.description && <p className={styles.description}>{giftData.description}</p>}
+
+              <div className={styles.pricePanel}>
+                <div><p className={styles.label}>Harga</p><p className={styles.price}>{formatNumber(Number(giftData.price))}</p></div>
+                <span className={`${styles.status} ${confirmed ? styles.statusChosen : ""}`}>
+                  {confirmed ? <IconCheck size={17} /> : <IconGift size={17} />}
+                  {confirmed ? "Sudah dipilih" : "Tersedia"}
+                </span>
+              </div>
+
+              {confirmed ? (
+                <div className={styles.selectedNote}><span className={styles.noteIcon}><IconCheck size={18} /></span><div><strong>Hadiah ini sudah dipilih</strong><p>Terima kasih sudah ikut merayakan hari bahagia mereka.</p>{giftData.name && <small>Atas nama {giftData.name}</small>}</div></div>
+              ) : (
+                <div className={styles.howTo}><strong>Cara memberikan</strong><p>Beli melalui toko online, lalu kembali ke sini untuk mengonfirmasi pilihanmu.</p></div>
+              )}
+
+              {recipient && <RecipientAddressCard recipient={recipient} />}
+
+              <div className={styles.actions}>
+                {!confirmed ? <>
+                  {giftData.linkProduct ? (
+                    <a href={giftData.linkProduct} target="_blank" rel="noreferrer" className={styles.primary}>
+                      <IconExternalLink size={18} aria-hidden="true" /> Beli kado di toko
+                    </a>
+                  ) : (
+                    <button type="button" disabled className={styles.primary}>
+                      Tautan toko belum tersedia
+                    </button>
+                  )}
+                  <button type="button" onClick={() => setIsOpen(true)} className={styles.secondary}>Sudah membeli? Konfirmasi</button>
+                </> : giftData.linkProduct ? <a href={giftData.linkProduct} target="_blank" rel="noreferrer" className={styles.secondary}><IconExternalLink size={17} /> Lihat produk</a> : null}
+                <Link href={invitationHref} className={styles.invitationLink}>Kembali ke undangan</Link>
+              </div>
+            </motion.div>
+          </div>
         </div>
+      </main>
 
-        {/* Product image */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="px-5 mt-2"
-        >
-          <div className="relative rounded-3xl overflow-hidden aspect-square w-full shadow-sm">
-            <Image
-              src={giftData?.thumbnail || ""}
-              alt={giftData?.title}
-              width={800}
-              height={800}
-              className={`w-full h-full object-cover ${confirmed ? "grayscale" : ""}`}
-            />
-            {confirmed && (
-              <div className="absolute inset-0 bg-black/25 flex flex-col items-center justify-center gap-2">
-                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg">
-                  <IconCheck size={28} className="text-green-kwn" />
-                </div>
-                <p className="text-white font-semibold text-sm bg-black/40 rounded-full px-4 py-1.5 backdrop-blur-sm">
-                  Sudah Dihadiahkan
-                </p>
-              </div>
-            )}
-          </div>
-        </motion.div>
-
-        {/* Product info card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.15 }}
-          className="mx-5 mt-4 bg-white rounded-3xl p-5 shadow-sm"
-        >
-          <h1 className="font-bold text-lg text-gray-900 leading-snug">
-            {giftData?.title}
-          </h1>
-
-          {giftData?.description && (
-            <p className="text-gray-400 text-sm mt-2 leading-relaxed">
-              {giftData.description}
-            </p>
-          )}
-
-          <div className="flex items-center justify-between mt-4">
-            <div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider">Harga</p>
-              <p className="text-2xl font-bold text-green-kwn mt-0.5">
-                {formatNumber(Number(giftData?.price))}
-              </p>
-            </div>
-            <div className="flex items-center gap-2 bg-green-kwn/10 rounded-2xl px-4 py-2">
-              <IconGift size={16} className="text-green-kwn" />
-              <span className="text-green-kwn text-xs font-semibold">
-                {confirmed ? "Terkonfirmasi" : "Tersedia"}
-              </span>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Confirmed by info */}
-        {confirmed && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mx-5 mt-3 bg-green-kwn/8 rounded-2xl p-4 flex items-center gap-3"
-          >
-            <div className="w-9 h-9 rounded-full bg-green-kwn/15 flex items-center justify-center shrink-0">
-              <IconCheck size={16} className="text-green-kwn" />
-            </div>
-            <div>
-              <p className="text-xs text-gray-500">Hadiah ini sudah dipilih oleh</p>
-              <p className="font-bold text-green-kwn text-sm">{giftData.name}</p>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Note */}
-        {!confirmed && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="mx-5 mt-3 rounded-2xl bg-amber-50 border border-amber-100 p-4"
-          >
-            <p className="text-amber-700 text-xs leading-relaxed">
-              💡 <span className="font-semibold">Cara memberikan:</span> Klik "Beli Sekarang" untuk
-              checkout di toko online, lalu klik "Konfirmasi" agar pasangan tahu kamu
-              sudah memilih hadiah ini.
-            </p>
-          </motion.div>
-        )}
-
-        {recipient && <RecipientAddressCard recipient={recipient} />}
-
-        {/* Spacer */}
-        <div className="flex-1" />
-
-        {/* CTA buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
-          className="px-5 pb-10 pt-6 flex flex-col gap-3"
-        >
-          {!confirmed ? (
-            <>
-              <Link href={giftData?.linkProduct || "#"} target="_blank" className="w-full">
-                <button
-                  className="w-full h-13 rounded-2xl font-bold text-white text-sm flex items-center justify-center gap-2"
-                  style={{ background: "linear-gradient(135deg, #2E7D32, #4CAF50)", height: "52px", boxShadow: "0 4px 16px rgba(46,125,50,0.3)" }}
-                >
-                  <IconExternalLink size={16} />
-                  Beli Sekarang
-                </button>
-              </Link>
-              <button
-                onClick={() => setIsOpen(true)}
-                className="w-full h-12 rounded-2xl font-semibold text-green-kwn text-sm bg-white border-2 border-green-kwn/30"
-              >
-                Sudah Beli? Konfirmasi di Sini
-              </button>
-            </>
-          ) : (
-            <Link href={giftData?.linkProduct || "#"} target="_blank" className="w-full">
-              <button className="w-full h-12 rounded-2xl font-medium text-gray-400 text-sm bg-white border border-gray-100 flex items-center justify-center gap-2">
-                <IconExternalLink size={14} />
-                Lihat Produk
-              </button>
-            </Link>
-          )}
-        </motion.div>
-      </div>
-
-      {/* Confirmation dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-sm rounded-3xl">
+        <DialogContent className="max-w-sm rounded-3xl p-6">
           <DialogHeader>
-            <div className="flex items-center justify-center mb-2">
-              <div className="w-12 h-12 bg-green-kwn/10 rounded-2xl flex items-center justify-center">
-                <IconGift size={22} className="text-green-kwn" />
-              </div>
-            </div>
-            <DialogTitle className="text-center">Konfirmasi Hadiah</DialogTitle>
-            <DialogDescription className="text-center text-xs">
-              Yay! Terima kasih sudah memilih hadiah ini. Isi data di bawah
-              agar pasangan tahu siapa yang sudah menghadiahkan.
-            </DialogDescription>
+            <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#e9f2e6] text-[#215b3b]"><IconGift size={22} /></div>
+            <DialogTitle className="text-center">Konfirmasi hadiah</DialogTitle>
+            <DialogDescription className="text-center text-sm leading-relaxed">Terima kasih sudah memilih hadiah ini. Isi nama dan nomor WhatsApp agar pasangan tahu siapa yang mengirimkannya.</DialogDescription>
           </DialogHeader>
-          <div className="flex flex-col gap-3 mt-2">
-            <Input
-              type="text"
-              placeholder="Nama lengkap kamu"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="rounded-xl h-11"
-            />
-            <Input
-              type="number"
-              placeholder="No. WhatsApp aktif"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="rounded-xl h-11"
-            />
-            <button
-              onClick={handleConfirm}
-              disabled={isPendingConfirm || !name || !phone}
-              className="w-full h-12 rounded-xl font-bold text-white text-sm disabled:opacity-50"
-              style={{ background: "linear-gradient(135deg, #2E7D32, #4CAF50)" }}
-            >
-              {isPendingConfirm ? "Menyimpan..." : "Konfirmasi Hadiahku 🎁"}
+          <form className="mt-2 flex flex-col gap-4" onSubmit={(event) => { event.preventDefault(); handleConfirm(); }}>
+            <label className="flex flex-col gap-1.5 text-sm font-medium">Nama lengkap
+              <Input type="text" autoComplete="name" placeholder="Nama lengkap kamu" value={name} onChange={(event) => setName(event.target.value)} className="h-11 rounded-xl" required />
+            </label>
+            <label className="flex flex-col gap-1.5 text-sm font-medium">Nomor WhatsApp
+              <Input type="tel" inputMode="tel" autoComplete="tel" placeholder="08xxxxxxxxxx" value={phone} onChange={(event) => setPhone(event.target.value)} className="h-11 rounded-xl" required />
+            </label>
+            <button type="submit" disabled={isPendingConfirm || !name.trim() || !phone.trim()} className={styles.primary}>
+              {isPendingConfirm ? "Menyimpan…" : "Konfirmasi hadiah"}
             </button>
-          </div>
+          </form>
         </DialogContent>
       </Dialog>
-    </>
+    </MotionConfig>
   );
 }
 
-function RecipientAddressCard({
-  recipient,
-}: {
-  recipient: NonNullable<Gift["recipientAddress"]>;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.45 }}
-      className="mx-5 mt-3 bg-white rounded-2xl p-4 shadow-sm border border-green-kwn/10"
-    >
-      <div className="flex items-center gap-2 pb-3 border-b border-gray-100">
-        <div className="w-8 h-8 rounded-xl bg-green-kwn/10 flex items-center justify-center shrink-0">
-          <IconMapPin size={15} className="text-green-kwn" />
-        </div>
-        <div className="min-w-0">
-          <p className="text-sm font-bold text-gray-900">Alamat Pengiriman Kado</p>
-          <p className="text-[11px] text-gray-400">Detail penerima hadiah fisik</p>
-        </div>
-      </div>
-
-      <div className="pt-3 flex flex-col gap-2.5">
-        {recipient.nameAddress && (
-          <RecipientInfoRow
-            icon={<IconUser size={14} />}
-            label="Penerima"
-            value={recipient.nameAddress}
-          />
-        )}
-        {recipient.phone && (
-          <RecipientInfoRow
-            icon={<IconPhone size={14} />}
-            label="Telepon"
-            value={recipient.phone}
-          />
-        )}
-        {recipient.address && (
-          <RecipientInfoRow
-            icon={<IconMapPin size={14} />}
-            label="Alamat"
-            value={recipient.address}
-            multiline
-          />
-        )}
-      </div>
-    </motion.div>
-  );
-}
-
-function RecipientInfoRow({
-  icon,
-  label,
-  value,
-  multiline = false,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-  multiline?: boolean;
-}) {
-  return (
-    <div className="flex items-start gap-2.5">
-      <div className="w-7 h-7 rounded-full bg-[#F0F7F3] text-green-kwn flex items-center justify-center shrink-0">
-        {icon}
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
-          {label}
-        </p>
-        <p className={`text-sm text-gray-700 font-medium ${multiline ? "leading-relaxed" : "truncate"}`}>
-          {value}
-        </p>
-      </div>
+function RecipientAddressCard({ recipient }: { recipient: NonNullable<Gift["recipientAddress"]> }) {
+  return <section className={styles.recipient} aria-labelledby="recipient-title">
+    <div className={styles.recipientHeading}><span><IconMapPin size={18} /></span><div><h2 id="recipient-title">Alamat pengiriman</h2><p>Detail untuk mengirim hadiah fisik</p></div></div>
+    <div className={styles.recipientRows}>
+      {recipient.nameAddress && <RecipientInfoRow icon={<IconUser size={16} />} label="Penerima" value={recipient.nameAddress} />}
+      {recipient.phone && <RecipientInfoRow icon={<IconPhone size={16} />} label="Telepon" value={recipient.phone} />}
+      {recipient.address && <RecipientInfoRow icon={<IconMapPin size={16} />} label="Alamat" value={recipient.address} multiline />}
     </div>
-  );
+  </section>;
+}
+
+function RecipientInfoRow({ icon, label, value, multiline = false }: { icon: ReactNode; label: string; value: string; multiline?: boolean }) {
+  return <div className={styles.recipientRow}><span className={styles.rowIcon}>{icon}</span><div><p>{label}</p><strong className={multiline ? styles.addressValue : ""}>{value}</strong></div></div>;
 }

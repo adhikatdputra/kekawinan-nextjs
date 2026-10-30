@@ -22,6 +22,9 @@ const themeApi = {
   update: async (id: string, body: ThemeBody) => {
     return axios.put(`/admin/theme/${id}`, body);
   },
+  setFeatured: async (id: string, isFeatured: boolean) => {
+    return axios.patch(`/admin/theme/${id}/featured`, { isFeatured });
+  },
   create: async (body: ThemeBody) => {
     return axios.post(`/admin/theme`, body);
   },

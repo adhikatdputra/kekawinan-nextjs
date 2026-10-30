@@ -4,7 +4,7 @@ import { Params } from "../interface/undangan";
 const themeApi = {
   // Public: active themes for the invitation picker
   getTheme: async () => {
-    return axios.get(`/theme/public?sortBy=createdAt&order=ASC`);
+    return axios.get(`/theme/public?sortBy=createdAt&order=DESC`);
   },
   // Admin only
   getThemeAll: async (params: Params) => {

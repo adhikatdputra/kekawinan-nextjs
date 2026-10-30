@@ -175,6 +175,21 @@
   --font-recoleta-alt: "Recoleta Alt", sans-serif;
   --color-green-kwn: var(--green-kwn);
   --color-green-soft-kwn: var(--green-soft-kwn);
+  /* Brand palette from the homepage redesign (bg-brand-cream, text-brand-ink, ...) */
+  --color-brand-ink: #183c30;
+  --color-brand-muted: #52675d;
+  --color-brand-green: #215b3b;
+  --color-brand-green-dark: #163f2a;
+  --color-brand-leaf: #34734c;
+  --color-brand-line: #d7e2d8;
+  --color-brand-cream: #fffdf5;
+  --color-brand-mint: #e9f2e6;
+  --color-brand-pink: #f9e6ee;
+  --color-brand-pink-deep: #edcbdc;
+  --color-brand-rose: #a54675;
+  --color-brand-sky: #eef3fc;
+  --color-brand-yellow: #f5d76c;
+  --color-brand-focus: #2459ce;
   --color-theme1-primary: var(--theme1-primary);
   --color-theme1-secondary: var(--theme1-secondary);
   --color-theme2-primary: var(--theme2-primary);

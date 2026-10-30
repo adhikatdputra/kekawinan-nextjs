@@ -7,8 +7,9 @@ export default function LandingLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // clip, not hidden: hidden makes this a scroll container and breaks position: sticky inside pages
   return (
-    <div className="overflow-x-hidden">
+    <div className="overflow-x-clip">
       <HeaderWeb />
       {children}
       <FooterWeb />

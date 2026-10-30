@@ -41,6 +41,8 @@ export interface Theme {
   description?: string | null;
   metaDescription?: string | null;
   keywords?: string[];
+  isFeatured?: boolean;
+  featuredAt?: string | null;
   createdAt: string;
   updatedAt: string;
   _count?: { undangan: number };

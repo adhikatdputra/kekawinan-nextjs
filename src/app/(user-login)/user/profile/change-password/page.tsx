@@ -3,19 +3,77 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import profileApi from "@/frontend/api/profile";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { toast } from "react-hot-toast";
-import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { IconEye, IconEyeOff } from "@tabler/icons-react";
+import Link from "next/link";
+import { IconArrowLeft, IconCheck, IconEye, IconEyeOff, IconLoader2, IconPoint } from "@tabler/icons-react";
+import { BrandCharacter } from "@/components/pages/home/brand-visual";
 
-export default function ProfilePage() {
+const focusRing =
+  "focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-brand-focus";
+
+// Same rule as passwordRegex below, split up so each one can be ticked off while typing
+const PASSWORD_RULES: { label: string; test: (v: string) => boolean }[] = [
+  { label: "Minimal 8 karakter", test: (v) => v.length >= 8 },
+  { label: "Ada huruf besar dan huruf kecil", test: (v) => /[A-Z]/.test(v) && /[a-z]/.test(v) },
+  { label: "Ada angka", test: (v) => /\d/.test(v) },
+  { label: "Ada simbol: @ $ ! % * ? &", test: (v) => /[@$!%*?&]/.test(v) },
+];
+
+function PasswordField({
+  id,
+  label,
+  value,
+  onChange,
+  autoComplete,
+  describedBy,
+  invalid,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  autoComplete: "current-password" | "new-password";
+  describedBy?: string;
+  invalid?: boolean;
+}) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <div>
+      <label htmlFor={id} className="mb-2.5 block text-sm font-bold">
+        {label}
+      </label>
+      <div className="relative">
+        <input
+          id={id}
+          type={visible ? "text" : "password"}
+          autoComplete={autoComplete}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          aria-describedby={describedBy}
+          aria-invalid={invalid || undefined}
+          className={`min-h-[52px] w-full rounded-xl border bg-white pr-14 pl-4 text-base text-brand-ink ${
+            invalid ? "border-brand-rose" : "border-brand-muted"
+          } ${focusRing}`}
+        />
+        <button
+          type="button"
+          onClick={() => setVisible((v) => !v)}
+          aria-label={visible ? `Sembunyikan ${label.toLowerCase()}` : `Tampilkan ${label.toLowerCase()}`}
+          aria-pressed={visible}
+          className={`absolute top-1/2 right-1.5 grid size-11 -translate-y-1/2 cursor-pointer place-items-center rounded-lg text-brand-muted hover:text-brand-ink ${focusRing}`}
+        >
+          {visible ? <IconEyeOff size={20} aria-hidden="true" /> : <IconEye size={20} aria-hidden="true" />}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+
+export default function ChangePasswordPage() {
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [showOldPassword, setShowOldPassword] = useState(false);
 
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -34,6 +92,10 @@ export default function ProfilePage() {
       } else {
         toast.error(response.message);
       }
+    },
+    onError: (error: unknown) => {
+      const axiosError = error as { response?: { data?: { message?: string } } };
+      toast.error(axiosError?.response?.data?.message ?? "Password gagal diubah. Coba lagi.");
     },
   });
 
@@ -56,113 +118,121 @@ export default function ProfilePage() {
     updateUser({ old_password: oldPassword, new_password: newPassword });
   };
 
+  // The regex only accepts letters, digits, and these symbols
+  const hasOtherCharacters = /[^A-Za-z\d@$!%*?&]/.test(newPassword);
+  const confirmMismatch = !!confirmPassword && newPassword !== confirmPassword;
+
   return (
-    <>
-      <div className="bg-[url('/images/bg-main.jpg')] bg-cover bg-center h-[300px] flex items-end">
-        <div className="container py-8 md:py-12">
-          <h1 className="text-black text-3xl md:text-5xl font-bold">
-            Ubah Password
-          </h1>
-        </div>
-      </div>
-      <div className="container py-12 md:py-24 max-w-[600px] mx-auto">
-        <div className="grid gap-4">
-          <div className="grid gap-3">
-            <Label htmlFor="email">Password Lama</Label>
-            <div className="relative">
-              <Input
-                type={showOldPassword ? "text" : "password"}
-                placeholder="Masukkan password lama"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-                className="border-green-kwn h-12 rounded-full px-4 bg-white"
-              />
-              <div className="absolute top-1/2 -translate-y-1/2 right-4">
-                {showOldPassword ? (
-                  <IconEyeOff
-                    size={20}
-                    onClick={() => setShowOldPassword(false)}
-                    className="cursor-pointer"
-                  />
-                ) : (
-                  <IconEye
-                    size={20}
-                    onClick={() => setShowOldPassword(true)}
-                    className="cursor-pointer"
-                  />
-                )}
-              </div>
-            </div>
+    <main className="min-h-[80vh] bg-brand-cream pt-[88px] text-brand-ink">
+      <header className="bg-brand-sky py-9 sm:py-12">
+        <div className="container grid items-center gap-6 sm:grid-cols-[1.4fr_1fr] sm:gap-14">
+          <div>
+            <Link
+              href="/user/profile"
+              className={`mb-4 inline-flex min-h-11 items-center gap-1.5 text-sm font-bold underline underline-offset-4 ${focusRing}`}
+            >
+              <IconArrowLeft size={16} aria-hidden="true" />
+              Kembali ke profil
+            </Link>
+            <h1 className="font-recoleta-alt text-[clamp(2rem,3.5vw,3rem)] font-bold leading-[1.2] tracking-[-0.025em]">
+              Ganti password
+              <br />
+              <span className="text-brand-focus">akun kamu.</span>
+            </h1>
+            <p className="mt-4 max-w-[480px] leading-[1.8] text-brand-muted">
+              Masukkan password yang sekarang, lalu buat password baru yang belum pernah kamu pakai di sini.
+            </p>
           </div>
-          <div className="grid gap-3">
-            <Label htmlFor="fullname">Password Baru</Label>
-            <div className="relative">
-              <Input
-                type={showPassword ? "text" : "password"}
-                placeholder="Masukkan password baru"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="border-green-kwn h-12 rounded-full px-4 bg-white"
-              />
-              <div className="absolute top-1/2 -translate-y-1/2 right-4">
-                {showPassword ? (
-                  <IconEyeOff size={20} onClick={() => setShowPassword(false)} className="cursor-pointer" />
-                ) : (
-                  <IconEye size={20} onClick={() => setShowPassword(true)} className="cursor-pointer" />
-                )}
-              </div>
-            </div>
-            {newPassword && !passwordRegex.test(newPassword) && (
-              <p className="text-xs text-red-500 px-1">
-                Min. 8 karakter, 1 huruf besar, 1 huruf kecil, 1 angka, 1 simbol (@$!%*?&)
+          <div
+            className="relative isolate order-first mx-auto min-h-40 w-[180px] sm:order-none sm:min-h-[240px] sm:w-full sm:max-w-[300px]"
+            aria-hidden="true"
+          >
+            <div className="absolute inset-x-[4%] top-[10%] bottom-0 -z-10 rounded-[48%_48%_20px_20px] bg-brand-yellow" />
+            <BrandCharacter character="courier" className="absolute -bottom-1 left-[12%] w-[78%]" />
+          </div>
+        </div>
+      </header>
+
+      <div className="container pt-8 pb-20 sm:pt-12">
+        <form
+          className="grid max-w-[640px] gap-5 rounded-2xl border border-brand-line bg-white p-5 sm:p-8"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!isPendingUpdate) handleSubmit();
+          }}
+        >
+          <PasswordField
+            id="old-password"
+            label="Password sekarang"
+            value={oldPassword}
+            onChange={setOldPassword}
+            autoComplete="current-password"
+          />
+
+          <div>
+            <PasswordField
+              id="new-password"
+              label="Password baru"
+              value={newPassword}
+              onChange={setNewPassword}
+              autoComplete="new-password"
+              describedBy="new-password-rules"
+              invalid={hasOtherCharacters}
+            />
+            <ul id="new-password-rules" className="mt-3 grid gap-1.5 text-[13px] sm:grid-cols-2">
+              {PASSWORD_RULES.map((rule) => {
+                const met = rule.test(newPassword);
+                return (
+                  <li key={rule.label} className={`flex items-center gap-1.5 ${met ? "text-brand-green" : "text-brand-muted"}`}>
+                    {met ? <IconCheck size={15} aria-hidden="true" /> : <IconPoint size={15} aria-hidden="true" />}
+                    {rule.label}
+                    <span className="sr-only">{met ? "(terpenuhi)" : "(belum)"}</span>
+                  </li>
+                );
+              })}
+            </ul>
+            {hasOtherCharacters && (
+              <p className="mt-2 text-[13px] text-brand-rose" role="alert">
+                Ada karakter yang tidak bisa dipakai. Gunakan huruf, angka, dan simbol @ $ ! % * ? & saja.
               </p>
             )}
           </div>
-          <div className="grid gap-3">
-            <Label htmlFor="phone">Konfirmasi Password</Label>
-            <div className="relative">
-              <Input
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="Masukkan konfirmasi password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="border-green-kwn h-12 rounded-full px-4 bg-white"
-              />
-              <div className="absolute top-1/2 -translate-y-1/2 right-4">
-                {showConfirmPassword ? (
-                  <IconEyeOff size={20} onClick={() => setShowConfirmPassword(false)} className="cursor-pointer" />
-                ) : (
-                  <IconEye size={20} onClick={() => setShowConfirmPassword(true)} className="cursor-pointer" />
-                )}
-              </div>
-            </div>
-            {confirmPassword && newPassword !== confirmPassword && (
-              <p className="text-xs text-red-500 px-1">Password tidak cocok</p>
+
+          <div>
+            <PasswordField
+              id="confirm-password"
+              label="Ulangi password baru"
+              value={confirmPassword}
+              onChange={setConfirmPassword}
+              autoComplete="new-password"
+              describedBy={confirmMismatch ? "confirm-password-error" : undefined}
+              invalid={confirmMismatch}
+            />
+            {confirmMismatch && (
+              <p id="confirm-password-error" className="mt-2 text-[13px] text-brand-rose">
+                Belum sama dengan password baru.
+              </p>
             )}
           </div>
-          <div className="flex flex-col md:flex-row gap-4 justify-center items-center mt-6">
-            <div>
-              <Button
-                disabled={
-                  isPendingUpdate ||
-                  !oldPassword ||
-                  !newPassword ||
-                  !confirmPassword
-                }
-                onClick={handleSubmit}
-              >
-                {isPendingUpdate ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" /> Please wait...
-                  </>
-                ) : (
-                  "Ubah Password"
-                )}
-              </Button>
-            </div>
+
+          <div>
+            <button
+              type="submit"
+              disabled={isPendingUpdate || !oldPassword || !newPassword || !confirmPassword}
+              className={`inline-flex min-h-[52px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-green px-6 font-bold text-white transition-colors duration-150 hover:bg-brand-green-dark disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:bg-brand-green ${focusRing}`}
+            >
+              {isPendingUpdate ? (
+                <>
+                  <IconLoader2 size={18} className="animate-spin" aria-hidden="true" />
+                  Menyimpan…
+                </>
+              ) : (
+                "Simpan password baru"
+              )}
+            </button>
           </div>
-        </div>
+        </form>
       </div>
-    </>
+    </main>
   );
 }

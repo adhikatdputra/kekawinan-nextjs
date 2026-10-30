@@ -4,6 +4,7 @@ import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, badRequest, forbidden, notFound, serverError } from '@/lib/api-response'
 import { resolveMediaUrl } from '@/lib/helpers'
 import { parseThemeSeoFields, revalidateTheme } from '@/lib/queries/revalidate-theme'
+import { enforceFeaturedLimit } from '@/lib/featured-themes'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -55,13 +56,23 @@ export async function PUT(request: NextRequest, { params }: Params) {
     if ('error' in seo) return badRequest(seo.error)
     Object.assign(data, seo.data)
 
-    const updated = await prisma.theme.update({ where: { id }, data })
+    // Showing a starred theme again (active / public) can push it past the limit
+    const visibilityChanged = 'isActive' in data || 'isShowAdmin' in data
+    const { updated, unfeatured } = await prisma.$transaction(async (tx) => {
+      const updated = await tx.theme.update({ where: { id }, data })
+      const unfeatured =
+        visibilityChanged && updated.isFeatured ? await enforceFeaturedLimit(tx) : []
+      return { updated, unfeatured }
+    })
 
     // Old name too, in case componentName changed and the old demo page is cached
     revalidateTheme(theme.componentName)
     if (updated.componentName !== theme.componentName) revalidateTheme(updated.componentName)
 
-    return ok({ ...updated, thumbnail: resolveMediaUrl(updated.thumbnail) }, 'Theme updated successfully')
+    return ok(
+      { ...updated, thumbnail: resolveMediaUrl(updated.thumbnail), unfeatured },
+      'Theme updated successfully',
+    )
   } catch (err) {
     console.error('[PUT /admin/theme]', err)
     return serverError()

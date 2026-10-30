@@ -1,5 +1,4 @@
 import Banner from "@/components/pages/home/banner";
-import MarqueeRibbon from "@/components/pages/home/marquee-ribbon";
 import Features from "@/components/pages/home/features";
 import Permalink from "@/components/pages/home/permalink";
 import CreateUndangan from "@/components/pages/home/create-undangan";
@@ -58,9 +57,9 @@ export default async function Homepage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="overflow-x-hidden">
+      {/* clip, not hidden: hidden turns this into a scroll container and breaks position: sticky (testimonial stack) */}
+      <div className="overflow-x-clip">
         <Banner />
-        <MarqueeRibbon />
         <Features />
         <GiftFeature />
         <Permalink />

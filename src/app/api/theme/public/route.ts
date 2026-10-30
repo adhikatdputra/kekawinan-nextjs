@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { ok, serverError } from '@/lib/api-response'
 import { resolveMediaUrl, paginate, parsePagination } from '@/lib/helpers'
 import { verifyAccessToken, isAdminLevel } from '@/lib/jwt'
+import { FEATURED_FIRST_ORDER } from '@/lib/queries/themes-public'
 
 // GET /api/theme/public — active themes for the invitation picker
 // Auth-aware:
@@ -44,7 +45,8 @@ export async function GET(request: NextRequest) {
         where,
         skip: (page - 1) * limit,
         take: limit,
-        orderBy: { [sortBy]: order },
+        // Featured themes stay on top whatever sort the picker asks for
+        orderBy: [...FEATURED_FIRST_ORDER, { [sortBy]: order }],
       }),
       prisma.theme.count({ where }),
     ])

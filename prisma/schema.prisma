@@ -59,6 +59,9 @@ model Theme {
   description     String?
   metaDescription String?    @db.VarChar(255)
   keywords        String[]   @default([])
+  // Tema unggulan: tampil paling atas untuk user, maksimal 10 (lihat FEATURED_THEME_LIMIT)
+  isFeatured      Boolean    @default(false)
+  featuredAt      DateTime?
   undangan        Undangan[]
 
   @@map("tbl_theme")

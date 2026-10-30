@@ -49,7 +49,7 @@ import themeComponentsApi from "@/frontend/api/admin/theme-components";
 import uploadApi from "@/frontend/api/upload";
 import AdminThemeStore from "@/frontend/store/admin-theme-store";
 import { debounce } from "lodash";
-import { IconPlus, IconExternalLink } from "@tabler/icons-react";
+import { IconPlus, IconExternalLink, IconStar, IconStarFilled } from "@tabler/icons-react";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -61,7 +61,8 @@ import {
 import Link from "next/link";
 
 export default function ThemeAdminPage() {
-  const { update, create, remove } = AdminThemeStore();
+  const { update, create, remove, featured } = AdminThemeStore();
+  const { mutate: setFeatured, isPending: isPendingFeatured, variables: featuredVars } = featured;
 
   const { mutate: updateTheme, isPending: isPendingUpdate } = update;
   const { mutate: createTheme, isPending: isPendingCreate } = create;
@@ -262,8 +263,9 @@ export default function ThemeAdminPage() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[4%]"><span className="sr-only">Unggulan</span></TableHead>
               <TableHead className="w-[8%]">Gambar</TableHead>
-              <TableHead className="w-[22%]">Nama</TableHead>
+              <TableHead className="w-[18%]">Nama</TableHead>
               <TableHead className="w-[18%]">Component Name</TableHead>
               <TableHead className="w-[14%]">Harga (credit)</TableHead>
               <TableHead className="w-[14%]">Promo</TableHead>
@@ -275,10 +277,24 @@ export default function ThemeAdminPage() {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TablePending colSpan={8} />
+              <TablePending colSpan={10} />
             ) : tableData.length > 0 ? (
               tableData.map((item) => (
                 <TableRow key={item.id}>
+                  <TableCell>
+                    {/* Featured themes go first for users; max 10, the oldest star drops off */}
+                    <button
+                      type="button"
+                      onClick={() => setFeatured({ id: item.id, isFeatured: !item.isFeatured }, { onSuccess: () => refetch() })}
+                      disabled={isPendingFeatured && featuredVars?.id === item.id}
+                      aria-pressed={!!item.isFeatured}
+                      aria-label={`${item.isFeatured ? "Lepas" : "Jadikan"} ${item.name} tema unggulan`}
+                      title={item.isFeatured ? "Tema unggulan, tampil paling atas" : "Jadikan tema unggulan"}
+                      className={`grid size-10 cursor-pointer place-items-center rounded-lg transition-colors hover:bg-amber-50 disabled:opacity-50 ${item.isFeatured ? "text-amber-500" : "text-gray-300 hover:text-amber-400"}`}
+                    >
+                      {item.isFeatured ? <IconStarFilled size={20} aria-hidden="true" /> : <IconStar size={20} aria-hidden="true" />}
+                    </button>
+                  </TableCell>
                   <TableCell>
                     {item.thumbnail ? (
                       <Image
@@ -334,7 +350,7 @@ export default function ThemeAdminPage() {
                 </TableRow>
               ))
             ) : (
-              <TableNoData colSpan={8} />
+              <TableNoData colSpan={10} />
             )}
           </TableBody>
         </Table>

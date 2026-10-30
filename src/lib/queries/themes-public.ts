@@ -1,4 +1,5 @@
 import { unstable_cache } from 'next/cache'
+import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { resolveMediaUrl } from '@/lib/helpers'
 
@@ -6,10 +7,26 @@ import { resolveMediaUrl } from '@/lib/helpers'
 // and the sitemap.
 export const THEMES_CACHE_TAG = 'themes-public'
 
+// Themes an admin stars go first, newest star first. Starring an 11th visible
+// theme unstars the one starred longest ago (see /api/admin/theme/:id/featured).
+export const FEATURED_THEME_LIMIT = 10
+
+// Featured first (newest star on top), then newest theme first. Used by every
+// user-facing theme list: homepage, /tema, and the invitation theme picker.
+export const FEATURED_FIRST_ORDER: Prisma.ThemeOrderByWithRelationInput[] = [
+  { isFeatured: 'desc' },
+  { featuredAt: { sort: 'desc', nulls: 'last' } },
+]
+
+export const THEME_DISPLAY_ORDER: Prisma.ThemeOrderByWithRelationInput[] = [
+  ...FEATURED_FIRST_ORDER,
+  { createdAt: 'desc' },
+]
+
 async function queryPublicThemes() {
   const rows = await prisma.theme.findMany({
     where: { isActive: true, isShowAdmin: false },
-    orderBy: { createdAt: 'asc' },
+    orderBy: THEME_DISPLAY_ORDER,
     select: {
       id: true,
       name: true,

@@ -11,10 +11,12 @@ type Props = {
     slug: string;
     id: string;
   }>;
+  searchParams: Promise<{ id?: string }>;
 };
 
-export default async function UndanganPage({ params }: Props) {
-  const { slug, id } = await params;
+export default async function UndanganPage({ params, searchParams }: Props) {
+  const [route, query] = await Promise.all([params, searchParams]);
+  const { slug, id } = route;
 
   const queryClient = new QueryClient();
 
@@ -25,7 +27,7 @@ export default async function UndanganPage({ params }: Props) {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <GiftDetailView id={id} />
+      <GiftDetailView id={id} slug={slug} tamuId={query.id} />
     </HydrationBoundary>
   );
 }
