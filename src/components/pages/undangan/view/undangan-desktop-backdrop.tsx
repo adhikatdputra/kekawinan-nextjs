@@ -28,6 +28,7 @@ const THEME_DECOR: Record<string, Decor> = {
   theme13: { accent: "#F48FB1", images: [] },
   theme14: { accent: "#C8C1F0", images: [] },
   theme15: { accent: "#D4B060", images: [{ src: "/images/theme3/daunkiri.png", at: "bl" }, { src: "/images/theme3/bunga.png", at: "br" }] },
+  theme20: { accent: "#E9C77B", images: [{ src: "/images/theme20/ondel-ondel.webp", at: "bl" }] },
   theme19: { accent: "#D9C99D", images: [{ src: "/images/theme19/siger-melati.webp", at: "bl" }] },
   theme18: { accent: "#D8B779", images: [{ src: "/images/theme18/gunungan.webp", at: "bl" }] },
   theme17: { accent: "#F7C5E4", images: [{ src: "/images/theme17/wedding-duo.webp", at: "bl" }] },
