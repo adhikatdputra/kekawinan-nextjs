@@ -34,7 +34,16 @@ const sections: LegalSection[] = [
           Pemilik akun harus berusia minimal 17 tahun.
         </p>
         <p>
-          Jaga password kamu. Semua aktivitas di akun kamu, termasuk yang
+          Kamu bisa mendaftar dengan email dan password, atau masuk dengan akun
+          Google. Kalau email akun Google kamu sama dengan email akun
+          Kekawinan yang sudah ada, keduanya dianggap akun yang sama dan kamu
+          akan masuk ke akun tersebut. Akun yang dibuat lewat Google tidak
+          punya password Kekawinan. Kalau ingin masuk dengan email dan
+          password juga, buat password dari halaman Profil.
+        </p>
+        <p>
+          Jaga password kamu, dan akun Google kamu kalau kamu masuk lewat
+          Google. Semua aktivitas di akun kamu, termasuk yang
           dilakukan kolaborator yang kamu undang, menjadi tanggung jawab kamu
           sebagai pemilik akun.
         </p>
@@ -229,7 +238,7 @@ export default function SyaratKetentuanPage() {
   return (
     <LegalDocument
       title="Syarat & Ketentuan"
-      updatedAt="30 Oktober 2026"
+      updatedAt="1 November 2026"
       intro={
         <p>
           Dengan membuat akun atau memakai Kekawinan, kamu setuju dengan aturan

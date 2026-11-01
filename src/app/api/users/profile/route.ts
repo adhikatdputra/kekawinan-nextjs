@@ -14,7 +14,13 @@ const SELECT_PROFILE = {
   isMember: true,
   expiredMember: true,
   createdAt: true,
+  password: true,
 } as const
+
+// Expose only whether a password exists (Google accounts may not have one), never the hash
+function toProfile<T extends { password: string | null }>({ password, ...user }: T) {
+  return { ...user, hasPassword: !!password }
+}
 
 // GET /api/users/profile
 export async function GET(request: NextRequest) {
@@ -28,7 +34,7 @@ export async function GET(request: NextRequest) {
     })
     if (!user) return notFound('User not found')
 
-    return ok(user, 'Get profile success')
+    return ok(toProfile(user), 'Get profile success')
   } catch {
     return serverError()
   }
@@ -47,7 +53,7 @@ export async function PUT(request: NextRequest) {
       return badRequest('Fullname is required')
     }
 
-    const user = await prisma.user.findUnique({ where: { id: auth.id } })
+    const user = await prisma.user.findUnique({ where: { id: auth.id }, select: { id: true } })
     if (!user) return notFound('User not found')
 
     const updated = await prisma.user.update({
@@ -60,7 +66,7 @@ export async function PUT(request: NextRequest) {
       select: SELECT_PROFILE,
     })
 
-    return ok(updated, 'Update profile success')
+    return ok(toProfile(updated), 'Update profile success')
   } catch {
     return serverError()
   }

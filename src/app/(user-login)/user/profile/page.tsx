@@ -191,13 +191,15 @@ export default function ProfilePage() {
             Password
           </h2>
           <p className="mt-2 text-sm leading-[1.8] text-brand-muted">
-            Ganti password kalau kamu merasa ada orang lain yang tahu, atau kalau sudah lama tidak menggantinya.
+            {user?.hasPassword === false
+              ? "Akun kamu dibuat lewat Google dan belum punya password. Buat password supaya kamu juga bisa masuk pakai email."
+              : "Ganti password kalau kamu merasa ada orang lain yang tahu, atau kalau sudah lama tidak menggantinya."}
           </p>
           <Link
             href="/user/profile/change-password"
             className={`mt-5 inline-flex min-h-11 items-center text-[15px] font-bold text-brand-green underline underline-offset-[6px] ${focusRing}`}
           >
-            Ubah password
+            {user?.hasPassword === false ? "Buat password" : "Ubah password"}
           </Link>
         </section>
       </div>

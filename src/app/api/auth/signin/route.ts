@@ -28,6 +28,11 @@ export async function POST(request: NextRequest) {
       return forbidden('Account is not active')
     }
 
+    // Accounts created via Google have no password yet
+    if (!user.password) {
+      return unauthorized('Email or password is wrong')
+    }
+
     // Verify password
     const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) {

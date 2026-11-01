@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import profileApi from "@/frontend/api/profile";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -74,18 +74,29 @@ function PasswordField({
 
 export default function ChangePasswordPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
+
+  // Same query as the profile page, so it's usually already cached
+  const { data: profile, isLoading: isLoadingProfile } = useQuery({
+    queryKey: ["user"],
+    queryFn: () => profileApi.getUser(),
+    select: (data) => data.data.data as { hasPassword?: boolean },
+  });
+  // Accounts created via Google have no password yet, so there is no old one to ask for
+  const isSettingFirst = profile?.hasPassword === false;
 
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const { mutate: updateUser, isPending: isPendingUpdate } = useMutation({
-    mutationFn: (body: { old_password: string; new_password: string }) =>
+    mutationFn: (body: { old_password?: string; new_password: string }) =>
       profileApi.updatePassword(body),
     onSuccess: (data) => {
       const response = data.data;
       if (response.success) {
-        toast.success("Password berhasil diubah");
+        toast.success(isSettingFirst ? "Password berhasil dibuat" : "Password berhasil diubah");
+        queryClient.invalidateQueries({ queryKey: ["user"] });
         setTimeout(() => {
           router.push("/user/profile");
         }, 2000);
@@ -115,7 +126,11 @@ export default function ChangePasswordPage() {
       return;
     }
 
-    updateUser({ old_password: oldPassword, new_password: newPassword });
+    updateUser(
+      isSettingFirst
+        ? { new_password: newPassword }
+        : { old_password: oldPassword, new_password: newPassword }
+    );
   };
 
   // The regex only accepts letters, digits, and these symbols
@@ -135,12 +150,14 @@ export default function ChangePasswordPage() {
               Kembali ke profil
             </Link>
             <h1 className="font-recoleta-alt text-[clamp(2rem,3.5vw,3rem)] font-bold leading-[1.2] tracking-[-0.025em]">
-              Ganti password
+              {isSettingFirst ? "Buat password" : "Ganti password"}
               <br />
               <span className="text-brand-focus">akun kamu.</span>
             </h1>
             <p className="mt-4 max-w-[480px] leading-[1.8] text-brand-muted">
-              Masukkan password yang sekarang, lalu buat password baru yang belum pernah kamu pakai di sini.
+              {isSettingFirst
+                ? "Akun kamu dibuat lewat Google. Setelah punya password, kamu juga bisa masuk pakai email dan password."
+                : "Masukkan password yang sekarang, lalu buat password baru yang belum pernah kamu pakai di sini."}
             </p>
           </div>
           <div
@@ -161,13 +178,22 @@ export default function ChangePasswordPage() {
             if (!isPendingUpdate) handleSubmit();
           }}
         >
-          <PasswordField
-            id="old-password"
-            label="Password sekarang"
-            value={oldPassword}
-            onChange={setOldPassword}
-            autoComplete="current-password"
-          />
+          {isLoadingProfile ? (
+            <p className="flex items-center gap-2 text-sm text-brand-muted" role="status">
+              <IconLoader2 size={18} className="animate-spin" aria-hidden="true" />
+              Memuat…
+            </p>
+          ) : (
+            !isSettingFirst && (
+              <PasswordField
+                id="old-password"
+                label="Password sekarang"
+                value={oldPassword}
+                onChange={setOldPassword}
+                autoComplete="current-password"
+              />
+            )
+          )}
 
           <div>
             <PasswordField
@@ -218,7 +244,13 @@ export default function ChangePasswordPage() {
           <div>
             <button
               type="submit"
-              disabled={isPendingUpdate || !oldPassword || !newPassword || !confirmPassword}
+              disabled={
+                isPendingUpdate ||
+                isLoadingProfile ||
+                (!isSettingFirst && !oldPassword) ||
+                !newPassword ||
+                !confirmPassword
+              }
               className={`inline-flex min-h-[52px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-green px-6 font-bold text-white transition-colors duration-150 hover:bg-brand-green-dark disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:bg-brand-green ${focusRing}`}
             >
               {isPendingUpdate ? (
@@ -227,7 +259,7 @@ export default function ChangePasswordPage() {
                   Menyimpan…
                 </>
               ) : (
-                "Simpan password baru"
+                isSettingFirst ? "Simpan password" : "Simpan password baru"
               )}
             </button>
           </div>

@@ -5,6 +5,9 @@ const authApi = {
   login: async (body: LoginBody) => {
     return axios.post(`/auth/signin`, body);
   },
+  loginWithGoogle: async (accessToken: string) => {
+    return axios.post(`/auth/google`, { access_token: accessToken });
+  },
   register: async (body: RegisterBody) => {
     return axios.post(`/users`, body);
   },

@@ -34,6 +34,17 @@ const sections: LegalSection[] = [
           bentuk hash, jadi tim kami pun tidak bisa membacanya.
         </p>
         <p>
+          <strong>Masuk atau daftar dengan Google.</strong> Kalau kamu memakai
+          tombol Google, kami hanya menerima nama, alamat email, dan status
+          verifikasi email dari akun Google kamu. Data itu kami pakai untuk
+          membuat akun atau mencocokkannya dengan akun Kekawinan yang memakai
+          email yang sama. Kami tidak menerima password Google kamu, tidak
+          meminta akses ke kontak, Gmail, Drive, atau data Google lainnya, dan
+          tidak menyimpan token akses dari Google setelah login selesai.
+          Akun yang dibuat lewat Google tidak memiliki nomor HP sampai kamu
+          mengisinya sendiri.
+        </p>
+        <p>
           <strong>Isi undangan.</strong> Semua yang kamu masukkan ke undangan:
           nama mempelai, jadwal dan lokasi acara, foto galeri, cerita Love
           Story, musik, serta nomor rekening, e-wallet, atau alamat yang kamu
@@ -129,8 +140,23 @@ const sections: LegalSection[] = [
           <li>
             <strong>Google Analytics</strong> untuk statistik kunjungan,
           </li>
+          <li>
+            <strong>Google Sign-In</strong> untuk masuk dan daftar dengan akun
+            Google, kalau kamu memilihnya,
+          </li>
           <li>penyedia email (SMTP) untuk mengirim email transaksional.</li>
         </ul>
+        <p>
+          Pemakaian informasi yang kami terima dari Google API mengikuti{" "}
+          <a
+            href="https://developers.google.com/terms/api-services-user-data-policy"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Google API Services User Data Policy
+          </a>
+          , termasuk ketentuan Limited Use.
+        </p>
         <p>
           Server layanan-layanan ini bisa berada di luar Indonesia. Pembelian
           credit terjadi di Shopee, jadi data pembayaran kamu diatur oleh
@@ -151,7 +177,9 @@ const sections: LegalSection[] = [
       <p>
         Setelah login, kami menyimpan token sesi di cookie browser supaya kamu
         tidak perlu login ulang di setiap halaman. Google Analytics juga
-        memasang cookie untuk membedakan kunjungan. Kamu bisa menghapus atau
+        memasang cookie untuk membedakan kunjungan. Tombol masuk dengan
+        Google memuat skrip dari Google, yang bisa memakai cookie Google
+        sesuai kebijakan privasi Google. Kamu bisa menghapus atau
         memblokir cookie lewat pengaturan browser, tetapi tanpa cookie sesi
         kamu tidak bisa masuk ke dashboard.
       </p>
@@ -267,7 +295,7 @@ export default function KebijakanPrivasiPage() {
   return (
     <LegalDocument
       title="Kebijakan Privasi"
-      updatedAt="30 Oktober 2026"
+      updatedAt="1 November 2026"
       intro={
         <p>
           Halaman ini menjelaskan data apa yang dikumpulkan Kekawinan saat kamu

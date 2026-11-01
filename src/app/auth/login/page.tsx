@@ -3,6 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import AuthShell from "@/components/pages/auth/auth-shell";
+import GoogleSignInButton from "@/components/pages/auth/google-sign-in-button";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { IconEye, IconEyeOff, IconLoader2 } from "@tabler/icons-react";
@@ -34,6 +35,8 @@ export default function LoginPage() {
                 Lanjutkan membuat undangan pernikahan digitalmu.
               </p>
             </div>
+
+            <GoogleSignInButton mode="login" />
 
             {/* Form fields */}
             <div className="flex flex-col gap-4">
