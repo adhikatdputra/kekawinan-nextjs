@@ -5,8 +5,8 @@ const undanganApi = {
   getUndangan: () => {
     return axios.get(`/undangan`);
   },
-  getMyUndangan: () => {
-    return axios.get(`/undangan/me`);
+  getMyUndangan: (params?: { page?: number; limit?: number }) => {
+    return axios.get(`/undangan/me`, { params });
   },
   getUndanganOverview: (id: string) => {
     return axios.get(`/undangan/${id}/overview`);

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { Loader2 } from "lucide-react";
@@ -23,6 +22,7 @@ import { useAuth } from "@/frontend/composable/useAuth";
 import undanganApi from "@/frontend/api/undangan";
 import themeApi from "@/frontend/api/theme";
 import creditsApi from "@/frontend/api/credits";
+import ThemePickerCaption from "@/components/pages/undangan/theme-picker-caption";
 import { Theme, UserCreditBalance } from "@/frontend/interface/undangan";
 
 interface Props {
@@ -141,10 +141,12 @@ export default function ThemeRequiredDialog({
                 const isSelected = selected?.id === item.id;
 
                 return (
+                  <div key={item.id}>
                   <button
-                    key={item.id}
                     type="button"
                     onClick={() => { if (affordable) setSelected(item); }}
+                    aria-pressed={isSelected}
+                    aria-label={`Pilih tema ${item.name}`}
                     className={`group relative w-full ${!affordable ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <div className={`relative rounded-lg overflow-hidden ${isSelected ? "ring-2 ring-green-kwn ring-offset-1" : "border border-border"}`}>
@@ -168,11 +170,10 @@ export default function ThemeRequiredDialog({
                           </div>
                         </div>
                       )}
-                      <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/70 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                        <Link href={`/${item.componentName?.toLowerCase()}/demo`} target="_blank">Preview</Link>
-                      </div>
                     </div>
                   </button>
+                  <ThemePickerCaption theme={item} />
+                  </div>
                 );
               })}
             </div>

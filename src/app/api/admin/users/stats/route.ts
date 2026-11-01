@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAuth, isAdminLevel } from '@/lib/jwt'
 import { ok, forbidden, serverError } from '@/lib/api-response'
+import { startOfWibDay } from '@/lib/jakarta-day'
 
 // GET /api/admin/users/stats
 export async function GET(request: NextRequest) {
@@ -10,13 +11,9 @@ export async function GET(request: NextRequest) {
   if (!isAdminLevel(auth.level)) return forbidden('Admin access required')
 
   try {
-    const now = new Date()
-    const startOf30Days = new Date(now)
-    startOf30Days.setDate(startOf30Days.getDate() - 30)
-    startOf30Days.setHours(0, 0, 0, 0)
-
-    const startOfToday = new Date(now)
-    startOfToday.setHours(0, 0, 0, 0)
+    // Day boundaries in WIB; the server clock is UTC
+    const startOf30Days = startOfWibDay(new Date(), 30)
+    const startOfToday = startOfWibDay()
 
     const [newUsers30d, loginUsers30d, loginToday] = await prisma.$transaction([
       prisma.user.count({

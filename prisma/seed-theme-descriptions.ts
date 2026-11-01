@@ -265,6 +265,22 @@ Cover menampilkan ilustrasi rumah kebaya lengkap dengan pohon kelapa, dan sepasa
 
 Cocok untuk pasangan yang menggelar pernikahan adat Betawi, atau ingin undangan yang meriah dengan sentuhan budaya Jakarta.`,
   },
+  {
+    componentName: "Theme21",
+    name: "Kabut Pagi",
+    keywords: [
+      "undangan pernikahan tema gunung",
+      "undangan digital nuansa alam",
+      "undangan pernikahan hijau hutan",
+    ],
+    metaDescription:
+      "Contoh undangan pernikahan digital bernuansa pegunungan berkabut di pagi hari, dengan warna hijau hutan dan krem. Lihat demonya di Kekawinan.",
+    description: `Kabut Pagi memakai foto pegunungan saat fajar sebagai latarnya: deretan gunung yang menembus kabut putih, hutan pinus di bagian bawah, dan danau kecil yang memantulkan cahaya pagi. Nama kalian tampil besar di atas langit yang pucat, lalu tamu membuka undangan dari panel hijau hutan di bagian bawah cover.
+
+Foto pasangan dibingkai seperti cetakan foto perjalanan dengan rangkaian pakis, ranting pinus, dan bunga liar putih di sudutnya. Foto mempelai memakai bingkai lengkung, dan detail acara disusun seperti jadwal perjalanan bernomor di atas latar hijau tua, lengkap dengan tombol menuju lokasi dan live streaming.
+
+Cocok untuk pasangan yang suka mendaki atau berlibur ke alam, atau ingin undangan yang tenang dan sejuk dengan nuansa hijau dan krem.`,
+  },
 ];
 
 // Tanpa argumen: semua tema. Dengan argumen: hanya tema itu, mis.

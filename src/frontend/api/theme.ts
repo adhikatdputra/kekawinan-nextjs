@@ -3,8 +3,10 @@ import { Params } from "../interface/undangan";
 
 const themeApi = {
   // Public: active themes for the invitation picker
+  // The picker shows every theme at once. The catalog is small and grows by
+  // hand, so one capped request beats paging (the API caps limit at 200).
   getTheme: async () => {
-    return axios.get(`/theme/public?sortBy=createdAt&order=DESC`);
+    return axios.get(`/theme/public?sortBy=createdAt&order=DESC&limit=100`);
   },
   // Admin only
   getThemeAll: async (params: Params) => {

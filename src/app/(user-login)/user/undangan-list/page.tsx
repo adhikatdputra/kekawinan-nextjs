@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/frontend/composable/useAuth";
 import useSession from "@/frontend/hook/useSession";
 import { Button } from "@/components/ui/button";
@@ -66,18 +66,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, keepPreviousData } from "@tanstack/react-query";
 import undanganApi from "@/frontend/api/undangan";
 import creditsApi from "@/frontend/api/credits";
 import redeemApi from "@/frontend/api/redeem";
 import themeApi from "@/frontend/api/theme";
 import authApi from "@/frontend/api/auth";
 import { Undangan, UserCreditBalance, Theme, UndanganBody } from "@/frontend/interface/undangan";
+import ThemePickerCaption from "@/components/pages/undangan/theme-picker-caption";
+import ListPagination from "@/components/pages/undangan/list-pagination";
 import { Loader2, ShoppingBag } from "lucide-react";
 
 
 // Set to true when Shopee credit is ready to launch
 const isShowCredit = false;
+const UNDANGAN_PER_PAGE = 10;
 
 export default function UndanganListPage() {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -111,11 +114,29 @@ export default function UndanganListPage() {
 
   // ── Queries ──────────────────────────────────────────────────────────────────
 
-  const { data: undangan, isLoading: isLoadingUndangan, refetch: refetchUndangan } = useQuery({
-    queryKey: ["undangan-me", getUser()?.id],
-    queryFn: () => undanganApi.getMyUndangan(),
-    select: (data) => data.data.data.rows as Undangan[],
+  const [listPage, setListPage] = useState(1);
+  const listTopRef = useRef<HTMLDivElement>(null);
+  const { data: undanganPage, isLoading: isLoadingUndangan, refetch: refetchUndangan } = useQuery({
+    queryKey: ["undangan-me", getUser()?.id, listPage],
+    queryFn: () => undanganApi.getMyUndangan({ page: listPage, limit: UNDANGAN_PER_PAGE }),
+    select: (data) => data.data.data as { rows: Undangan[]; total_page: number; total_data: number },
+    placeholderData: keepPreviousData,
   });
+
+  const undangan = undanganPage?.rows;
+  const totalListPages = undanganPage?.total_page ?? 1;
+
+  // Deleting the last undangan on the last page leaves that page empty
+  useEffect(() => {
+    if (undanganPage && undanganPage.rows.length === 0 && listPage > 1) {
+      setListPage(Math.max(1, undanganPage.total_page));
+    }
+  }, [undanganPage, listPage]);
+
+  const goToListPage = (next: number) => {
+    setListPage(next);
+    listTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const { data: creditData, isLoading: isLoadingCredits, refetch: refetchCredits } = useQuery({
     queryKey: ["my-credits", getUser()?.id],
@@ -432,10 +453,10 @@ export default function UndanganListPage() {
 
           {/* ── Daftar Undangan ─────────────────────────────────────────────── */}
           <div className="flex flex-col gap-4">
-            <div className={styles.listHeading}><div><h2>Undangan kalian</h2><p>Pilih undangan untuk mengatur konten, tamu, dan kado.</p></div><Link href="/faq" className={styles.helpLink}>Butuh bantuan?</Link></div>
+            <div ref={listTopRef} className={`${styles.listHeading} scroll-mt-24`}><div><h2>Undangan kalian</h2><p>Pilih undangan untuk mengatur konten, tamu, dan kado.</p></div><Link href="/faq" className={styles.helpLink}>Butuh bantuan?</Link></div>
             {isLoadingUndangan ? (
               <PendingData />
-            ) : (undangan?.length ?? 0) === 0 ? (
+            ) : (undanganPage?.total_data ?? 0) === 0 ? (
               <div className={styles.empty}><BrandCharacter character="courier" className={styles.emptyCharacter} /><h3>Cerita kalian mulai di sini.</h3><p>Buat undangan pertama, pilih tema, lalu isi detail hari bahagia kalian.</p><Button className={styles.createButton} onClick={openCreate}><IconPlus size={18} />Buat undangan pertama</Button></div>
             ) : (
               <div className="flex flex-col gap-4">
@@ -681,6 +702,9 @@ export default function UndanganListPage() {
                     </div>
                   );
                 })}
+                {totalListPages > 1 && (
+                  <ListPagination page={listPage} totalPages={totalListPages} onChange={goToListPage} />
+                )}
               </div>
             )}
           </div>
@@ -801,7 +825,7 @@ export default function UndanganListPage() {
                       className={
                         isDialogExpanded
                           ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 px-1"
-                          : "flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory -mx-1 px-1"
+                          : "grid grid-cols-2 sm:grid-cols-3 gap-3 px-1"
                       }
                     >
                       {themes?.map((item: Theme) => {
@@ -810,7 +834,7 @@ export default function UndanganListPage() {
                         const isSelected = selectedTheme?.id === item.id;
 
                         return (
-                          <div key={item.id} className={isDialogExpanded ? "" : "snap-start shrink-0 w-[44%] sm:w-[30%]"}>
+                          <div key={item.id}>
                             <button
                               type="button"
                               onClick={() => {
@@ -818,6 +842,8 @@ export default function UndanganListPage() {
                                 setSelectedTheme(item);
                                 if (formErrors.theme) setFormErrors((p) => ({ ...p, theme: undefined }));
                               }}
+                              aria-pressed={isSelected}
+                              aria-label={`Pilih tema ${item.name}`}
                               className={`group relative w-full ${!affordable ? "opacity-50 cursor-not-allowed" : ""}`}
                             >
                               <div className={`relative rounded-lg overflow-hidden ${isSelected ? "ring-2 ring-green-kwn ring-offset-1" : "border border-border"}`}>
@@ -854,11 +880,9 @@ export default function UndanganListPage() {
                                     </div>
                                   </div>
                                 )}
-                                <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/70 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                  <Link href={`/${item.componentName?.toLowerCase()}/demo`} target="_blank">Preview</Link>
-                                </div>
                               </div>
                             </button>
+                            <ThemePickerCaption theme={item} />
                           </div>
                         );
                       })}

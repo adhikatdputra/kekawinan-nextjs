@@ -252,7 +252,7 @@ export default function UsersPage() {
             <IconUserCheck size={24} />
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Login (30 hari)</p>
+            <p className="text-sm text-muted-foreground">Aktif (30 hari)</p>
             <p className="text-2xl font-bold">{statsData?.loginUsers30d ?? "—"}</p>
           </div>
         </div>
@@ -261,7 +261,7 @@ export default function UsersPage() {
             <IconLogin size={24} />
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Login Hari Ini</p>
+            <p className="text-sm text-muted-foreground">Aktif Hari Ini</p>
             <p className="text-2xl font-bold">{statsData?.loginToday ?? "—"}</p>
           </div>
         </div>

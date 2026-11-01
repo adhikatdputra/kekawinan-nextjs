@@ -47,6 +47,17 @@ export async function GET(request: NextRequest) {
         take: limit,
         // Featured themes stay on top whatever sort the picker asks for
         orderBy: [...FEATURED_FIRST_ORDER, { [sortBy]: order }],
+        // Only what the picker shows; description/keywords are long SEO text
+        select: {
+          id: true,
+          name: true,
+          thumbnail: true,
+          componentName: true,
+          credit: true,
+          promo: true,
+          isShowAdmin: true,
+          isFeatured: true,
+        },
       }),
       prisma.theme.count({ where }),
     ])

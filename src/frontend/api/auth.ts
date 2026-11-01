@@ -8,6 +8,9 @@ const authApi = {
   register: async (body: RegisterBody) => {
     return axios.post(`/users`, body);
   },
+  recordActivity: async () => {
+    return axios.post(`/auth/activity`);
+  },
   getMe: async () => {
     return axios.get(`/users/profile`);
   },

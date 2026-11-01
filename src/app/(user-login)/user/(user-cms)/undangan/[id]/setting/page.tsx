@@ -92,6 +92,9 @@ export default function SettingPage() {
   });
 
   const handleUpdateUndanganContent = () => {
+    // Until the saved content arrives the form still holds the defaults, and
+    // saving then would wipe a custom message
+    if (!undanganContent) return;
     if (whatsappMessage.length > WHATSAPP_MESSAGE_MAX_LENGTH) {
       toast.error(`Pesan WhatsApp maksimal ${WHATSAPP_MESSAGE_MAX_LENGTH} karakter`);
       return;
@@ -236,7 +239,7 @@ export default function SettingPage() {
         </div>
       </CmsSection>
 
-      <CmsSaveBar onSave={handleUpdateUndanganContent} pending={isUpdating} />
+      <CmsSaveBar onSave={handleUpdateUndanganContent} pending={isUpdating} disabled={!undanganContent} />
     </div>
   );
 }
