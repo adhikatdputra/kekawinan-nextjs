@@ -1,24 +1,29 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  CmsPageHeader,
+  CmsField,
+  cmsFocusRing,
+  cmsFileInput,
+  cmsPrimaryButton,
+  cmsSecondaryButton,
+} from "@/components/pages/undangan/cms-ui";
+import { BrandCharacter } from "@/components/pages/home/brand-visual";
 import { useParams } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import undanganGaleriApi from "@/frontend/api/undangan-galeri";
 import uploadApi from "@/frontend/api/upload";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
-import { Input } from "@/components/ui/input";
 import {
   IconChevronUp,
   IconChevronDown,
   IconLoader2,
+  IconPlus,
+  IconTrash,
 } from "@tabler/icons-react";
 import { UndanganGaleri } from "@/frontend/interface/undangan";
 import Image from "next/image";
-import MenuAction from "@/components/ui/custom/menu-action";
-import TablePending from "@/components/ui/custom/table-pending";
-import TableNoData from "@/components/ui/custom/table-no-data";
 
 import {
   AlertDialog,
@@ -31,15 +36,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
+const orderButton = `grid size-10 cursor-pointer place-items-center rounded-lg text-brand-ink transition-colors hover:bg-brand-mint disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent ${cmsFocusRing}`;
 
 export default function GaleriFotoPage() {
   const params = useParams();
@@ -146,117 +144,133 @@ export default function GaleriFotoPage() {
     }
   }, [undanganGaleri]);
 
+  const MAX_PHOTOS = 6;
+  const canAdd = tableData.length < MAX_PHOTOS;
+
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-1 border-b pb-4">
-        <h1 className="text-2xl font-bold">Galeri Foto</h1>
-        <p>
-          Upload maksimal 6 foto terbaik dengan pasanganmu untuk section gallery
-          di undangan kamu
-        </p>
-      </div>
-      {tableData.length < 6 && !isOpenCreate && (
-        <div>
-          <Button onClick={() => setIsOpenCreate(true)}>Tambah Foto</Button>
-        </div>
-      )}
-      {isOpenCreate && (
-        <div className="flex flex-col gap-6 bg-green-soft-kwn p-4 rounded-md">
-          <div className="grid gap-2">
-            <Label htmlFor="image">Upload Foto</Label>
-            <Input
-              type="file"
-              id="image"
-              accept="image/*"
-              onChange={(e) => setImage(e.target.files?.[0] || null)}
-              className="cursor-pointer bg-white"
-            />
-            <p className="text-sm text-muted-foreground">
-              Format file yang diizinkan: PNG, JPG, JPEG, GIF, dan WEBP. Ukuran
-              maksimal 1MB.
+    <div className="flex flex-col gap-6 text-brand-ink">
+      <CmsPageHeader
+        title="Galeri foto"
+        description="Pilih sampai 6 foto terbaik kalian berdua untuk bagian galeri di undangan."
+      />
+
+      <section aria-labelledby="galeri-heading" className="grid gap-4">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 id="galeri-heading" className="font-bold">Foto kamu</h2>
+            <p className="mt-1 text-sm text-brand-muted">
+              {isLoading ? "Memuat…" : `${tableData.length} dari ${MAX_PHOTOS} foto. Urutan di sini sama dengan di undangan.`}
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button
-              onClick={handleCreateUndanganGaleri}
-              disabled={isCreating || !image}
-            >
-              {isCreating ? (
-                <>
-                  <IconLoader2 className="animate-spin" />
-                  <span>Menyimpan...</span>
-                </>
-              ) : (
-                <span>Simpan Foto</span>
-              )}
-            </Button>
-            <Button variant="outline" onClick={() => setIsOpenCreate(false)}>
-              Batal
-            </Button>
-          </div>
+          {canAdd && !isOpenCreate && (
+            <button type="button" onClick={() => setIsOpenCreate(true)} className={cmsPrimaryButton}>
+              <IconPlus size={18} aria-hidden="true" />
+              Tambah foto
+            </button>
+          )}
         </div>
-      )}
-      <div>
-        <Table>
-          <TableCaption>Maksimal 6 foto</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Gambar</TableHead>
-              <TableHead className="text-right">Aksi</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TablePending colSpan={2} />
-            ) : tableData.length > 0 ? (
-              tableData.map((item, index) => (
-                <TableRow key={item.id}>
-                  <TableCell>
-                    <Image
-                      src={item.image}
-                      alt="Gambar"
-                      width={400}
-                      height={400}
-                      className="w-[160px] rounded-md"
-                    />
-                  </TableCell>
-                  <TableCell className="text-right flex gap-2 justify-end items-center">
-                    {index > 0 && (
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => moveUpFoto(item.id)}
-                        className="rounded-md h-7 w-7 bg-green-kwn text-white"
-                      >
-                        <IconChevronUp />
-                      </Button>
-                    )}
-                    {index < tableData.length - 1 && (
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => moveDownFoto(item.id)}
-                        className="rounded-md h-7 w-7 bg-blue-600 text-white"
-                      >
-                        <IconChevronDown />
-                      </Button>
-                    )}
-                    <MenuAction
-                      handleDelete={() => {
+
+        {isOpenCreate && (
+          <div className="grid gap-4 rounded-2xl border border-brand-line bg-brand-mint p-4 sm:p-6">
+            <CmsField
+              label="Upload foto"
+              htmlFor="image"
+              hint="PNG, JPG, JPEG, GIF, atau WEBP. Maksimal 1MB."
+            >
+              <input
+                type="file"
+                id="image"
+                accept="image/*"
+                onChange={(e) => setImage(e.target.files?.[0] || null)}
+                className={cmsFileInput}
+              />
+            </CmsField>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={handleCreateUndanganGaleri}
+                disabled={isCreating || !image}
+                className={cmsPrimaryButton}
+              >
+                {isCreating ? (
+                  <>
+                    <IconLoader2 size={18} className="animate-spin" aria-hidden="true" />
+                    Menyimpan…
+                  </>
+                ) : (
+                  "Simpan foto"
+                )}
+              </button>
+              <button type="button" onClick={() => setIsOpenCreate(false)} className={cmsSecondaryButton}>
+                Batal
+              </button>
+            </div>
+          </div>
+        )}
+
+        {isLoading ? (
+          <div className="flex items-center justify-center gap-2 rounded-2xl bg-brand-cream p-10 text-brand-muted">
+            <IconLoader2 size={20} className="animate-spin" aria-hidden="true" />
+            Memuat foto…
+          </div>
+        ) : tableData.length > 0 ? (
+          <ol className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
+            {tableData.map((item, index) => (
+              <li key={item.id} className="overflow-hidden rounded-2xl border border-brand-line bg-brand-cream">
+                <Image
+                  src={item.image}
+                  alt={`Foto galeri ke-${index + 1}`}
+                  width={400}
+                  height={400}
+                  className="aspect-square w-full object-cover"
+                />
+                <div className="flex items-center justify-between gap-2 p-2">
+                  <span className="pl-1 text-sm font-bold text-brand-muted">#{index + 1}</span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => moveUpFoto(item.id)}
+                      disabled={index === 0}
+                      aria-label={`Pindahkan foto ke-${index + 1} ke atas`}
+                      className={orderButton}
+                    >
+                      <IconChevronUp size={18} aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => moveDownFoto(item.id)}
+                      disabled={index === tableData.length - 1}
+                      aria-label={`Pindahkan foto ke-${index + 1} ke bawah`}
+                      className={orderButton}
+                    >
+                      <IconChevronDown size={18} aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
                         setIsOpenDelete(true);
                         setSelectedItem(item);
                       }}
-                      items={["Hapus"]}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableNoData colSpan={2} />
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                      aria-label={`Hapus foto ke-${index + 1}`}
+                      className={`${orderButton} text-brand-rose hover:bg-brand-pink`}
+                    >
+                      <IconTrash size={18} aria-hidden="true" />
+                    </button>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <div className="flex flex-col items-center rounded-2xl border border-dashed border-brand-line bg-brand-cream px-6 py-10 text-center">
+            <BrandCharacter character="gift" className="w-28" />
+            <p className="mt-4 font-bold">Belum ada foto</p>
+            <p className="mt-1 max-w-sm text-sm text-brand-muted">
+              Tambahkan foto prewedding atau momen favorit kalian berdua.
+            </p>
+          </div>
+        )}
+      </section>
 
       <AlertDialog open={isOpenDelete} onOpenChange={setIsOpenDelete}>
         <AlertDialogContent>

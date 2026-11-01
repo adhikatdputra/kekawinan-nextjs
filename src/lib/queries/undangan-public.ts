@@ -25,7 +25,8 @@ async function queryPublicUndanganBySlug(permalink: string) {
   const data = await prisma.undangan.findUnique({
     where: { permalink },
     include: {
-      content: true,
+      // The WhatsApp template is only for the owner, not for guests
+      content: { omit: { whatsappMessage: true } },
       gifts: {
         include: { bank: true },
         orderBy: { createdAt: 'asc' },

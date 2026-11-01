@@ -276,6 +276,62 @@ Cocok untuk pasangan yang ingin warna gelap yang hangat dengan sentuhan bunga ya
 
 ---
 
+## theme17 · Cobalt Pop
+
+**Keyword:** undangan pernikahan lucu, undangan digital kartun, undangan pernikahan ceria
+**Meta description:** Contoh undangan pernikahan digital yang lucu dan ceria, dengan karakter kartun biru dan pink serta warna cerah. Lihat demonya di Kekawinan.
+
+**Deskripsi:**
+Cobalt Pop adalah tema paling ceria di Kekawinan. Dua karakter kartun, satu biru dan satu pink, bergandengan tangan di cover, lengkap dengan stiker kuning bertuliskan "A little love. A lot of fun!" dan nama kalian dalam huruf biru besar.
+
+Setelah undangan dibuka, foto kalian diapit dua karakter mempelai. Profil pengantin memakai kartu lengkung pink dan biru, hitung mundur tampil dalam kotak warna-warni, dan bagian RSVP ditemani karakter hijau yang membawa surat cinta.
+
+Pilih tema ini kalau kalian ingin undangan yang santai dan bikin tamu tersenyum, bukan yang formal dan kalem.
+
+---
+
+## theme18 · Panggih
+
+**Keyword:** undangan pernikahan adat jawa, undangan digital jawa, undangan pernikahan jawa klasik
+**Meta description:** Contoh undangan pernikahan digital adat Jawa dengan gunungan, bingkai ukiran kayu pendopo, dan warna cokelat emas. Lihat demonya di Kekawinan.
+
+**Deskripsi:**
+Panggih berarti "bertemu", nama salah satu prosesi dalam pernikahan adat Jawa. Undangannya dibuka seperti pintu kayu cokelat yang terbelah ke kiri dan kanan, lalu menampilkan gunungan berukir pohon kehidupan di atas kertas krem.
+
+Setiap bagian dibingkai ukiran kayu pendopo dengan rangkaian melati di sudut bawahnya. Foto kalian tampil dalam bingkai lengkung bergaris emas, hitung mundur memakai angka emas di atas latar cokelat tua, dan ucapan dari tamu ditulis di kartu berhias motif kawung. Sapaan seperti "Panggih ing katresnan" dan "Matur nuwun" ikut melengkapi suasananya.
+
+Cocok untuk pasangan yang menggelar pernikahan adat Jawa, atau ingin undangan yang klasik dan hangat dengan warna kayu dan emas.
+
+---
+
+## theme19 · Priangan
+
+**Keyword:** undangan pernikahan adat sunda, undangan digital sunda, undangan pernikahan siger sunda
+**Meta description:** Contoh undangan pernikahan digital adat Sunda dengan siger, untaian melati, dan lukisan alam Priangan. Lihat demonya di Kekawinan.
+
+**Deskripsi:**
+Priangan terinspirasi dari tanah Sunda. Cover menampilkan siger, mahkota pengantin Sunda, yang dihiasi untaian melati, di atas kertas krem berbingkai garis emas tipis. Di bagian bawah halaman ada lukisan rumah adat di tengah sawah terasering, dengan gunung berkabut di belakangnya.
+
+Warna utamanya hijau hutan dan krem, dengan aksen emas. Sapaan Sunda seperti "Wilujeng sumping", "Dina bagja urang", dan "Hatur nuhun" menemani nama kalian, dan cerita cinta kalian tampil sebagai album foto.
+
+Pilih tema ini kalau kalian menggelar pernikahan adat Sunda, atau ingin undangan bernuansa alam yang tenang dan sejuk.
+
+---
+
+## theme20 · Serambi Betawi
+
+**Keyword:** undangan pernikahan adat betawi, undangan digital betawi, undangan pernikahan ondel-ondel
+**Meta description:** Contoh undangan pernikahan digital adat Betawi dengan rumah kebaya, ondel-ondel, dan lisplang gigi balang. Lihat demonya di Kekawinan.
+
+**Deskripsi:**
+Serambi Betawi mengajak tamu masuk ke teras rumah Betawi. Setiap halaman dibingkai genteng merah, lisplang gigi balang berwarna emas, dan tiang kayu hijau, dengan bunga bugenvil di kedua sudut bawahnya.
+
+Cover menampilkan ilustrasi rumah kebaya lengkap dengan pohon kelapa, dan sepasang ondel-ondel menyambut tamu setelah undangan dibuka. Warnanya krem, hijau tua, emas, dan merah marun, seperti rumah Betawi yang sedang menggelar hajatan.
+
+Cocok untuk pasangan yang menggelar pernikahan adat Betawi, atau ingin undangan yang meriah dengan sentuhan budaya Jakarta.
+
+---
+
 ## Catatan untuk diperiksa
 
 - Deskripsi ditulis dari thumbnail dan kode. Beberapa detail kecil (misalnya jenis bunga di theme4 dan theme16) sebaiknya dicocokkan dengan demo aslinya.

@@ -1,6 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  CmsPageHeader,
+  CmsField,
+  cmsFocusRing,
+  cmsFileInput,
+  cmsPrimaryButton,
+  cmsSecondaryButton,
+  cmsInput,
+  cmsTextarea,
+} from "@/components/pages/undangan/cms-ui";
+import { BrandCharacter } from "@/components/pages/home/brand-visual";
 import { useParams } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import loveStoryApi from "@/frontend/api/undangan-love-story";
@@ -8,16 +19,7 @@ import uploadApi from "@/frontend/api/upload";
 import { LoveStory } from "@/frontend/interface/undangan";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,14 +36,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import MenuAction from "@/components/ui/custom/menu-action";
-import TablePending from "@/components/ui/custom/table-pending";
-import TableNoData from "@/components/ui/custom/table-no-data";
 import Image from "next/image";
 import toast from "react-hot-toast";
-import { IconChevronUp, IconChevronDown, IconLoader2 } from "@tabler/icons-react";
+import {
+  IconChevronUp,
+  IconChevronDown,
+  IconLoader2,
+  IconPlus,
+  IconEdit,
+  IconTrash,
+} from "@tabler/icons-react";
 
 const EMPTY_FORM = { waktu: "", lokasi: "", story: "" };
+
+const orderButton = `grid size-10 cursor-pointer place-items-center rounded-lg text-brand-ink transition-colors hover:bg-brand-mint disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent ${cmsFocusRing}`;
 
 export default function LoveStoryPage() {
   const params = useParams();
@@ -202,178 +210,194 @@ export default function LoveStoryPage() {
   // ── Shared form fields ───────────────────────────────────────────────────────
 
   const formFields = (
-    <div className="flex flex-col gap-4">
-      <div className="grid gap-2">
-        <Label>
-          Foto <span className="text-muted-foreground text-xs">(opsional)</span>
-        </Label>
-        <Input
+    <div className="grid gap-5">
+      <CmsField label="Foto" htmlFor="story-image" optional hint="PNG, JPG, JPEG, atau WEBP. Maksimal 1MB.">
+        <input
+          id="story-image"
           type="file"
           accept="image/*"
           onChange={handleImageChange}
-          className="cursor-pointer bg-white border-white"
+          className={cmsFileInput}
         />
         {imagePreview && (
           <Image
             src={imagePreview}
-            alt="Preview"
+            alt="Preview foto cerita"
             width={400}
             height={300}
-            className="w-[120px] object-cover rounded-md"
+            className="w-[140px] rounded-xl object-cover"
           />
         )}
-        <p className="text-xs text-muted-foreground">
-          Format: PNG, JPG, JPEG, WEBP. Maks 1MB.
-        </p>
+      </CmsField>
+      <div className="grid gap-5 sm:grid-cols-2">
+        <CmsField label="Waktu" htmlFor="story-waktu" optional>
+          <Input
+            id="story-waktu"
+            placeholder="Juni 2019"
+            value={form.waktu}
+            onChange={(e) => setForm((f) => ({ ...f, waktu: e.target.value }))}
+            className={cmsInput}
+          />
+        </CmsField>
+        <CmsField label="Lokasi" htmlFor="story-lokasi" optional>
+          <Input
+            id="story-lokasi"
+            placeholder="Bandung"
+            value={form.lokasi}
+            onChange={(e) => setForm((f) => ({ ...f, lokasi: e.target.value }))}
+            className={cmsInput}
+          />
+        </CmsField>
       </div>
-      <div className="grid gap-2">
-        <Label>
-          Waktu <span className="text-muted-foreground text-xs">(opsional)</span>
-        </Label>
-        <Input
-          placeholder="contoh: Juni 2019, Tahun 2020..."
-          value={form.waktu}
-          onChange={(e) => setForm((f) => ({ ...f, waktu: e.target.value }))}
-          className="bg-white"
-        />
-      </div>
-      <div className="grid gap-2">
-        <Label>
-          Lokasi <span className="text-muted-foreground text-xs">(opsional)</span>
-        </Label>
-        <Input
-          placeholder="contoh: Bandung, Jakarta..."
-          value={form.lokasi}
-          onChange={(e) => setForm((f) => ({ ...f, lokasi: e.target.value }))}
-          className="bg-white"
-        />
-      </div>
-      <div className="grid gap-2">
-        <Label>
-          Story <span className="text-red-500">*</span>
-        </Label>
+      <CmsField label="Cerita" htmlFor="story-text">
         <Textarea
-          placeholder="Ceritakan momen ini..."
+          id="story-text"
+          placeholder="Ceritakan momen ini…"
           rows={4}
           value={form.story}
           onChange={(e) => setForm((f) => ({ ...f, story: e.target.value }))}
-          className="bg-white"
+          className={cmsTextarea}
+          required
         />
-      </div>
+      </CmsField>
     </div>
   );
 
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-1 border-b pb-4">
-        <h1 className="text-2xl font-bold">Love Story</h1>
-        <p>
-          Ceritakan perjalanan cinta kalian — momen-momen yang tak terlupakan
-          sebelum hari bahagia.
-        </p>
-      </div>
+    <div className="flex flex-col gap-6 text-brand-ink">
+      <CmsPageHeader
+        title="Love story"
+        description="Ceritakan perjalanan cinta kalian, dari momen pertama sampai hari bahagia."
+      />
 
-      {!isOpenCreate && (
-        <div>
-          <Button onClick={() => { resetForm(); setIsOpenCreate(true); }}>
-            + Tambah Cerita
-          </Button>
-        </div>
-      )}
-
-      {isOpenCreate && (
-        <div className="bg-green-soft-kwn p-4 rounded-md">
-          <h2 className="font-semibold mb-4">Tambah Cerita Baru</h2>
-          {formFields}
-          <div className="flex gap-2 mt-4">
-            <Button onClick={handleCreate} disabled={isCreating || !form.story.trim()}>
-              {isCreating ? (
-                <><IconLoader2 className="animate-spin w-4 h-4" /><span>Menyimpan...</span></>
-              ) : "Simpan"}
-            </Button>
-            <Button variant="outline" onClick={() => { setIsOpenCreate(false); resetForm(); }}>
-              Batal
-            </Button>
+      <section aria-labelledby="story-heading" className="grid gap-4">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 id="story-heading" className="font-bold">Cerita kalian</h2>
+            <p className="mt-1 text-sm text-brand-muted">
+              {isLoading ? "Memuat…" : `${tableData.length} cerita. Urutan di sini sama dengan di undangan.`}
+            </p>
           </div>
-        </div>
-      )}
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Foto</TableHead>
-            <TableHead>Waktu &amp; Lokasi</TableHead>
-            <TableHead>Story</TableHead>
-            <TableHead className="text-right">Aksi</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {isLoading ? (
-            <TablePending colSpan={4} />
-          ) : tableData.length > 0 ? (
-            tableData.map((item, index) => (
-              <TableRow key={item.id}>
-                <TableCell>
-                  {item.image ? (
-                    <Image
-                      src={item.image}
-                      alt="foto"
-                      width={120}
-                      height={80}
-                      className="w-[100px] rounded-md object-cover"
-                    />
-                  ) : (
-                    <span className="text-muted-foreground text-sm">–</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-col gap-0.5 text-sm">
-                    {item.waktu && <span className="font-medium">{item.waktu}</span>}
-                    {item.lokasi && <span className="text-muted-foreground">{item.lokasi}</span>}
-                    {!item.waktu && !item.lokasi && <span className="text-muted-foreground">–</span>}
-                  </div>
-                </TableCell>
-                <TableCell className="max-w-xs">
-                  <p className="line-clamp-3 text-sm">{item.story}</p>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex gap-2 justify-end items-center">
-                    {index > 0 && (
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => handleMoveUp(item.id)}
-                        className="h-7 w-7 bg-green-kwn text-white rounded-md"
-                      >
-                        <IconChevronUp />
-                      </Button>
-                    )}
-                    {index < tableData.length - 1 && (
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => handleMoveDown(item.id)}
-                        className="h-7 w-7 bg-blue-600 text-white rounded-md"
-                      >
-                        <IconChevronDown />
-                      </Button>
-                    )}
-                    <MenuAction
-                      handleEdit={() => openEdit(item)}
-                      handleDelete={() => { setSelectedItem(item); setIsOpenDelete(true); }}
-                      items={["Edit", "Hapus"]}
-                    />
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableNoData colSpan={4} />
+          {!isOpenCreate && (
+            <button
+              type="button"
+              onClick={() => { resetForm(); setIsOpenCreate(true); }}
+              className={cmsPrimaryButton}
+            >
+              <IconPlus size={18} aria-hidden="true" />
+              Tambah cerita
+            </button>
           )}
-        </TableBody>
-      </Table>
+        </div>
+
+        {isOpenCreate && (
+          <div className="rounded-2xl border border-brand-line bg-brand-mint p-4 sm:p-6">
+            <h3 className="mb-4 font-bold">Cerita baru</h3>
+            {formFields}
+            <div className="mt-5 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={handleCreate}
+                disabled={isCreating || !form.story.trim()}
+                className={cmsPrimaryButton}
+              >
+                {isCreating ? (
+                  <><IconLoader2 size={18} className="animate-spin" aria-hidden="true" />Menyimpan…</>
+                ) : "Simpan cerita"}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setIsOpenCreate(false); resetForm(); }}
+                className={cmsSecondaryButton}
+              >
+                Batal
+              </button>
+            </div>
+          </div>
+        )}
+
+        {isLoading ? (
+          <div className="flex items-center justify-center gap-2 rounded-2xl bg-brand-cream p-10 text-brand-muted">
+            <IconLoader2 size={20} className="animate-spin" aria-hidden="true" />
+            Memuat cerita…
+          </div>
+        ) : tableData.length > 0 ? (
+          <ol className="grid gap-3">
+            {tableData.map((item, index) => (
+              <li
+                key={item.id}
+                className="flex flex-col gap-4 rounded-2xl border border-brand-line bg-brand-cream p-4 sm:flex-row"
+              >
+                {item.image ? (
+                  <Image
+                    src={item.image}
+                    alt=""
+                    width={240}
+                    height={240}
+                    className="aspect-[4/3] w-full shrink-0 rounded-xl object-cover sm:w-[140px]"
+                  />
+                ) : (
+                  <div className="hidden w-[140px] shrink-0 place-items-center rounded-xl bg-brand-mint text-xs text-brand-muted sm:grid">
+                    Tanpa foto
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold text-brand-muted">
+                    #{index + 1}
+                    {item.waktu && <> · {item.waktu}</>}
+                    {item.lokasi && <> · {item.lokasi}</>}
+                  </p>
+                  <p className="mt-1.5 line-clamp-3 text-sm leading-relaxed">{item.story}</p>
+                </div>
+                <div className="flex items-start gap-1 sm:flex-col">
+                  <button
+                    type="button"
+                    onClick={() => handleMoveUp(item.id)}
+                    disabled={index === 0}
+                    aria-label={`Pindahkan cerita ke-${index + 1} ke atas`}
+                    className={orderButton}
+                  >
+                    <IconChevronUp size={18} aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleMoveDown(item.id)}
+                    disabled={index === tableData.length - 1}
+                    aria-label={`Pindahkan cerita ke-${index + 1} ke bawah`}
+                    className={orderButton}
+                  >
+                    <IconChevronDown size={18} aria-hidden="true" />
+                  </button>
+                </div>
+                <div className="flex gap-2 sm:flex-col">
+                  <button type="button" onClick={() => openEdit(item)} className={`${cmsSecondaryButton} px-4!`}>
+                    <IconEdit size={16} aria-hidden="true" />
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setSelectedItem(item); setIsOpenDelete(true); }}
+                    className={`${cmsSecondaryButton} border-brand-pink-deep! bg-brand-pink! px-4! text-brand-rose! hover:bg-brand-pink-deep!`}
+                  >
+                    <IconTrash size={16} aria-hidden="true" />
+                    Hapus
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <div className="flex flex-col items-center rounded-2xl border border-dashed border-brand-line bg-brand-cream px-6 py-10 text-center">
+            <BrandCharacter character="host" className="w-28" />
+            <p className="mt-4 font-bold">Belum ada cerita</p>
+            <p className="mt-1 max-w-sm text-sm text-brand-muted">
+              Mulai dari pertama kali kalian bertemu, misalnya.
+            </p>
+          </div>
+        )}
+      </section>
 
       {/* Edit Dialog */}
       <Dialog
@@ -388,7 +412,11 @@ export default function LoveStoryPage() {
           </DialogHeader>
           {formFields}
           <div className="flex gap-2 mt-4">
-            <Button onClick={handleUpdate} disabled={isUpdating || !form.story.trim()}>
+            <Button
+              className="bg-brand-green hover:bg-brand-green-dark"
+              onClick={handleUpdate}
+              disabled={isUpdating || !form.story.trim()}
+            >
               {isUpdating ? (
                 <><IconLoader2 className="animate-spin w-4 h-4" /><span>Menyimpan...</span></>
               ) : "Simpan"}

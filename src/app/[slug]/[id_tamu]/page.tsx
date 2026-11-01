@@ -176,17 +176,17 @@ export default async function UndanganPage({ params, searchParams }: Props) {
   // Desktop: text on the left, phone frame on the right (sticky while the
   // text scrolls). Mobile: invitation first, text below.
   return (
-    <div className="lg:min-h-screen lg:bg-green-soft-kwn/40">
+    <div className="bg-brand-cream lg:min-h-screen">
       <script
         type="application/ld+json"
         // Escape "<" so a theme name can never close the script tag
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, "\\u003c") }}
       />
-      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-center lg:gap-20 lg:px-8 lg:py-14 max-w-6xl mx-auto">
-        <div className="order-2 lg:order-none lg:max-w-[440px] lg:pt-6 border-t border-gray-100 lg:border-t-0">
+      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-center lg:gap-16 lg:px-8 lg:py-12 max-w-6xl mx-auto">
+        <div className="order-2 border-t border-brand-line lg:order-none lg:max-w-[480px] lg:border-t-0 lg:pt-6">
           <ThemeDemoInfo name={themeName} description={demoTheme.description} />
         </div>
-        <div className="order-1 lg:order-none lg:shrink-0 lg:sticky lg:top-14">
+        <div className="order-1 lg:order-none lg:shrink-0 lg:sticky lg:top-8">
           <ThemeDemoPreview slug={slug} themeName={themeName}>
             {view}
           </ThemeDemoPreview>

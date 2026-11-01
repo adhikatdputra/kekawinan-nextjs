@@ -1,15 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  CmsPageHeader,
+  CmsSection,
+  CmsField,
+  CmsSaveBar,
+  cmsInput,
+  cmsTextarea,
+} from "@/components/pages/undangan/cms-ui";
 import { useParams } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import undanganContentApi from "@/frontend/api/undangan-content";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
-import { Loader2 } from "lucide-react";
 
 export default function InformasiAcaraPage() {
   const params = useParams();
@@ -66,88 +71,71 @@ export default function InformasiAcaraPage() {
   }, [undanganContent]);
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-1 border-b pb-4">
-        <h1 className="text-2xl font-bold">Informasi Acara Pernikahan</h1>
-        <p>
-          Masukkan informasi acara pernikahanmu agar memudahkan para tamu untuk
-          datang ke acara bahagiamu
-        </p>
+    <div className="flex flex-col gap-6 text-brand-ink">
+      <CmsPageHeader
+        title="Informasi acara"
+        description="Waktu dan tempat acara, supaya tamu tahu kapan dan ke mana harus datang."
+      />
+
+      <div className="grid gap-6 xl:grid-cols-2">
+        <CmsSection title="Akad nikah">
+          <CmsField label="Waktu" htmlFor="akad_time" hint="Contoh: 3 Desember 2022 • 15.00 - 17.00 WIB">
+            <Input
+              id="akad_time"
+              value={akad_time}
+              onChange={(e) => setAkadTime(e.target.value)}
+              placeholder="3 Desember 2022 • 15.00 - 17.00 WIB"
+              className={cmsInput}
+            />
+          </CmsField>
+          <CmsField label="Lokasi" htmlFor="akad_place" hint="Nama gedung dan alamat lengkap.">
+            <Textarea
+              id="akad_place"
+              value={akad_place}
+              onChange={(e) => setAkadPlace(e.target.value)}
+              className={cmsTextarea}
+            />
+          </CmsField>
+        </CmsSection>
+
+        <CmsSection title="Resepsi">
+          <CmsField label="Waktu" htmlFor="resepsi_time" hint="Contoh: 3 Desember 2022 • 19.00 - 21.00 WIB">
+            <Input
+              id="resepsi_time"
+              value={resepsi_time}
+              onChange={(e) => setResepsiTime(e.target.value)}
+              placeholder="3 Desember 2022 • 19.00 - 21.00 WIB"
+              className={cmsInput}
+            />
+          </CmsField>
+          <CmsField label="Lokasi" htmlFor="resepsi_place" hint="Nama gedung dan alamat lengkap.">
+            <Textarea
+              id="resepsi_place"
+              value={resepsi_place}
+              onChange={(e) => setResepsiPlace(e.target.value)}
+              className={cmsTextarea}
+            />
+          </CmsField>
+        </CmsSection>
       </div>
-      <div className="flex flex-col gap-6">
-        <div className="grid gap-2">
-          <Label htmlFor="akad_time">Waktu Akad Nikah</Label>
+
+      <CmsSection title="Peta lokasi">
+        <CmsField
+          label="Link Google Maps"
+          htmlFor="gmaps"
+          hint="Buka lokasinya di Google Maps, pilih Bagikan, lalu salin link-nya ke sini."
+        >
           <Input
-            id="akad_time"
-            value={akad_time}
-            onChange={(e) => setAkadTime(e.target.value)}
-            placeholder="Masukkan waktu akad nikah"
-            className="h-10"
-          />
-          <p className="text-sm text-muted-foreground">
-            Contoh: 3 Desember 2022 • 15.00 - 17.00 WIB
-          </p>
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="akad_place">Lokasi Akad Nikah</Label>
-          <Textarea
-            id="akad_place"
-            value={akad_place}
-            onChange={(e) => setAkadPlace(e.target.value)}
-            placeholder="Masukkan lokasi akad nikah"
-          />
-          <p className="text-sm text-muted-foreground">
-            Nama gedung dan alamat lengkap
-          </p>
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="resepsi_time">Waktu Resepsi Nikah</Label>
-          <Input
-            id="resepsi_time"
-            value={resepsi_time}
-            onChange={(e) => setResepsiTime(e.target.value)}
-            placeholder="Masukkan waktu resepsi nikah"
-            className="h-10"
-          />
-          <p className="text-sm text-muted-foreground">
-            Contoh: 3 Desember 2022 • 15.00 - 17.00 WIB
-          </p>
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="resepsi_place">Lokasi Resepsi Nikah</Label>
-          <Textarea
-            id="resepsi_place"
-            value={resepsi_place}
-            onChange={(e) => setResepsiPlace(e.target.value)}
-            placeholder="Masukkan lokasi resepsi nikah"
-          />
-          <p className="text-sm text-muted-foreground">
-            Nama gedung dan alamat lengkap
-          </p>
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="resepsi_time">Lokasi Google Maps</Label>
-          <Input
-            id="resepsi_time"
+            id="gmaps"
             value={gmaps}
             onChange={(e) => setGmaps(e.target.value)}
-            placeholder="Masukkan lokasi google maps"
-            className="h-10"
+            placeholder="https://maps.app.goo.gl/…"
+            className={cmsInput}
           />
-        </div>
-      </div>
-      <div>
-        <Button onClick={handleUpdateUndanganContent} disabled={isUpdating}>
-          {isUpdating ? (
-            <>
-              <Loader2 className="animate-spin" />
-              <span>Menyimpan...</span>
-            </>
-          ) : (
-            <span>Simpan Perubahan</span>
-          )}
-        </Button>
-      </div>
+        </CmsField>
+      </CmsSection>
+
+      <CmsSaveBar onSave={handleUpdateUndanganContent} pending={isUpdating} />
     </div>
   );
 }

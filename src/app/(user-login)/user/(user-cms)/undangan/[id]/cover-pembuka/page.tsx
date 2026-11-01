@@ -1,15 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  CmsPageHeader,
+  CmsSection,
+  CmsField,
+  CmsSaveBar,
+  cmsInput,
+  cmsFileInput,
+  cmsSecondaryButton,
+} from "@/components/pages/undangan/cms-ui";
 import { useParams } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import undanganContentApi from "@/frontend/api/undangan-content";
 import uploadApi from "@/frontend/api/upload";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
-import { Loader2, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import ImageUpload from "@/components/ui/custom/image-uploader";
 import Link from "next/link";
 import { IconCalendar, IconX } from "@tabler/icons-react";
@@ -160,169 +167,158 @@ export default function CoverPembukaPage() {
   }, [undanganContent]);
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-1 border-b pb-4">
-        <h1 className="text-2xl font-bold">Cover Pembuka</h1>
-        <p>
-          Kamu dapat mengatur tampilan depan halaman undangan. Jangan lupa
-          mengisi semua data ya biar undangan bagus maksimal
-        </p>
-      </div>
-      <div className="grid gap-8">
-        <div className="flex flex-col gap-6">
-          <div className="grid gap-2">
-            <div className="md:w-1/2">
-              <Label htmlFor="date" className="pb-2">
-                Tanggal Pernikahan
-              </Label>
-              <DateTimePicker
-                onChange={setDateWedding}
-                value={date_wedding}
-                locale="id"
-                format="dd MMMM yyyy HH:mm"
-                // Batas 1 tahun sejak undangan dibuat (server juga mengecek)
-                maxDate={
-                  !isAdmin && undanganContent?.createdAt
-                    ? new Date(new Date(undanganContent.createdAt).getTime() + 365 * 24 * 60 * 60 * 1000)
-                    : undefined
-                }
-                calendarIcon={<IconCalendar />}
-                clearIcon={<IconX size={16} />}
-                className="h-10"
-              />
-              {date_wedding && (
-                <p className="text-sm text-muted-foreground mt-2">
-                  {formatDateIdWithTime(date_wedding.toString())} WIB
-                </p>
-              )}
-              <p className="text-xs text-muted-foreground mt-1">
-                Undangan aktif setidaknya sampai 2 minggu setelah tanggal ini. Tanggal
-                paling jauh 1 tahun sejak undangan dibuat.
-              </p>
-            </div>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="img_thumbnail">Gambar Thumbnail</Label>
-            <div className="flex flex-col md:flex-row gap-4 md:items-center">
-              <ImageUpload
-                placeholder="w-32 h-32 bg-gray-200 rounded-full"
-                icon={Upload}
-                iconSize={32}
-                defaultValue={img_thumbnail}
-                onChange={(file, imageUrl) => {
-                  if (file) {
-                    setImgThumbnail(imageUrl as string);
-                    setImgThumbnailUpload(file);
-                  }
-                }}
-              />
-              <div className="text-sm text-muted-foreground md:w-1/2">
-                Foto thumbnail digunakan untuk icon website kamu dan juga gambar
-                cover amplop di awal undangan (Saran dimensi: 1:1 / 300 x
-                300px). Contoh:{" "}
-                <Link
-                  href="/images/thumb.png"
-                  target="_blank"
-                  className="text-green-kwn font-semibold"
-                >
-                  Lihat Gambar
-                </Link>
-              </div>
-            </div>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="img_bg">Foto Cover Undangan</Label>
-            <div className="flex flex-col md:flex-row gap-4 md:items-center">
-              <ImageUpload
-                placeholder="w-40 h-[200px] bg-gray-200 rounded-md"
-                icon={Upload}
-                iconSize={32}
-                defaultValue={img_bg}
-                onChange={(file, imageUrl) => {
-                  if (file) {
-                    setImgBg(imageUrl as string);
-                    setImgBgUpload(file);
-                  }
-                }}
-              />
-              <div className="text-sm text-muted-foreground md:w-1/2">
-                Upload foto calon pengantin, foto ini akan di gunakan sebagai
-                cover dari undanganmu (Maks ukuran 1Mb).{" "}
-                <Link
-                  href="/images/cover.png"
-                  target="_blank"
-                  className="text-green-kwn font-semibold"
-                >
-                  Lihat Contoh
-                </Link>
-              </div>
-            </div>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="title">Nama Pengantin / Judul Undangan</Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Masukkan nama pengantin / judul undangan"
-              className="h-10"
-            />
-            <p className="text-sm text-muted-foreground">
-              Masukkan nama pengantin: Romeo & Juliet
-            </p>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="music">Music (Optional)</Label>
-            {is_music ? (
-              <div className="flex flex-col md:flex-row gap-4 md:items-center">
-                <audio src={music instanceof File ? URL.createObjectURL(music) : (music || "")} controls></audio>
-                <div>
-                  <Button variant="outline" onClick={() => setIsMusic(false)}>
-                    Ganti Music
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <Input
-                type="file"
-                accept="audio/*"
-                id="music"
-                onChange={(e) => {
-                  handleMusicChange(e.target.files?.[0] || null);
-                  e.target.value = "";
-                }}
-                placeholder="Masukkan link music"
-                className="h-10"
-              />
-            )}
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="stream_link">Link Streaming (Optional)</Label>
-            <Input
-              id="stream_link"
-              value={stream_link}
-              onChange={(e) => setStreamLink(e.target.value)}
-              placeholder="Masukkan link streaming"
-              className="h-10"
-            />
-            <p className="text-sm text-muted-foreground">
-              Kosongkan jika tidak ada link Streaming
-            </p>
-          </div>
-        </div>
-      </div>
-      <div>
-        <Button onClick={handleUpdateUndanganContent} disabled={isSaving || isUpdating}>
-          {isSaving || isUpdating ? (
+    <div className="flex flex-col gap-6 text-brand-ink">
+      <CmsPageHeader
+        title="Cover pembuka"
+        description="Halaman pertama yang dilihat tamu. Isi semuanya supaya undangan tampil maksimal."
+      />
+
+      <CmsSection title="Tanggal & judul">
+        <CmsField
+          label="Tanggal pernikahan"
+          htmlFor="date"
+          hint={
             <>
-              <Loader2 className="animate-spin" />
-              <span>Menyimpan...</span>
+              {date_wedding && (
+                <span className="block font-bold text-brand-ink">
+                  {formatDateIdWithTime(date_wedding.toString())} WIB
+                </span>
+              )}
+              Undangan aktif setidaknya sampai 2 minggu setelah tanggal ini. Tanggal
+              paling jauh 1 tahun sejak undangan dibuat.
             </>
+          }
+        >
+          <div className="max-w-sm [&_.react-datetime-picker]:w-full [&_.react-datetime-picker__wrapper]:h-11 [&_.react-datetime-picker__wrapper]:rounded-xl [&_.react-datetime-picker__wrapper]:border-brand-line [&_.react-datetime-picker__wrapper]:bg-white [&_.react-datetime-picker__wrapper]:px-2">
+            <DateTimePicker
+              onChange={setDateWedding}
+              value={date_wedding}
+              locale="id"
+              format="dd MMMM yyyy HH:mm"
+              // Batas 1 tahun sejak undangan dibuat (server juga mengecek)
+              maxDate={
+                !isAdmin && undanganContent?.createdAt
+                  ? new Date(new Date(undanganContent.createdAt).getTime() + 365 * 24 * 60 * 60 * 1000)
+                  : undefined
+              }
+              calendarIcon={<IconCalendar />}
+              clearIcon={<IconX size={16} />}
+            />
+          </div>
+        </CmsField>
+        <CmsField
+          label="Nama pengantin / judul undangan"
+          htmlFor="title"
+          hint="Contoh: Romeo & Juliet"
+        >
+          <Input
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Romeo & Juliet"
+            className={cmsInput}
+          />
+        </CmsField>
+      </CmsSection>
+
+      <CmsSection title="Foto">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <CmsField
+            label="Foto thumbnail"
+            hint={
+              <>
+                Dipakai untuk ikon website dan cover amplop di awal undangan.
+                Rasio 1:1, misalnya 300 × 300px.{" "}
+                <Link href="/images/thumb.png" target="_blank" className="font-bold text-brand-green underline underline-offset-4">
+                  Lihat contoh
+                </Link>
+              </>
+            }
+          >
+            <ImageUpload
+              placeholder="size-32 rounded-full bg-brand-mint"
+              icon={Upload}
+              iconSize={28}
+              defaultValue={img_thumbnail}
+              onChange={(file, imageUrl) => {
+                if (file) {
+                  setImgThumbnail(imageUrl as string);
+                  setImgThumbnailUpload(file);
+                }
+              }}
+            />
+          </CmsField>
+          <CmsField
+            label="Foto cover undangan"
+            hint={
+              <>
+                Foto calon pengantin untuk cover undangan. Maksimal 1MB.{" "}
+                <Link href="/images/cover.png" target="_blank" className="font-bold text-brand-green underline underline-offset-4">
+                  Lihat contoh
+                </Link>
+              </>
+            }
+          >
+            <ImageUpload
+              placeholder="w-40 h-[200px] rounded-xl bg-brand-mint"
+              icon={Upload}
+              iconSize={28}
+              defaultValue={img_bg}
+              onChange={(file, imageUrl) => {
+                if (file) {
+                  setImgBg(imageUrl as string);
+                  setImgBgUpload(file);
+                }
+              }}
+            />
+          </CmsField>
+        </div>
+      </CmsSection>
+
+      <CmsSection title="Musik & streaming">
+        <CmsField label="Musik latar" htmlFor="music" optional>
+          {is_music ? (
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <audio
+                src={music instanceof File ? URL.createObjectURL(music) : (music || "")}
+                controls
+                className="w-full max-w-sm"
+              ></audio>
+              <button type="button" className={cmsSecondaryButton} onClick={() => setIsMusic(false)}>
+                Ganti musik
+              </button>
+            </div>
           ) : (
-            <span>Simpan Perubahan</span>
+            <input
+              type="file"
+              accept="audio/*"
+              id="music"
+              onChange={(e) => {
+                handleMusicChange(e.target.files?.[0] || null);
+                e.target.value = "";
+              }}
+              className={cmsFileInput}
+            />
           )}
-        </Button>
-      </div>
+        </CmsField>
+        <CmsField
+          label="Link streaming"
+          htmlFor="stream_link"
+          optional
+          hint="Kosongkan kalau acaranya tidak disiarkan."
+        >
+          <Input
+            id="stream_link"
+            type="url"
+            value={stream_link}
+            onChange={(e) => setStreamLink(e.target.value)}
+            placeholder="https://"
+            className={cmsInput}
+          />
+        </CmsField>
+      </CmsSection>
+
+      <CmsSaveBar onSave={handleUpdateUndanganContent} pending={isSaving || isUpdating} />
     </div>
   );
 }

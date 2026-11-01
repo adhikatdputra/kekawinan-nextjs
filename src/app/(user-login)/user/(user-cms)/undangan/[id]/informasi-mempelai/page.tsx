@@ -1,15 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  CmsPageHeader,
+  CmsSection,
+  CmsField,
+  CmsSaveBar,
+  cmsInput,
+} from "@/components/pages/undangan/cms-ui";
 import { useParams } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import undanganContentApi from "@/frontend/api/undangan-content";
 import uploadApi from "@/frontend/api/upload";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
-import { Loader2, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import ImageUpload from "@/components/ui/custom/image-uploader";
 
 export default function InformasiMempelaiPage() {
@@ -95,163 +100,107 @@ export default function InformasiMempelaiPage() {
     }
   }, [undanganContent]);
 
-  return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-1 border-b pb-4">
-        <h1 className="text-2xl font-bold">Informasi Mempelai</h1>
-        <p>
-          Masukkan data pengantin beserta nama kedua orang tua dari pengantin.
-          Jangan lupa upload fotonya juga agar undangan terlihat lebih rapih
-        </p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="flex flex-col gap-6">
-          <div className="grid gap-2">
-            <Label htmlFor="img_female">Foto Mempelai Wanita</Label>
-            <ImageUpload
-              placeholder="w-32 h-32 bg-gray-200 rounded-full"
-              icon={Upload}
-              iconSize={32}
-              defaultValue={img_female}
-              onChange={(file, imageUrl) => {
-                if (file) {
-                  setImgFemale(imageUrl as string);
-                  setFemaleUpload(file);
-                }
-              }}
-            />
-          </div>
+  const sides = [
+    {
+      key: "female",
+      title: "Mempelai wanita",
+      child: "Putri",
+      photo: img_female,
+      onPhoto: (file: File, url: string) => {
+        setImgFemale(url);
+        setFemaleUpload(file);
+      },
+      name: [name_female, setNameFemale],
+      mother: [mother_female, setMotherFemale],
+      father: [father_female, setFatherFemale],
+      order: [female_no, setFemaleNo],
+    },
+    {
+      key: "male",
+      title: "Mempelai pria",
+      child: "Putra",
+      photo: img_male,
+      onPhoto: (file: File, url: string) => {
+        setImgMale(url);
+        setMaleUpload(file);
+      },
+      name: [name_male, setNameMale],
+      mother: [mother_male, setMotherMale],
+      father: [father_male, setFatherMale],
+      order: [male_no, setMaleNo],
+    },
+  ] as const;
 
-          <div className="grid gap-2">
-            <Label htmlFor="name_male">Nama Mempelai Wanita</Label>
-            <Input
-              id="name_male"
-              value={name_female}
-              onChange={(e) => setNameFemale(e.target.value)}
-              placeholder="Masukkan nama mempelai wanita"
-              className="h-10"
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="mother_female">Nama Ibu Mempelai Wanita</Label>
-            <Input
-              id="mother_female"
-              value={mother_female}
-              onChange={(e) => setMotherFemale(e.target.value)}
-              placeholder="Masukkan nama ibu mempelai wanita"
-              className="h-10"
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="father_female">Nama Ayah Mempelai Wanita</Label>
-            <Input
-              id="father_female"
-              value={father_female}
-              onChange={(e) => setFatherFemale(e.target.value)}
-              placeholder="Masukkan nama ayah mempelai wanita"
-              className="h-10"
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="female_no">Anak Keberapa?</Label>
-            <Input
-              id="female_no"
-              value={female_no}
-              onChange={(e) => setFemaleNo(e.target.value)}
-              placeholder="Masukkan anak keberapa mempelai wanita"
-              className="h-10"
-            />
-            <p className="text-sm text-muted-foreground">
-              Contoh: pertama, kedua, ketiga, dst
-            </p>
-          </div>
-          <div className="grid gap-2">
-            <div className="bg-muted rounded-md p-4 text-sm">
-              Putri {female_no || "..."} dari keluarga Bpk{" "}
-              {father_female || "..."}
-              dan Ibu {mother_female || "..."}
+  return (
+    <div className="flex flex-col gap-6 text-brand-ink">
+      <CmsPageHeader
+        title="Informasi mempelai"
+        description="Nama dan foto kedua mempelai, beserta nama orang tua masing-masing."
+      />
+
+      <div className="grid gap-6 xl:grid-cols-2">
+        {sides.map((side) => (
+          <CmsSection key={side.key} title={side.title}>
+            <CmsField label="Foto">
+              <ImageUpload
+                placeholder="size-32 rounded-full bg-brand-mint"
+                icon={Upload}
+                iconSize={28}
+                defaultValue={side.photo}
+                onChange={(file, imageUrl) => {
+                  if (file) side.onPhoto(file, imageUrl as string);
+                }}
+              />
+            </CmsField>
+            <CmsField label="Nama lengkap" htmlFor={`name_${side.key}`}>
+              <Input
+                id={`name_${side.key}`}
+                value={side.name[0]}
+                onChange={(e) => side.name[1](e.target.value)}
+                className={cmsInput}
+              />
+            </CmsField>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <CmsField label="Nama ayah" htmlFor={`father_${side.key}`}>
+                <Input
+                  id={`father_${side.key}`}
+                  value={side.father[0]}
+                  onChange={(e) => side.father[1](e.target.value)}
+                  className={cmsInput}
+                />
+              </CmsField>
+              <CmsField label="Nama ibu" htmlFor={`mother_${side.key}`}>
+                <Input
+                  id={`mother_${side.key}`}
+                  value={side.mother[0]}
+                  onChange={(e) => side.mother[1](e.target.value)}
+                  className={cmsInput}
+                />
+              </CmsField>
             </div>
-          </div>
-        </div>
-        <div className="flex flex-col gap-6">
-          <div className="grid gap-2">
-            <Label htmlFor="img_male">Foto Mempelai Pria</Label>
-            <ImageUpload
-              placeholder="w-32 h-32 bg-gray-200 rounded-full"
-              icon={Upload}
-              iconSize={32}
-              defaultValue={img_male}
-              onChange={(file, imageUrl) => {
-                if (file) {
-                  setImgMale(imageUrl as string);
-                  setMaleUpload(file);
-                }
-              }}
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="name_male">Nama Mempelai Pria</Label>
-            <Input
-              id="name_male"
-              value={name_male}
-              onChange={(e) => setNameMale(e.target.value)}
-              placeholder="Masukkan nama mempelai pria"
-              className="h-10"
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="mother_male">Nama Ibu Mempelai Pria</Label>
-            <Input
-              id="mother_male"
-              value={mother_male}
-              onChange={(e) => setMotherMale(e.target.value)}
-              placeholder="Masukkan nama ibu mempelai pria"
-              className="h-10"
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="father_male">Nama Ayah Mempelai Pria</Label>
-            <Input
-              id="father_male"
-              value={father_male}
-              onChange={(e) => setFatherMale(e.target.value)}
-              placeholder="Masukkan nama ayah mempelai pria"
-              className="h-10"
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="male_no">Anak Keberapa?</Label>
-            <Input
-              id="male_no"
-              value={male_no}
-              onChange={(e) => setMaleNo(e.target.value)}
-              placeholder="Masukkan anak keberapa mempelai pria"
-              className="h-10"
-            />
-            <p className="text-sm text-muted-foreground">
-              Contoh: pertama, kedua, ketiga, dst
-            </p>
-          </div>
-          <div className="grid gap-2">
-            <div className="bg-muted rounded-md p-4 text-sm">
-              Putra {male_no || "..."} dari keluarga Bpk {father_male || "..."}
-              dan Ibu {mother_male || "..."}
+            <CmsField
+              label="Anak keberapa?"
+              htmlFor={`${side.key}_no`}
+              hint="Contoh: pertama, kedua, ketiga"
+            >
+              <Input
+                id={`${side.key}_no`}
+                value={side.order[0]}
+                onChange={(e) => side.order[1](e.target.value)}
+                className={cmsInput}
+              />
+            </CmsField>
+            {/* Mirrors the sentence shown on the invitation */}
+            <div className="rounded-xl bg-white p-4 text-sm leading-relaxed">
+              <span className="mb-1 block text-xs font-bold text-brand-muted">Tampil di undangan</span>
+              {side.child} {side.order[0] || "…"} dari keluarga Bpk {side.father[0] || "…"} dan
+              Ibu {side.mother[0] || "…"}
             </div>
-          </div>
-        </div>
+          </CmsSection>
+        ))}
       </div>
-      <div>
-        <Button onClick={handleUpdateUndanganContent} disabled={isUpdating}>
-          {isUpdating ? (
-            <>
-              <Loader2 className="animate-spin" />
-              <span>Menyimpan...</span>
-            </>
-          ) : (
-            <span>Simpan Perubahan</span>
-          )}
-        </Button>
-      </div>
+
+      <CmsSaveBar onSave={handleUpdateUndanganContent} pending={isUpdating} />
     </div>
   );
 }

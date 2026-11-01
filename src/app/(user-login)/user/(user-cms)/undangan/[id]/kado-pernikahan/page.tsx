@@ -2,14 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { Gift, Params } from "@/frontend/interface/undangan";
-import MenuAction from "@/components/ui/custom/menu-action";
-import TablePending from "@/components/ui/custom/table-pending";
-import TableNoData from "@/components/ui/custom/table-no-data";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 
 import {
@@ -22,16 +17,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 
 import {
   Dialog,
@@ -50,8 +35,25 @@ import GiftStore from "@/frontend/store/gift-store";
 import { debounce } from "lodash";
 import { formatNumber } from "@/helper/number";
 import Link from "next/link";
-import { IconPlus } from "@tabler/icons-react";
-import { Label } from "@/components/ui/label";
+import {
+  IconPlus,
+  IconSearch,
+  IconLoader2,
+  IconGift,
+  IconEdit,
+  IconTrash,
+  IconExternalLink,
+} from "@tabler/icons-react";
+import {
+  CmsPageHeader,
+  CmsField,
+  cmsFocusRing,
+  cmsInput,
+  cmsFileInput,
+  cmsPrimaryButton,
+  cmsSecondaryButton,
+} from "@/components/pages/undangan/cms-ui";
+import { BrandCharacter } from "@/components/pages/home/brand-visual";
 
 export default function KadoPernikahanPage() {
   const params = useParams();
@@ -232,133 +234,166 @@ export default function KadoPernikahanPage() {
     };
   }, []);
 
+  const iconAction = `grid size-10 cursor-pointer place-items-center rounded-lg transition-colors ${cmsFocusRing} focus-visible:outline-offset-2`;
+
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-1 border-b pb-4">
-        <h1 className="text-2xl font-bold">Kado Pernikahan</h1>
-        <p>
-          Kamu dapat mengatur dan melihat kado yang sudah diberikan tamu yang di
-          undang
-        </p>
-      </div>
-      <div className="border border-border p-6 rounded-2xl grid gap-4">
-        <div className="grid grid-cols-1 items-center">
-          <div className="flex gap-2 justify-end">
-            <Button
+    <div className="flex flex-col gap-6 text-brand-ink">
+      <CmsPageHeader
+        title="Kado pernikahan"
+        description="Daftar kado yang kalian inginkan. Tamu bisa memilih satu, lalu kalian bisa lihat siapa yang menghadiahkannya."
+      />
+
+      <section aria-labelledby="kado-heading" className="grid grid-cols-[minmax(0,1fr)] gap-4">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 id="kado-heading" className="font-bold">Wishlist kado</h2>
+            <p className="mt-1 text-sm text-brand-muted">
+              {isLoading ? "Memuat…" : `${resultTable?.count ?? 0} kado`}
+            </p>
+          </div>
+          <div className="flex w-full flex-wrap gap-2 sm:w-auto">
+            <div className="relative min-w-0 flex-1 sm:w-64 sm:flex-none">
+              <label htmlFor="cari-kado" className="sr-only">Cari kado</label>
+              <IconSearch
+                size={18}
+                className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-brand-muted"
+                aria-hidden="true"
+              />
+              <Input
+                id="cari-kado"
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Cari nama kado"
+                className={`${cmsInput} pl-10`}
+              />
+            </div>
+            <button
+              type="button"
               onClick={() => {
-                setIsOpen(true);
+                resetForm();
                 setSelectedItem(null);
+                setIsOpen(true);
               }}
+              className={cmsPrimaryButton}
             >
-              <IconPlus size={16} />
-              Tambah Kado
-            </Button>
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari kado pernikahan"
-              className="max-w-xs"
-            />
+              <IconPlus size={18} aria-hidden="true" />
+              Tambah kado
+            </button>
           </div>
         </div>
-        <Table>
-          <TableCaption>Kado Pernikahan</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[10%]">Gambar</TableHead>
-              <TableHead className="w-[25%]">Nama Kado</TableHead>
-              <TableHead className="w-[20%]">Harga</TableHead>
-              <TableHead className="w-[20%]">Link</TableHead>
-              <TableHead className="w-[15%]">Status</TableHead>
-              <TableHead className="text-right w-[10%]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TablePending colSpan={6} />
-            ) : tableData.length > 0 ? (
-              tableData.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="w-[10%]">
-                    {item.thumbnail ? (
-                      <Image
-                        src={item.thumbnail}
-                        alt={item.title}
-                        width={100}
-                        height={100}
-                        className="rounded-md aspect-square object-cover"
-                      />
-                    ) : (
-                      <div className="w-[60px] h-[60px] rounded-md bg-muted flex items-center justify-center text-muted-foreground text-xs">
-                        No Image
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="w-[25%] whitespace-break-spaces">
-                    {item.title}
-                  </TableCell>
-                  <TableCell className="w-[20%] whitespace-break-spaces">
-                    {formatNumber(Number(item.price))}
-                  </TableCell>
-                  <TableCell className="w-[20%] whitespace-break-spaces">
-                    <Link href={item.linkProduct} target="_blank" className="text-green-kwn underline">
-                      Lihat Kado
-                    </Link>
-                  </TableCell>
-                  <TableCell className="w-[15%]">
-                    <p>
-                      {item.isConfirm
-                        ? "Dihadiahkan oleh"
-                        : "Belum"}
-                    </p>
+
+        {isLoading ? (
+          <div className="flex items-center justify-center gap-2 rounded-2xl bg-brand-cream p-10 text-brand-muted">
+            <IconLoader2 size={20} className="animate-spin" aria-hidden="true" />
+            Memuat kado…
+          </div>
+        ) : tableData.length > 0 ? (
+          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 2xl:grid-cols-3">
+            {tableData.map((item) => (
+              <li key={item.id} className="flex gap-4 rounded-2xl border border-brand-line bg-brand-cream p-3">
+                {item.thumbnail ? (
+                  <Image
+                    src={item.thumbnail}
+                    alt=""
+                    width={200}
+                    height={200}
+                    className="size-24 shrink-0 rounded-xl bg-white object-cover"
+                  />
+                ) : (
+                  <div className="grid size-24 shrink-0 place-items-center rounded-xl bg-brand-mint text-brand-leaf">
+                    <IconGift size={28} aria-hidden="true" />
+                  </div>
+                )}
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <p className="line-clamp-2 font-bold leading-snug">{item.title}</p>
+                  <p className="mt-0.5 text-sm text-brand-muted tabular-nums">
+                    Rp {formatNumber(Number(item.price))}
+                  </p>
+                  <div className="mt-2">
                     {item.isConfirm ? (
-                      <>
-                        <p className="text-sm text-muted-foreground">
-                          {item.name}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {item.phone}
-                        </p>
-                      </>
+                      <span className="inline-flex flex-wrap gap-x-1 rounded-lg bg-brand-mint px-2.5 py-1 text-xs font-bold text-brand-green">
+                        Dihadiahkan oleh {item.name}
+                        {item.phone && <span className="font-normal">· {item.phone}</span>}
+                      </span>
                     ) : (
-                      <div></div>
+                      <span className="inline-flex rounded-lg bg-white px-2.5 py-1 text-xs font-bold text-brand-muted ring-1 ring-brand-line">
+                        Belum dipilih tamu
+                      </span>
                     )}
-                  </TableCell>
-                  <TableCell className="text-right w-[10%]">
-                    <div className="flex gap-2 justify-end">
-                      <MenuAction
-                        handleDelete={() => {
+                  </div>
+                  <div className="mt-auto flex items-center justify-between gap-2 pt-2">
+                    <Link
+                      href={item.linkProduct}
+                      target="_blank"
+                      className={`inline-flex items-center gap-1 text-sm font-bold text-brand-green underline underline-offset-4 ${cmsFocusRing}`}
+                    >
+                      Lihat produk
+                      <IconExternalLink size={14} aria-hidden="true" />
+                      <span className="sr-only">(tab baru)</span>
+                    </Link>
+                    <div className="flex">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDataEdit(item);
+                          setIsOpen(true);
+                        }}
+                        aria-label={`Edit ${item.title}`}
+                        className={`${iconAction} hover:bg-brand-mint`}
+                      >
+                        <IconEdit size={18} aria-hidden="true" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
                           setIsOpenDelete(true);
                           setSelectedItem(item);
                         }}
-                        handleEdit={() => {
-                          setIsOpen(true);
-                          setDataEdit(item);
-                        }}
-                        items={["Hapus", "Edit"]}
-                      />
+                        aria-label={`Hapus ${item.title}`}
+                        className={`${iconAction} text-brand-rose hover:bg-brand-pink`}
+                      >
+                        <IconTrash size={18} aria-hidden="true" />
+                      </button>
                     </div>
-                  </TableCell>
-                </TableRow>
-              ))
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="flex flex-col items-center rounded-2xl border border-dashed border-brand-line bg-brand-cream px-6 py-10 text-center">
+            <BrandCharacter character="gift" className="w-28" />
+            {queryParams.search ? (
+              <>
+                <p className="mt-4 font-bold">Tidak ada kado yang cocok</p>
+                <p className="mt-1 max-w-sm text-sm text-brand-muted">Coba kata lain atau kosongkan pencarian.</p>
+              </>
             ) : (
-              <TableNoData colSpan={6} />
+              <>
+                <p className="mt-4 font-bold">Belum ada kado</p>
+                <p className="mt-1 max-w-sm text-sm text-brand-muted">
+                  Tambahkan barang yang kalian butuhkan, lengkap dengan link tokonya.
+                </p>
+              </>
             )}
-          </TableBody>
-        </Table>
-        <Separator />
-        {!isLoading && (
-          <Pagination
-            page={page}
-            setPage={setPage}
-            totalPage={resultTable?.total_page}
-            totalData={resultTable?.count}
-            pageSize={limit}
-            setPageSize={setLimit}
-            totalDataPerPage={tableData.length}
-          />
+          </div>
         )}
-      </div>
+
+        {!isLoading && tableData.length > 0 && (
+          <div className="border-t border-brand-line pt-4">
+            <Pagination
+              page={page}
+              setPage={setPage}
+              totalPage={resultTable?.total_page}
+              totalData={resultTable?.count}
+              pageSize={limit}
+              setPageSize={setLimit}
+              totalDataPerPage={tableData.length}
+            />
+          </div>
+        )}
+      </section>
 
       <Dialog open={isOpen} onOpenChange={(open) => {
         setIsOpen(open);
@@ -367,65 +402,75 @@ export default function KadoPernikahanPage() {
       }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{selectedItem ? "Edit" : "Tambah"} Kado</DialogTitle>
-            <DialogDescription></DialogDescription>
-            <div className="flex flex-col gap-4 py-4">
-              <div className="grid gap-2">
-                <Label>Nama Kado</Label>
-                <Input
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label>Harga</Label>
-                <Input
-                  type="number"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label>Link Kado</Label>
-                <Input
-                  value={linkProduct}
-                  onChange={(e) => setLinkProduct(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label>Gambar</Label>
-                <Input
-                  type="file"
-                  id="image"
-                  accept="image/*"
-                  onChange={(e) => setThumbnail(e.target.files?.[0] || null)}
-                  className="cursor-pointer bg-white"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Format file yang diizinkan: PNG, JPG, JPEG, GIF, dan WEBP.
-                  Ukuran maksimal 1MB.
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => {
+            <DialogTitle>{selectedItem ? "Edit kado" : "Tambah kado"}</DialogTitle>
+            <DialogDescription>Tamu akan diarahkan ke link produk untuk membelinya.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-5 py-2">
+            <CmsField label="Nama kado" htmlFor="gift-title">
+              <Input
+                id="gift-title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className={cmsInput}
+              />
+            </CmsField>
+            <CmsField label="Harga (Rp)" htmlFor="gift-price">
+              <Input
+                id="gift-price"
+                type="number"
+                inputMode="numeric"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                className={cmsInput}
+              />
+            </CmsField>
+            <CmsField label="Link produk" htmlFor="gift-link">
+              <Input
+                id="gift-link"
+                type="url"
+                placeholder="https://"
+                value={linkProduct}
+                onChange={(e) => setLinkProduct(e.target.value)}
+                className={cmsInput}
+              />
+            </CmsField>
+            <CmsField label="Gambar" htmlFor="gift-image" hint="PNG, JPG, JPEG, GIF, atau WEBP. Maksimal 1MB.">
+              <input
+                type="file"
+                id="gift-image"
+                accept="image/*"
+                onChange={(e) => setThumbnail(e.target.files?.[0] || null)}
+                className={cmsFileInput}
+              />
+            </CmsField>
+          </div>
+          <div className="flex flex-wrap justify-end gap-2">
+            <button
+              type="button"
+              className={cmsSecondaryButton}
+              onClick={() => {
                 setIsOpen(false);
                 resetForm();
-              }}>
-                Batal
-              </Button>
-              <Button onClick={handleSubmit} disabled={isPendingUpdate || isPendingCreate}>
-                {isPendingUpdate || isPendingCreate ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Menyimpan...</span>
-                  </>
-                ) : (
-                  "Simpan"
-                )}
-              </Button>
-            </div>
-          </DialogHeader>
+              }}
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              className={cmsPrimaryButton}
+              onClick={handleSubmit}
+              disabled={isPendingUpdate || isPendingCreate}
+            >
+              {isPendingUpdate || isPendingCreate ? (
+                <>
+                  <IconLoader2 size={18} className="animate-spin" aria-hidden="true" />
+                  Menyimpan…
+                </>
+              ) : (
+                "Simpan kado"
+              )}
+            </button>
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -433,7 +478,7 @@ export default function KadoPernikahanPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-bold">
-              Hapus Kado
+              Hapus kado
             </AlertDialogTitle>
             <AlertDialogDescription className="text-lg text-black font-normal">
               Apakah kamu yakin ingin menghapus kado {" "}

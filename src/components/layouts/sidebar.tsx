@@ -10,10 +10,10 @@ import {
   Settings,
   CalendarHeart,
   Gift,
-  ArrowLeftToLine,
   CakeSlice,
   Users,
   Heart,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import useSession from "@/frontend/hook/useSession";
@@ -39,6 +39,9 @@ import undanganApi from "@/frontend/api/undangan";
 import { formatDate } from "@/helper/date";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/frontend/composable/useAuth";
+
+const focusRing =
+  "focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-brand-focus";
 
 export function AppSidebar() {
   useSession();
@@ -70,11 +73,6 @@ export function AppSidebar() {
       title: "Amplop Digital",
       url: `/user/undangan/${id}/amplop-digital`,
       icon: CakeSlice,
-    },
-    {
-      title: "Kembali",
-      url: `/user/undangan-list`,
-      icon: ArrowLeftToLine,
     },
   ];
 
@@ -120,134 +118,106 @@ export function AppSidebar() {
 
   const isOwner = !!undangan && undangan.userId === getUser()?.id;
 
+  const groups = [
+    {
+      label: "Tamu",
+      items: [
+        ...menuItems,
+        ...(isOwner
+          ? [{ title: "Kolaborator", url: `/user/undangan/${id}/kolaborator`, icon: Users }]
+          : []),
+      ],
+    },
+    { label: "Isi undangan", items },
+    { label: "Kado pernikahan", items: menuGift },
+  ];
+
   return (
-    <Sidebar className="py-2">
-      <SidebarHeader className="px-4">
-        <Image
-          src="/images/kekawinan-logo.png"
-          alt="Logo"
-          width={200}
-          height={200}
-        />
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup className="border-y border-gray-200 py-6 px-4 mt-4">
-          <div className="flex flex-col gap-3">
-            {isLoading ? (
-              <>
-                <Skeleton className="w-full h-10 rounded-md" />
-                <Skeleton className="w-full h-10 rounded-md" />
-              </>
-            ) : (
-              <>
-                <div>
-                  <h3 className="font-medium">{undangan?.name}</h3>
-                  <p className="text-sm">{formatDate(undangan?.expired)}</p>
+    <Sidebar className="border-brand-line!">
+      {/* One wrapper so the brand background also covers the mobile sheet,
+          which doesn't receive Sidebar's className */}
+      <div className="flex h-full min-h-0 flex-col bg-brand-cream text-brand-ink">
+        <SidebarHeader className="px-4 pt-4 pb-3">
+          <Link href="/user/undangan-list" className={`rounded-md ${focusRing}`}>
+            <Image
+              src="/images/kekawinan-logo.png"
+              alt="Kekawinan"
+              width={200}
+              height={200}
+              className="h-auto w-[150px]"
+            />
+          </Link>
+        </SidebarHeader>
+        <SidebarContent className="gap-1">
+          <SidebarGroup className="px-4 pt-1 pb-3">
+            <div className="rounded-2xl bg-brand-mint p-4">
+              {isLoading ? (
+                <div className="grid gap-2">
+                  <Skeleton className="h-5 w-3/4 rounded-md bg-white/70" />
+                  <Skeleton className="h-4 w-1/2 rounded-md bg-white/70" />
+                  <Skeleton className="mt-2 h-11 w-full rounded-xl bg-white/70" />
                 </div>
-                <Link href={`/${undangan?.permalink}/demo`} target="_blank">
-                  <Button className="w-full rounded-full">
-                    Preview Undangan
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>Tamu Management</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    className={cn(
-                      pathname === item.url && "bg-gray-200 hover:bg-gray-200"
-                    )}
+              ) : (
+                <>
+                  <p className="font-recoleta-alt text-lg leading-snug font-bold">{undangan?.name}</p>
+                  <p className="mt-1 text-sm text-brand-muted">{formatDate(undangan?.expired)}</p>
+                  <Link
+                    href={`/${undangan?.permalink}/demo`}
+                    target="_blank"
+                    className={`mt-4 flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-green px-4 text-sm font-bold text-white transition-colors hover:bg-brand-green-dark ${focusRing}`}
                   >
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-              {isOwner && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    className={cn(
-                      pathname === `/user/undangan/${id}/kolaborator` &&
-                        "bg-gray-200 hover:bg-gray-200"
-                    )}
-                  >
-                    <Link href={`/user/undangan/${id}/kolaborator`}>
-                      <Users />
-                      <span>Kolaborator</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                    Preview undangan
+                    <ExternalLink className="size-4" aria-hidden="true" />
+                    <span className="sr-only">(buka di tab baru)</span>
+                  </Link>
+                </>
               )}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>Content Management</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    className={cn(
-                      pathname === item.url && "bg-gray-200 hover:bg-gray-200"
-                    )}
-                  >
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>Kado Pernikahan</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuGift.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    className={cn(
-                      pathname === item.url && "bg-gray-200 hover:bg-gray-200"
-                    )}
-                  >
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-      <SidebarFooter className="px-4">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <Button
-              variant="outline"
-              className="w-full rounded-full bg-red-700 text-white hover:bg-red-800 hover:text-white"
-            >
-              Dukung Kami Sekarang
-            </Button>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
+            </div>
+          </SidebarGroup>
+          {groups.map((group) => (
+            <SidebarGroup key={group.label} className="px-3 py-1.5">
+              <SidebarGroupLabel className="text-xs font-bold text-brand-muted">
+                {group.label}
+              </SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {group.items.map((item) => {
+                    const active = pathname === item.url;
+                    return (
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton
+                          asChild
+                          className={cn(
+                            "h-10 rounded-xl px-3 text-brand-ink hover:bg-brand-mint hover:text-brand-ink focus-visible:ring-brand-focus [&>svg]:text-brand-leaf",
+                            active && "bg-brand-mint font-bold text-brand-green [&>svg]:text-brand-green"
+                          )}
+                        >
+                          <Link href={item.url} aria-current={active ? "page" : undefined}>
+                            <item.icon aria-hidden="true" />
+                            <span>{item.title}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          ))}
+        </SidebarContent>
+        <SidebarFooter className="border-t border-brand-line px-4 py-3">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <Button
+                variant="outline"
+                className="min-h-11 w-full rounded-xl border-brand-pink-deep bg-brand-pink font-bold text-brand-rose hover:bg-brand-pink-deep hover:text-brand-rose"
+              >
+                Dukung Kami Sekarang
+              </Button>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+      </div>
     </Sidebar>
   );
 }

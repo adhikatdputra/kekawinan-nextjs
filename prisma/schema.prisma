@@ -161,6 +161,8 @@ model UndanganContent {
   music           String?
   isCovid         Int?
   religionVersion String    @default("ISLAM") @db.VarChar(24)
+  /// Template pesan WhatsApp ke tamu; null = pakai teks bawaan (src/lib/whatsapp-message.ts)
+  whatsappMessage String?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   undangan        Undangan  @relation(fields: [undanganId], references: [id], onDelete: Cascade)

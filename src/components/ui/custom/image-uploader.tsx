@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import React, { useState, useRef, useEffect } from 'react';
 import { Camera, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function ImageUpload({ 
   placeholder = "w-64 h-64 bg-blue-400 rounded-lg",
@@ -11,7 +12,7 @@ export default function ImageUpload({
   accept = "image/*",
   maxSize = 1 * 1024 * 1024, // 1MB default
   showDeleteButton = true,
-  uploadText = "Click to upload image",
+  uploadText = "Pilih foto",
   className = ""
 }) {
   const [image, setImage] = useState<string | null>(defaultValue);
@@ -21,7 +22,7 @@ export default function ImageUpload({
   const handleFileSelect = (file: File) => {
     if (file && file.type.startsWith('image/')) {
       if (file.size > maxSize) {
-        alert(`File size must be less than ${Math.round(maxSize / 1024 / 1024)}MB`);
+        toast.error(`Ukuran foto maksimal ${Math.round(maxSize / 1024 / 1024)}MB`);
         return;
       }
       
@@ -85,22 +86,18 @@ export default function ImageUpload({
   return (
     <div className={`relative w-fit ${className}`}>
       <div
-        className={`
-          ${placeholder} 
-          cursor-pointer 
-          border-2 
-          border-dashed 
-          border-gray-300 
-          hover:border-gray-400 
-          transition-colors 
-          duration-200 
-          flex 
-          items-center 
-          justify-center 
-          overflow-hidden
-          ${isDragging ? 'border-blue-500 bg-blue-50' : ''}
-          ${image ? 'border-solid border-gray-200' : ''}
-        `}
+        role="button"
+        tabIndex={0}
+        aria-label={image ? "Ganti foto" : uploadText}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleClick();
+          }
+        }}
+        className={`${placeholder} flex cursor-pointer items-center justify-center overflow-hidden border-2 border-dashed border-brand-line transition-colors duration-200 hover:border-brand-leaf focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-brand-focus ${
+          isDragging ? "border-brand-focus bg-brand-sky" : ""
+        } ${image ? "border-solid" : ""}`}
         onClick={handleClick}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -115,12 +112,10 @@ export default function ImageUpload({
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="flex flex-col items-center justify-center text-gray-500 p-4">
-            <IconComponent size={iconSize} className="mb-2" />
-            <p className="text-sm text-center font-medium">{uploadText}</p>
-            <p className="text-xs text-center mt-1 text-gray-400">
-              Drag & drop or click to browse
-            </p>
+          <div className="flex flex-col items-center justify-center p-3 text-center text-brand-muted">
+            <IconComponent size={iconSize} className="mb-1.5 text-brand-leaf" aria-hidden="true" />
+            <p className="text-sm font-bold text-brand-ink">{uploadText}</p>
+            <p className="mt-0.5 text-xs">atau tarik ke sini</p>
           </div>
         )}
       </div>
@@ -129,8 +124,9 @@ export default function ImageUpload({
       {image && showDeleteButton && (
         <button
           onClick={handleDelete}
-          className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors duration-200 shadow-lg"
-          aria-label="Delete image"
+          type="button"
+          className="absolute top-1 right-1 grid size-8 place-items-center rounded-full bg-white text-brand-rose shadow-md ring-1 ring-brand-line transition-colors hover:bg-brand-pink focus-visible:outline-3 focus-visible:outline-brand-focus"
+          aria-label="Hapus foto"
         >
           <X size={16} />
         </button>
@@ -143,6 +139,7 @@ export default function ImageUpload({
         accept={accept}
         onChange={handleFileInputChange}
         className="hidden"
+        tabIndex={-1}
       />
     </div>
   );

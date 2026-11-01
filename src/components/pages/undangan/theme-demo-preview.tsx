@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { BrandCharacter } from "@/components/pages/home/brand-visual";
 
 const DESKTOP_QUERY = "(min-width: 1024px)";
 
@@ -38,21 +39,32 @@ export default function ThemeDemoPreview({
 
   return (
     <div className="flex flex-col items-center gap-4">
-      {/* Shadow marks the one element lifted off the page: the device */}
-      <div className="w-[390px] h-[min(844px,calc(100vh-7rem))] rounded-[2.75rem] border-[10px] border-gray-900 bg-gray-900 shadow-2xl shadow-gray-900/20 overflow-hidden">
-        <iframe
-          src={embedUrl}
-          title={`Pratinjau undangan tema ${themeName}`}
-          className="w-full h-full rounded-[2rem] bg-white"
+      <div className="relative isolate px-10 pt-8">
+        {/* Arch behind the phone, like the scenes on the homepage */}
+        <div
+          className="absolute inset-x-0 top-0 bottom-16 -z-10 rounded-[48%_48%_28px_28px] bg-brand-pink-deep/70"
+          aria-hidden="true"
+        />
+        {/* Shadow marks the one element lifted off the page: the device */}
+        <div className="h-[min(844px,calc(100vh-9rem))] w-[390px] overflow-hidden rounded-[2.75rem] border-[10px] border-brand-ink bg-brand-ink shadow-2xl shadow-brand-ink/25">
+          <iframe
+            src={embedUrl}
+            title={`Pratinjau undangan tema ${themeName}`}
+            className="h-full w-full rounded-[2rem] bg-white"
+          />
+        </div>
+        <BrandCharacter
+          character="gift"
+          className="pointer-events-none absolute -bottom-4 -left-6 w-[120px]"
         />
       </div>
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-brand-muted">
         Gulir di dalam layar untuk melihat seluruh undangan.{" "}
         <a
           href={embedUrl}
           target="_blank"
           rel="noopener"
-          className="text-green-kwn underline underline-offset-2"
+          className="font-bold text-brand-green underline underline-offset-4 focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-brand-focus"
         >
           Buka penuh
         </a>

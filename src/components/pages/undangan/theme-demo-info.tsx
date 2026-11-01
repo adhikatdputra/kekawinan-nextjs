@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { IconArrowLeft, IconCheck } from "@tabler/icons-react";
+import { BrandCharacter } from "@/components/pages/home/brand-visual";
 
 // Fitur ini ada di semua tema, jadi ditulis sekali di sini dan bukan di
 // deskripsi per tema (menghindari teks duplikat di 16 halaman demo).
@@ -15,6 +16,9 @@ const SHARED_FEATURES = [
   "Amplop digital dan wishlist kado",
 ];
 
+const focusRing =
+  "focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-brand-focus";
+
 export default function ThemeDemoInfo({
   name,
   description,
@@ -28,57 +32,77 @@ export default function ThemeDemoInfo({
     .filter(Boolean);
 
   return (
-    <div className="px-6 py-10 lg:p-0">
-      <div className="flex items-center justify-between mb-10">
-        <Link href="/" aria-label="Kekawinan, ke beranda">
+    <div className="px-6 py-10 text-brand-ink lg:p-0">
+      <div className="mb-10 flex items-center justify-between gap-4">
+        <Link href="/" aria-label="Kekawinan, ke beranda" className={`rounded-md ${focusRing}`}>
           <Image
             src="/images/kekawinan-logo.png"
             alt="Kekawinan"
             width={400}
             height={400}
-            className="w-[120px] h-auto"
+            className="h-auto w-[140px]"
           />
         </Link>
         <Link
           href="/tema"
-          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-green-kwn transition-colors"
+          className={`inline-flex min-h-11 items-center gap-1.5 text-sm font-bold text-brand-green underline underline-offset-4 ${focusRing}`}
         >
-          <ArrowLeft className="w-4 h-4" />
+          <IconArrowLeft size={16} aria-hidden="true" />
           Semua tema
         </Link>
       </div>
 
-      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-5">
-        Undangan Pernikahan Digital Tema {name}
+      <h1 className="font-recoleta-alt text-[clamp(2rem,4vw,3rem)] leading-[1.15] font-bold tracking-[-0.025em]">
+        <span className="mb-2 block font-sans text-base font-bold tracking-normal text-brand-muted">
+          Undangan Pernikahan Digital
+        </span>
+        Tema <span className="text-brand-leaf">{name}</span>
       </h1>
 
       {paragraphs.length > 0 && (
-        <div className="text-gray-700 leading-relaxed space-y-4 mb-8">
+        <div className="mt-6 space-y-4 leading-[1.8] text-brand-muted">
           {paragraphs.map((p, i) => (
             <p key={i}>{p}</p>
           ))}
         </div>
       )}
 
-      <h2 className="text-base font-semibold text-gray-900 mb-3">
-        Yang ada di tema ini
-      </h2>
-      <ul className="list-disc pl-5 space-y-1.5 text-gray-700 mb-3">
-        {SHARED_FEATURES.map((f) => (
-          <li key={f}>{f}</li>
-        ))}
-      </ul>
-      <p className="text-sm text-gray-500 mb-8">
-        Semua isi bisa kamu ganti dari dashboard, dan tampilan menyesuaikan
-        layar HP tamu.
-      </p>
+      <section aria-labelledby="fitur-tema" className="mt-8 rounded-2xl bg-brand-mint p-5 sm:p-6">
+        <h2 id="fitur-tema" className="font-bold">
+          Yang ada di tema ini
+        </h2>
+        <ul className="mt-4 grid gap-x-6 gap-y-2.5 text-[15px] sm:grid-cols-2">
+          {SHARED_FEATURES.map((f) => (
+            <li key={f} className="flex items-start gap-2">
+              <IconCheck size={18} className="mt-0.5 shrink-0 text-brand-green" aria-hidden="true" />
+              {f}
+            </li>
+          ))}
+        </ul>
+      </section>
 
-      <Link
-        href="/auth/register"
-        className="inline-block bg-green-kwn text-white font-semibold text-sm rounded-full px-6 py-3 hover:bg-green-kwn/90 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-kwn"
-      >
-        Daftar dan buat undanganmu
-      </Link>
+      <div className="mt-6 flex items-center gap-4 rounded-2xl bg-brand-pink p-5">
+        <BrandCharacter character="host" className="w-16 shrink-0" />
+        <p className="text-sm leading-relaxed">
+          Semua isi bisa kamu ganti dari dashboard, dan tampilannya menyesuaikan
+          layar HP tamu.
+        </p>
+      </div>
+
+      <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+        <Link
+          href="/auth/register"
+          className={`inline-flex min-h-[52px] items-center rounded-xl bg-brand-green px-6 font-bold text-white transition-colors hover:bg-brand-green-dark ${focusRing}`}
+        >
+          Daftar dan buat undanganmu
+        </Link>
+        <Link
+          href="/tema"
+          className={`inline-flex min-h-11 items-center font-bold text-brand-green underline underline-offset-4 ${focusRing}`}
+        >
+          Lihat tema lain
+        </Link>
+      </div>
     </div>
   );
 }

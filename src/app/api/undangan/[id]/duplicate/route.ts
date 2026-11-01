@@ -147,6 +147,7 @@ export async function POST(request: NextRequest, { params }: Params) {
               music: c.music,
               isCovid: c.isCovid,
               religionVersion: c.religionVersion,
+              whatsappMessage: c.whatsappMessage,
             }
           : { id: nanoid(), undanganId: newId },
       }),

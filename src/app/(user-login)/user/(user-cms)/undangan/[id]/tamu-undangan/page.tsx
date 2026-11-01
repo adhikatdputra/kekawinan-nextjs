@@ -14,13 +14,16 @@ import {
   IconFileSpreadsheet,
   IconTrash,
   IconCopy,
+  IconSearch,
+  IconCircleCheck,
+  IconAlertTriangle,
 } from "@tabler/icons-react";
 import MenuAction from "@/components/ui/custom/menu-action";
 import TablePending from "@/components/ui/custom/table-pending";
-import TableNoData from "@/components/ui/custom/table-no-data";
 import { IconLoader2 } from "@tabler/icons-react";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
+import { BrandCharacter } from "@/components/pages/home/brand-visual";
+import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { QRCodeCanvas } from "qrcode.react";
 import { BASE_URL } from "@/lib/config";
@@ -47,6 +50,7 @@ import {
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -83,6 +87,23 @@ import undanganTamuApi from "@/frontend/api/undangan-tamu";
 import undanganApi from "@/frontend/api/undangan";
 import tamuBulkApi from "@/frontend/api/tamu-bulk";
 import toast from "react-hot-toast";
+import { renderWhatsappMessage } from "@/lib/whatsapp-message";
+
+const focusRing =
+  "focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-brand-focus";
+
+// "Belum" is a normal waiting state, not an error, so it stays neutral
+function StatusBadge({ done, doneLabel }: { done: boolean; doneLabel: string }) {
+  return (
+    <span
+      className={`inline-flex items-center rounded-lg px-2.5 py-0.5 text-xs font-bold ${
+        done ? "bg-brand-mint text-brand-green" : "bg-brand-cream text-brand-muted ring-1 ring-brand-line"
+      }`}
+    >
+      {done ? doneLabel : "Belum"}
+    </span>
+  );
+}
 
 export default function TamuPage() {
   const params = useParams();
@@ -257,32 +278,14 @@ export default function TamuPage() {
     );
   };
 
-  const buildInvitationMessage = (item: UndanganTamu) => {
-    const tamu = item.name.replace("&", "dan");
-    const pengantin = undangan?.content?.title?.replace("&", "dan") ?? "";
-    const tglwaktu = undangan?.content?.resepsiTime ?? "";
-    const tempat = undangan?.content?.resepsiPlace ?? "";
-    const link = undangan?.permalink ?? "";
-
-    return `Bismillahirrahmanirrahim
-Assalamu'alaikum Warahmatullahi Wabarakatuh
-
-Yth. Bpk/Ibu/Sdr/i *${tamu}*,
-
-Dengan mengharap ridha dan rahmat Allah SWT, serta tanpa mengurangi rasa hormat. Perkenankan kami mengundang Bpk/Ibu/Sdr/i untuk hadir di acara pernikahan kami:
-
-*Pernikahan ${pengantin}*
-*Tanggal:* ${tglwaktu}
-*Lokasi:* ${tempat}
-
-Merupakan suatu kehormatan bagi kami apabila Bpk/Ibu/Sdr/i dapat menghadiri/ menyaksikan prosesi pernikahan kami, serta jangan lupa konfirmasi kehadiranmu ya pada tautan dibawah ini:
-
-https://kekawinan.com/${link}/${item.id}
-
-Kami juga mengharapkan ucapan, harapan, serta doa Bpk/Ibu/Sdr/i untuk kami.
-
-Atas perhatiannya kami ucapkan terimakasih.`;
-  };
+  const buildInvitationMessage = (item: UndanganTamu) =>
+    renderWhatsappMessage(undangan?.content?.whatsappMessage, {
+      nama_tamu: item.name.replace("&", "dan"),
+      pengantin: undangan?.content?.title?.replace("&", "dan") ?? "",
+      tanggal: undangan?.content?.resepsiTime ?? "",
+      lokasi: undangan?.content?.resepsiPlace ?? "",
+      link: `https://kekawinan.com/${undangan?.permalink ?? ""}/${item.id}`,
+    });
 
   const handleCopyInvitationMessage = async (item: UndanganTamu) => {
     try {
@@ -486,287 +489,259 @@ Atas perhatiannya kami ucapkan terimakasih.`;
     }
   };
 
+  const funnel = [
+    {
+      label: "Tamu di daftar",
+      value: undanganTamu?.total_data,
+      loading: isLoading,
+      className: "bg-brand-green text-white",
+      unitClassName: "text-white/80",
+    },
+    { label: "Dikirim lewat WhatsApp", value: totalKirimWA?.total_send },
+    { label: "Membuka undangan", value: totalKirimWA?.total_read },
+    { label: "Sudah RSVP", value: totalKirimWA?.total_confirm },
+    { label: "Sudah hadir (absensi)", value: totalKirimWA?.total_attended },
+  ];
+
+  const attendance = [
+    { label: "orang diundang", value: undanganOverview?.total_tamu },
+    { label: "akan hadir", value: undanganOverview?.total_tamu_hadir },
+    { label: "tidak hadir", value: undanganOverview?.total_tamu_tidak_hadir },
+    { label: "sudah hadir", value: undanganOverview?.total_tamu_sudah_hadir },
+  ];
+
+  const isFiltered = !!queryParams.search || activeFilter !== "all";
+  const iconButton = `cursor-pointer rounded-md border p-1 ${focusRing} focus-visible:outline-offset-2`;
+
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-1 border-b pb-4">
-        <h1 className="text-2xl font-bold">Tamu Undangan</h1>
-        <p>
-          Kamu dapat melihat perkiraan tamu yang akan hadir serta mengatur data
-          tamu yang di undang
+    <div className="flex flex-col gap-8 text-brand-ink">
+      <header className="relative overflow-hidden rounded-2xl bg-brand-sky p-6 sm:p-8 sm:pr-[200px]">
+        <h1 className="font-recoleta-alt text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.2] font-bold tracking-[-0.02em]">
+          Tamu undangan
+        </h1>
+        <p className="mt-3 max-w-[560px] leading-[1.7] text-brand-muted">
+          Tambahkan tamu, kirim undangan lewat WhatsApp, lalu pantau siapa yang
+          sudah membuka, RSVP, dan hadir.
         </p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-        <div className="bg-[url('/images/bg-fitur.png')] bg-cover bg-center rounded-2xl p-6 border border-gray-200 min-h-[180px] flex  items-end">
-          <div>
-            <h3 className="text-lg font-bold">
-              Total Tamu <br />
-              Undangan
-            </h3>
-            <div className="flex items-end gap-2 mt-4">
-              <h6 className="text-6xl font-bold">
-                {isLoading ? (
-                  <IconLoader2 size={40} className="animate-spin pb-1" />
+        <div className="absolute -bottom-2 right-6 hidden w-[160px] sm:block" aria-hidden="true">
+          <div className="absolute inset-x-[4%] top-[14%] bottom-0 rounded-[48%_48%_16px_16px] bg-brand-yellow" />
+          <BrandCharacter character="courier" className="relative w-full" />
+        </div>
+      </header>
+
+      <section aria-labelledby="ringkasan-heading" className="grid grid-cols-[minmax(0,1fr)] gap-3">
+        <h2 id="ringkasan-heading" className="sr-only">Ringkasan tamu</h2>
+        <dl className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-5">
+          {funnel.map((stat) => {
+            const loading = stat.loading ?? isLoadingTotalKirimWA;
+            return (
+              <div
+                key={stat.label}
+                className={`flex min-h-[132px] flex-col rounded-2xl p-4 sm:p-5 ${stat.className ?? "border border-brand-line bg-brand-cream"}`}
+              >
+                <dt className="font-bold leading-snug">{stat.label}</dt>
+                <dd className="mt-auto flex items-baseline gap-1.5 pt-4">
+                  <span className="font-recoleta-alt text-[clamp(2rem,3.5vw,2.75rem)] leading-none font-bold">
+                    {loading ? (
+                      <IconLoader2 size={28} className="animate-spin" aria-label="Memuat" />
+                    ) : (
+                      stat.value || 0
+                    )}
+                  </span>
+                  <span className={`text-sm ${stat.unitClassName ?? "text-brand-muted"}`}>tamu</span>
+                </dd>
+              </div>
+            );
+          })}
+        </dl>
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 rounded-xl bg-brand-mint px-4 py-3 text-sm">
+          <span className="font-bold">Perkiraan kehadiran</span>
+          {attendance.map((item) => (
+            <span key={item.label} className="flex items-center gap-1">
+              <strong className="font-bold text-brand-green">
+                {isLoadingOverview ? (
+                  <IconLoader2 size={14} className="animate-spin" aria-label="Memuat" />
                 ) : (
-                  undanganTamu?.total_data || 0
+                  item.value || 0
                 )}
-              </h6>
-              <p className="text-muted-foreground pb-1">Tamu</p>
-            </div>
-          </div>
+              </strong>
+              {item.label}
+            </span>
+          ))}
         </div>
-        <div className="bg-[url('/images/bg-fitur.png')] bg-cover bg-center rounded-2xl p-6 border border-gray-200 min-h-[180px] flex  items-end">
+      </section>
+
+      <section
+        aria-labelledby="import-heading"
+        className="grid grid-cols-[minmax(0,1fr)] gap-4 rounded-2xl border border-brand-line bg-brand-cream p-5 sm:p-6"
+      >
+        <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-2">
           <div>
-            <h3 className="text-lg font-bold">
-              Total Kirim <br />
-              Whatsapp
-            </h3>
-            <div className="flex items-end gap-2 mt-4">
-              <h6 className="text-6xl font-bold">
-                {isLoadingTotalKirimWA ? (
-                  <IconLoader2 size={40} className="animate-spin pb-1" />
-                ) : (
-                  totalKirimWA?.total_send || 0
-                )}
-              </h6>
-              <p className="text-muted-foreground pb-1">Tamu</p>
-            </div>
+            <h2 id="import-heading" className="flex items-center gap-2 font-bold">
+              <IconFileSpreadsheet size={20} className="text-brand-leaf" aria-hidden="true" />
+              Import tamu dari Excel
+            </h2>
+            <p className="mt-1 text-sm text-brand-muted">
+              Tambahkan banyak tamu sekaligus dalam dua langkah.
+            </p>
           </div>
-        </div>
-        <div className="bg-[url('/images/bg-fitur.png')] bg-cover bg-center rounded-2xl p-6 border border-gray-200 min-h-[180px] flex  items-end">
-          <div>
-            <h3 className="text-lg font-bold">
-              Total <br />
-              Konfirmasi
-            </h3>
-            <div className="flex items-end gap-2 mt-4">
-              <h6 className="text-6xl font-bold">
-                {isLoadingTotalKirimWA ? (
-                  <IconLoader2 size={40} className="animate-spin pb-1" />
-                ) : (
-                  totalKirimWA?.total_confirm || 0
-                )}
-              </h6>
-              <p className="text-muted-foreground pb-1">Tamu</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-[url('/images/bg-fitur.png')] bg-cover bg-center rounded-2xl p-6 border border-gray-200 min-h-[180px] flex  items-end">
-          <div>
-            <h3 className="text-lg font-bold">
-              Membuka <br />
-              Undangan
-            </h3>
-            <div className="flex items-end gap-2 mt-4">
-              <h6 className="text-6xl font-bold">
-                {isLoadingTotalKirimWA ? (
-                  <IconLoader2 size={40} className="animate-spin pb-1" />
-                ) : (
-                  totalKirimWA?.total_read || 0
-                )}
-              </h6>
-              <p className="text-muted-foreground pb-1">Tamu</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-[url('/images/bg-fitur.png')] bg-cover bg-center rounded-2xl p-6 border border-gray-200 min-h-[180px] flex items-end">
-          <div>
-            <h3 className="text-lg font-bold">
-              Sudah Hadir <br />
-              (Absensi)
-            </h3>
-            <div className="flex items-end gap-2 mt-4">
-              <h6 className="text-6xl font-bold">
-                {isLoadingTotalKirimWA ? (
-                  <IconLoader2 size={40} className="animate-spin pb-1" />
-                ) : (
-                  totalKirimWA?.total_attended || 0
-                )}
-              </h6>
-              <p className="text-muted-foreground pb-1">Tamu</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="max-w-[900px] mx-auto w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-[url('/images/bg-fitur.png')] bg-cover bg-center rounded-2xl p-4 border border-gray-200 flex items-end">
-            <h3 className="font-semibold flex items-center gap-2 justify-center md:w-full">
-              Total Tamu:{" "}
-              {isLoadingOverview ? (
-                <IconLoader2 size={20} className="animate-spin pb-1" />
-              ) : (
-                undanganOverview?.total_tamu || 0
-              )}{" "}
-              Orang
-            </h3>
-          </div>
-          <div className="bg-[url('/images/bg-fitur.png')] bg-cover bg-center rounded-2xl p-4 border border-gray-200 flex items-end">
-            <h3 className="font-semibold flex items-center gap-2 justify-center md:w-full">
-              Akan Hadir:{" "}
-              {isLoadingOverview ? (
-                <IconLoader2 size={20} className="animate-spin pb-1" />
-              ) : (
-                undanganOverview?.total_tamu_hadir || 0
-              )}{" "}
-              Orang
-            </h3>
-          </div>
-          <div className="bg-[url('/images/bg-fitur.png')] bg-cover bg-center rounded-2xl p-4 border border-gray-200 flex items-end">
-            <h3 className="font-semibold flex items-center gap-2 justify-center md:w-full">
-              Tidak Hadir:{" "}
-              {isLoadingOverview ? (
-                <IconLoader2 size={20} className="animate-spin pb-1" />
-              ) : (
-                undanganOverview?.total_tamu_tidak_hadir || 0
-              )}{" "}
-              Orang
-            </h3>
-          </div>
-          <div className="rounded-2xl p-4 border border-gray-200 flex items-end bg-green-soft-kwn">
-            <h3 className="font-semibold flex items-center gap-2 justify-center md:w-full">
-              Sudah Hadir:{" "}
-              {isLoadingOverview ? (
-                <IconLoader2 size={20} className="animate-spin pb-1" />
-              ) : (
-                undanganOverview?.total_tamu_sudah_hadir || 0
-              )}{" "}
-              Orang
-            </h3>
-          </div>
-        </div>
-      </div>
-      {/* Import Excel Card */}
-      <div className="border border-border p-6 rounded-2xl flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <h3 className="font-semibold text-base flex items-center gap-2">
-            <IconFileSpreadsheet size={18} />
-            Import Tamu dari Excel
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            Upload file Excel sesuai template untuk menambahkan banyak tamu sekaligus.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <a
-            href="/docs/template_tamu_undangan.xlsx"
-            download
-            className="inline-flex items-center gap-2 text-sm border border-border rounded-md px-3 py-2 hover:bg-muted transition-colors"
-          >
-            <IconDownload size={14} />
-            Download Template
-          </a>
-          <div className="flex items-center gap-2 flex-1 min-w-[200px] max-w-xs">
-            <Input
-              type="file"
-              accept=".xlsx,.xls"
-              onChange={(e) => {
-                setImportFile(e.target.files?.[0] ?? null);
-                setImportResult(null);
-              }}
-              disabled={isImporting}
-              className="text-sm"
-            />
-          </div>
-          <Button
-            onClick={handleImport}
-            disabled={!importFile || isImporting}
-            size="sm"
-          >
-            {isImporting ? (
-              <>
-                <IconLoader2 size={14} className="animate-spin" />
-                Memproses...
-              </>
-            ) : (
-              "Upload & Proses"
-            )}
-          </Button>
-          <a
+          <Link
             href={`/user/undangan/${id}/tamu-undangan/bulk-log`}
-            className="text-sm text-primary underline underline-offset-2 ml-auto"
+            className={`text-sm font-bold text-brand-green underline underline-offset-4 ${focusRing}`}
           >
-            Lihat Log Import
-          </a>
+            Lihat log import
+          </Link>
         </div>
+        <ol className="grid gap-3 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+          <li className="flex flex-col gap-3 rounded-xl bg-white p-4">
+            <p className="text-sm">
+              <span className="font-bold">1. Isi template</span>
+              <span className="block text-brand-muted">Satu baris untuk satu tamu.</span>
+            </p>
+            <a
+              href="/docs/template_tamu_undangan.xlsx"
+              download
+              className={`mt-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-brand-line px-4 text-sm font-bold transition-colors hover:bg-brand-mint ${focusRing}`}
+            >
+              <IconDownload size={16} aria-hidden="true" />
+              Download template
+            </a>
+          </li>
+          <li className="flex flex-col gap-3 rounded-xl bg-white p-4">
+            <p className="text-sm">
+              <span className="font-bold">2. Upload file</span>
+              <span className="block text-brand-muted">Format .xlsx atau .xls.</span>
+            </p>
+            <div className="mt-auto flex flex-col gap-2 sm:flex-row">
+              {/* Native input stays focusable; the label is the visible picker */}
+              <input
+                id="import-file"
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={(e) => {
+                  setImportFile(e.target.files?.[0] ?? null);
+                  setImportResult(null);
+                }}
+                disabled={isImporting}
+                className="peer sr-only"
+              />
+              <label
+                htmlFor="import-file"
+                className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-2 rounded-xl border border-dashed border-brand-line px-4 text-sm transition-colors hover:bg-brand-mint peer-focus-visible:outline-3 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-brand-focus"
+              >
+                <IconFileSpreadsheet size={16} className="shrink-0 text-brand-leaf" aria-hidden="true" />
+                {importFile ? (
+                  <span className="truncate font-bold">{importFile.name}</span>
+                ) : (
+                  <span className="text-brand-muted">Pilih file Excel</span>
+                )}
+              </label>
+              <button
+                type="button"
+                onClick={handleImport}
+                disabled={!importFile || isImporting}
+                className={`inline-flex min-h-11 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl bg-brand-green px-5 text-sm font-bold text-white transition-colors hover:bg-brand-green-dark disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:bg-brand-green ${focusRing}`}
+              >
+                {isImporting ? (
+                  <>
+                    <IconLoader2 size={16} className="animate-spin" aria-hidden="true" />
+                    Memproses…
+                  </>
+                ) : (
+                  "Upload & proses"
+                )}
+              </button>
+            </div>
+          </li>
+        </ol>
         {importResult && (
-          <div className="rounded-lg border px-4 py-3 flex flex-wrap items-center gap-4 text-sm bg-muted/30">
-            <span className="text-green-600 font-medium">
-              ✓ {importResult.success_count} tamu berhasil
+          <div
+            role="status"
+            className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-xl bg-white px-4 py-3 text-sm"
+          >
+            <span className="flex items-center gap-1.5 font-bold text-brand-green">
+              <IconCircleCheck size={18} aria-hidden="true" />
+              {importResult.success_count} tamu berhasil
             </span>
             {importResult.failed_count > 0 && (
-              <span className="text-red-500 font-medium">
-                ✗ {importResult.failed_count} baris gagal —{" "}
-                <a
+              <span className="flex items-center gap-1.5 font-bold text-brand-rose">
+                <IconAlertTriangle size={18} aria-hidden="true" />
+                {importResult.failed_count} baris gagal,
+                <Link
                   href={`/user/undangan/${id}/tamu-undangan/bulk-log`}
-                  className="underline underline-offset-2"
+                  className={`underline underline-offset-4 ${focusRing}`}
                 >
-                  Lihat log
-                </a>
+                  lihat log
+                </Link>
               </span>
             )}
-            <span className="text-muted-foreground">
-              Total diproses: {importResult.total}
-            </span>
+            <span className="text-brand-muted">Total diproses: {importResult.total}</span>
           </div>
         )}
-      </div>
+      </section>
 
-      <div className="border border-border p-6 rounded-2xl grid gap-4">
-        <div className="flex flex-wrap gap-2 justify-end items-center">
-          {selectedIds.size > 0 && (
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="sm">
-                  {selectedIds.size} Terpilih
-                  <IconChevronDown size={14} className="ml-1" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-52 p-1" align="end">
-                <button
-                  onClick={handleDownloadSelectedQR}
-                  disabled={isDownloadingSelectedQR}
-                  className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors disabled:opacity-50"
-                >
-                  {isDownloadingSelectedQR ? (
-                    <IconLoader2 size={15} className="animate-spin" />
-                  ) : (
-                    <IconDownload size={15} />
-                  )}
-                  Download QR ({selectedIds.size})
-                </button>
-                <button
-                  onClick={() => setIsOpenBulkDelete(true)}
-                  disabled={isBulkDeleting}
-                  className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
-                >
-                  <IconTrash size={15} />
-                  Hapus Terpilih ({selectedIds.size})
-                </button>
-              </PopoverContent>
-            </Popover>
-          )}
-          <Button
-            variant="outline"
-            onClick={handleDownloadAllQr}
-            disabled={isDownloadingZip}
-          >
-            {isDownloadingZip ? (
-              <IconLoader2 size={16} className="animate-spin" />
-            ) : (
-              <IconDownload size={16} />
-            )}
-            Download Semua QR
-          </Button>
-          <Button
-            variant="outline"
+      <section aria-labelledby="daftar-tamu-heading" className="grid grid-cols-[minmax(0,1fr)] gap-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h2 id="daftar-tamu-heading" className="font-recoleta-alt text-2xl font-bold">
+              Daftar tamu
+            </h2>
+            <p className="mt-1 text-sm text-brand-muted">
+              Klik ikon WhatsApp untuk mengirim undangan ke tiap tamu.
+            </p>
+          </div>
+          <button
+            type="button"
             onClick={() => {
               setIsOpen(true);
               setSelectedItem(null);
             }}
+            className={`inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 self-start rounded-xl bg-brand-green px-5 text-sm font-bold text-white transition-colors hover:bg-brand-green-dark lg:self-auto ${focusRing}`}
           >
-            <IconPlus size={16} />
-            Tambah Tamu
-          </Button>
+            <IconPlus size={18} aria-hidden="true" />
+            Tambah tamu
+          </button>
+        </div>
+
+        <div className="flex flex-col gap-2 rounded-xl bg-brand-mint px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+          <p className="flex items-start gap-2">
+            <IconBrandWhatsapp size={18} className="mt-0.5 shrink-0 text-brand-green" aria-hidden="true" />
+            <span>
+              Teks pesan WhatsApp bisa kamu ubah sendiri.{" "}
+              <span className="text-brand-muted">
+                {undangan?.content?.whatsappMessage
+                  ? "Sekarang memakai teks buatanmu."
+                  : "Sekarang memakai teks bawaan."}
+              </span>
+            </span>
+          </p>
+          <Link
+            href={`/user/undangan/${id}/setting`}
+            className={`shrink-0 self-start pl-[26px] font-bold text-brand-green underline underline-offset-4 sm:self-auto sm:pl-0 ${focusRing}`}
+          >
+            Ubah teks pesan
+          </Link>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative w-full sm:w-64">
+            <label htmlFor="cari-tamu" className="sr-only">
+              Cari tamu
+            </label>
+            <IconSearch
+              size={18}
+              className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-brand-muted"
+              aria-hidden="true"
+            />
+            <Input
+              id="cari-tamu"
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cari nama tamu"
+              className="h-11 rounded-xl border-brand-line bg-white pl-10 text-brand-ink focus-visible:border-brand-focus focus-visible:ring-brand-focus/30"
+            />
+          </div>
           <Select
             value={activeFilter}
             onValueChange={(v) => {
@@ -783,188 +758,262 @@ Atas perhatiannya kami ucapkan terimakasih.`;
               );
             }}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger
+              className="h-11! w-[180px] rounded-xl border-brand-line bg-white text-brand-ink"
+              aria-label="Filter status tamu"
+            >
               <SelectValue placeholder="Filter" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua</SelectItem>
-              <SelectItem value="send_1">Sudah Dikirim</SelectItem>
-              <SelectItem value="send_0">Belum Dikirim</SelectItem>
-              <SelectItem value="read_1">Sudah Dilihat</SelectItem>
-              <SelectItem value="read_0">Belum Dilihat</SelectItem>
+              <SelectItem value="all">Semua tamu</SelectItem>
+              <SelectItem value="send_1">Sudah dikirim</SelectItem>
+              <SelectItem value="send_0">Belum dikirim</SelectItem>
+              <SelectItem value="read_1">Sudah dilihat</SelectItem>
+              <SelectItem value="read_0">Belum dilihat</SelectItem>
               <SelectItem value="confirm_1">Sudah RSVP</SelectItem>
               <SelectItem value="confirm_0">Belum RSVP</SelectItem>
-              <SelectItem value="attend_1">Sudah Absen</SelectItem>
-              <SelectItem value="attend_0">Belum Absen</SelectItem>
+              <SelectItem value="attend_1">Sudah absen</SelectItem>
+              <SelectItem value="attend_0">Belum absen</SelectItem>
             </SelectContent>
           </Select>
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari tamu"
-            className="max-w-xs"
-          />
+          <div className="flex flex-wrap gap-2 sm:ml-auto">
+            {selectedIds.size > 0 && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="h-11 rounded-xl border-brand-green bg-brand-mint font-bold text-brand-green hover:bg-brand-mint"
+                  >
+                    {selectedIds.size} dipilih
+                    <IconChevronDown size={16} aria-hidden="true" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-56 p-1" align="end">
+                  <button
+                    onClick={handleDownloadSelectedQR}
+                    disabled={isDownloadingSelectedQR}
+                    className="flex min-h-11 w-full items-center gap-2 rounded-md px-3 text-sm transition-colors hover:bg-brand-mint disabled:opacity-50"
+                  >
+                    {isDownloadingSelectedQR ? (
+                      <IconLoader2 size={16} className="animate-spin" aria-hidden="true" />
+                    ) : (
+                      <IconDownload size={16} aria-hidden="true" />
+                    )}
+                    Download QR ({selectedIds.size})
+                  </button>
+                  <button
+                    onClick={() => setIsOpenBulkDelete(true)}
+                    disabled={isBulkDeleting}
+                    className="flex min-h-11 w-full items-center gap-2 rounded-md px-3 text-sm text-brand-rose transition-colors hover:bg-brand-pink disabled:opacity-50"
+                  >
+                    <IconTrash size={16} aria-hidden="true" />
+                    Hapus terpilih ({selectedIds.size})
+                  </button>
+                </PopoverContent>
+              </Popover>
+            )}
+            <Button
+              variant="outline"
+              onClick={handleDownloadAllQr}
+              disabled={isDownloadingZip}
+              className="h-11 rounded-xl border-brand-line bg-white font-bold text-brand-ink hover:bg-brand-mint"
+            >
+              {isDownloadingZip ? (
+                <IconLoader2 size={16} className="animate-spin" aria-hidden="true" />
+              ) : (
+                <IconDownload size={16} aria-hidden="true" />
+              )}
+              Download semua QR
+            </Button>
+          </div>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-10">
-                <Checkbox
-                  checked={isAllOnPageSelected}
-                  onCheckedChange={toggleSelectAll}
-                  aria-label="Pilih semua"
-                />
-              </TableHead>
-              <TableHead>Nama Tamu</TableHead>
-              <TableHead>No. Whatsapp</TableHead>
-              <TableHead>Total Tamu (Orang)</TableHead>
-              <TableHead>Dilihat</TableHead>
-              <TableHead>RSVP</TableHead>
-              <TableHead>Absensi</TableHead>
-              <TableHead>Hadir Pukul</TableHead>
-              <TableHead className="text-right w-[10%]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TablePending colSpan={9} />
-            ) : tableData.length > 0 ? (
-              tableData.map((item) => (
-                <TableRow key={item.id} data-selected={selectedIds.has(item.id)} className="data-[selected=true]:bg-primary/5">
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedIds.has(item.id)}
-                      onCheckedChange={() => toggleSelect(item.id)}
-                      aria-label={`Pilih ${item.name}`}
-                    />
-                  </TableCell>
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell>{item.phone}</TableCell>
-                  <TableCell>{item.maxInvite}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.isRead ? "bg-primary/10 text-primary" : "bg-red-100 text-red-600"}`}
-                    >
-                      {item.isRead ? "Sudah" : "Belum"}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.isConfirm ? "bg-primary/10 text-primary" : "bg-red-100 text-red-600"}`}
-                    >
-                      {item.isConfirm ? "Sudah" : "Belum"}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.isAttend ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
-                    >
-                      {item.isAttend ? "Hadir" : "Belum"}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
-                    {item.attendedAt
-                      ? new Date(item.attendedAt).toLocaleTimeString("id-ID", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          timeZoneName: "short",
-                        })
-                      : "-"}
-                  </TableCell>
-                  <TableCell className="text-right w-[10%]">
-                    <div className="flex gap-2 justify-end">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger
-                            onClick={() => setQrTamu(item)}
-                            className="cursor-pointer border border-border rounded-md p-1 bg-white"
-                          >
-                            <IconQrcode size={18} />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Lihat & Download QR</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger
-                            onClick={() => {
-                              handleSendWhatsapp(item);
-                            }}
-                            className={`${
-                              !item.sendStatus
-                                ? "bg-green-soft-kwn"
-                                : "bg-white"
-                            } cursor-pointer border border-border rounded-md p-1 `}
-                          >
-                            {!item.sendStatus ? (
-                              <IconBrandWhatsapp size={18} />
-                            ) : (
-                              <IconSend2 size={18} />
-                            )}
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>
-                              {item.sendStatus
-                                ? "Undangan sudah dikirim"
-                                : "Kirim Undangan melalui Whatsapp"}
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger
-                            onClick={() => {
-                              handleCopyInvitationMessage(item);
-                            }}
-                            className="cursor-pointer border border-border rounded-md p-1 bg-white"
-                          >
-                            <IconCopy size={18} />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Copy Text Undangan</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <MenuAction
-                        handleLihat={() => setDetailItem(item)}
-                        handleDelete={() => {
-                          setIsOpenDelete(true);
-                          setSelectedItem(item);
-                        }}
-                        handleEdit={() => {
-                          setIsOpen(true);
-                          setSelectedItem(item);
-                          setName(item.name);
-                          setPhone(item.phone);
-                          setMaxInvite(item.maxInvite.toString());
-                        }}
-                        items={["Lihat", "Hapus", "Edit"]}
+
+        <div className="rounded-2xl border border-brand-line">
+          <Table>
+            <TableCaption className="sr-only">Daftar tamu undangan</TableCaption>
+            <TableHeader>
+              <TableRow className="border-brand-line hover:bg-transparent [&>th]:text-brand-muted">
+                <TableHead className="w-10 pl-4">
+                  <Checkbox
+                    checked={isAllOnPageSelected}
+                    onCheckedChange={toggleSelectAll}
+                    aria-label="Pilih semua tamu di halaman ini"
+                  />
+                </TableHead>
+                <TableHead>Nama tamu</TableHead>
+                <TableHead>No. WhatsApp</TableHead>
+                <TableHead>Jumlah orang</TableHead>
+                <TableHead>Dilihat</TableHead>
+                <TableHead>RSVP</TableHead>
+                <TableHead>Absensi</TableHead>
+                <TableHead>Hadir pukul</TableHead>
+                <TableHead className="w-[10%] pr-4 text-right">
+                  <span className="sr-only">Aksi</span>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TablePending colSpan={9} />
+              ) : tableData.length > 0 ? (
+                tableData.map((item) => (
+                  <TableRow
+                    key={item.id}
+                    data-selected={selectedIds.has(item.id)}
+                    className="border-brand-line hover:bg-brand-cream data-[selected=true]:bg-brand-mint/60"
+                  >
+                    <TableCell className="pl-4">
+                      <Checkbox
+                        checked={selectedIds.has(item.id)}
+                        onCheckedChange={() => toggleSelect(item.id)}
+                        aria-label={`Pilih ${item.name}`}
                       />
+                    </TableCell>
+                    <TableCell className="font-bold">{item.name}</TableCell>
+                    <TableCell className="tabular-nums">{item.phone}</TableCell>
+                    <TableCell>{item.maxInvite}</TableCell>
+                    <TableCell>
+                      <StatusBadge done={!!item.isRead} doneLabel="Sudah" />
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge done={!!item.isConfirm} doneLabel="Sudah" />
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge done={!!item.isAttend} doneLabel="Hadir" />
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap text-sm text-brand-muted tabular-nums">
+                      {item.attendedAt
+                        ? new Date(item.attendedAt).toLocaleTimeString("id-ID", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            timeZoneName: "short",
+                          })
+                        : "-"}
+                    </TableCell>
+                    <TableCell className="w-[10%] pr-4 text-right">
+                      <div className="flex justify-end gap-2">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger
+                              onClick={() => setQrTamu(item)}
+                              aria-label={`QR code ${item.name}`}
+                              className={`${iconButton} border-brand-line bg-white hover:bg-brand-mint`}
+                            >
+                              <IconQrcode size={18} aria-hidden="true" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Lihat & download QR</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger
+                              onClick={() => {
+                                handleSendWhatsapp(item);
+                              }}
+                              aria-label={
+                                item.sendStatus
+                                  ? `Kirim ulang undangan ke ${item.name} lewat WhatsApp`
+                                  : `Kirim undangan ke ${item.name} lewat WhatsApp`
+                              }
+                              className={`${iconButton} ${
+                                !item.sendStatus
+                                  ? "border-brand-green bg-brand-mint text-brand-green"
+                                  : "border-brand-line bg-white text-brand-muted hover:bg-brand-mint"
+                              }`}
+                            >
+                              {!item.sendStatus ? (
+                                <IconBrandWhatsapp size={18} aria-hidden="true" />
+                              ) : (
+                                <IconSend2 size={18} aria-hidden="true" />
+                              )}
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                {item.sendStatus
+                                  ? "Undangan sudah dikirim"
+                                  : "Kirim undangan lewat WhatsApp"}
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger
+                              onClick={() => {
+                                handleCopyInvitationMessage(item);
+                              }}
+                              aria-label={`Salin teks undangan untuk ${item.name}`}
+                              className={`${iconButton} border-brand-line bg-white hover:bg-brand-mint`}
+                            >
+                              <IconCopy size={18} aria-hidden="true" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Salin teks undangan</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <MenuAction
+                          handleLihat={() => setDetailItem(item)}
+                          handleDelete={() => {
+                            setIsOpenDelete(true);
+                            setSelectedItem(item);
+                          }}
+                          handleEdit={() => {
+                            setIsOpen(true);
+                            setSelectedItem(item);
+                            setName(item.name);
+                            setPhone(item.phone);
+                            setMaxInvite(item.maxInvite.toString());
+                          }}
+                          items={["Lihat", "Hapus", "Edit"]}
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow className="hover:bg-transparent">
+                  <TableCell colSpan={9} className="py-10 text-center whitespace-normal">
+                    <div className="mx-auto flex max-w-sm flex-col items-center">
+                      <BrandCharacter character="gift" className="w-28" />
+                      {isFiltered ? (
+                        <>
+                          <p className="mt-4 font-bold">Tidak ada tamu yang cocok</p>
+                          <p className="mt-1 text-sm text-brand-muted">
+                            Coba kata lain atau pilih filter &ldquo;Semua tamu&rdquo;.
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="mt-4 font-bold">Belum ada tamu</p>
+                          <p className="mt-1 text-sm text-brand-muted">
+                            Tambahkan satu per satu, atau import dari Excel di atas.
+                          </p>
+                        </>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableNoData colSpan={9} />
-            )}
-          </TableBody>
-        </Table>
-        <Separator />
-        {!isLoading && (
-          <Pagination
-            page={page}
-            setPage={setPage}
-            totalPage={undanganTamu?.total_page}
-            totalData={undanganTamu?.total_data}
-            pageSize={limit}
-            setPageSize={setLimit}
-            totalDataPerPage={tableData.length}
-          />
-        )}
-      </div>
+              )}
+            </TableBody>
+          </Table>
+          {!isLoading && (
+            <div className="border-t border-brand-line p-4">
+              <Pagination
+                page={page}
+                setPage={setPage}
+                totalPage={undanganTamu?.total_page}
+                totalData={undanganTamu?.total_data}
+                pageSize={limit}
+                setPageSize={setLimit}
+                totalDataPerPage={tableData.length}
+              />
+            </div>
+          )}
+        </div>
+      </section>
 
       <Dialog
         open={isOpen}
@@ -1046,6 +1095,7 @@ Atas perhatiannya kami ucapkan terimakasih.`;
                 Batal
               </Button>
               <Button
+                className="bg-brand-green hover:bg-brand-green-dark"
                 onClick={selectedItem ? handleUpdateTamu : handleCreateTamu}
                 disabled={isPendingCreate || isPendingUpdate}
               >
@@ -1085,7 +1135,7 @@ Atas perhatiannya kami ucapkan terimakasih.`;
                 />
               )}
             </div>
-            <Button className="w-full" onClick={handleDownloadQrPng}>
+            <Button className="w-full bg-brand-green hover:bg-brand-green-dark" onClick={handleDownloadQrPng}>
               <IconDownload size={16} />
               Download PNG
             </Button>
@@ -1195,10 +1245,10 @@ Atas perhatiannya kami ucapkan terimakasih.`;
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-bold">
-              Hapus Ucapan
+              Hapus tamu
             </AlertDialogTitle>
             <AlertDialogDescription className="text-lg text-black font-normal">
-              Apakah kamu yakin ingin menghapus ucapan dari{" "}
+              Apakah kamu yakin ingin menghapus tamu{" "}
               <span className="font-bold">{selectedItem?.name}</span> ?
             </AlertDialogDescription>
           </AlertDialogHeader>

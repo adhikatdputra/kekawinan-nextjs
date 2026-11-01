@@ -12,7 +12,6 @@ const PREVIEW_SECTIONS = [
   "informasi-acara",
   "galeri-foto",
   "love-story",
-  "setting",
 ];
 
 // Wait for a burst of saves (e.g. several gallery uploads) before reloading
@@ -64,7 +63,7 @@ export default function CmsLivePreview() {
       aria-label="Preview undangan"
       className="hidden min-[1400px]:flex flex-col items-center gap-3 shrink-0 sticky top-4"
     >
-      <div className="w-[360px] h-[min(780px,calc(100vh-6rem))] rounded-[2.5rem] border-[10px] border-gray-900 bg-gray-900 overflow-hidden">
+      <div className="w-[360px] h-[min(780px,calc(100vh-6rem))] rounded-[2.5rem] border-[10px] border-brand-ink bg-brand-ink overflow-hidden">
         {/* key forces a fresh load after each save */}
         <iframe
           key={version}
@@ -73,13 +72,13 @@ export default function CmsLivePreview() {
           className="w-full h-full rounded-[1.8rem] bg-white"
         />
       </div>
-      <p className="text-xs text-muted-foreground text-center max-w-[340px]">
+      <p className="max-w-[340px] text-center text-xs text-brand-muted">
         Preview diperbarui setiap kali kamu menyimpan.{" "}
         <a
           href={`/${undangan.permalink}/demo`}
           target="_blank"
           rel="noopener"
-          className="text-green-kwn underline underline-offset-2"
+          className="font-bold text-brand-green underline underline-offset-2"
         >
           Buka penuh
         </a>

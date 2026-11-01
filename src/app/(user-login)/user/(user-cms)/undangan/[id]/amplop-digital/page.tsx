@@ -7,8 +7,6 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import undanganContentApi from "@/frontend/api/undangan-content";
 import bankApi, { BankOption } from "@/frontend/api/bank";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -35,7 +33,19 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import toast from "react-hot-toast";
-import { Loader2, Plus, Pencil, Trash2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { IconPlus, IconEdit, IconTrash, IconLoader2 } from "@tabler/icons-react";
+import {
+  CmsPageHeader,
+  CmsSection,
+  CmsField,
+  cmsFocusRing,
+  cmsInput,
+  cmsTextarea,
+  cmsPrimaryButton,
+  cmsSecondaryButton,
+} from "@/components/pages/undangan/cms-ui";
+import { BrandCharacter } from "@/components/pages/home/brand-visual";
 import { UndanganGift } from "@/frontend/interface/undangan";
 import { getBankPalette } from "@/lib/bank-colors";
 
@@ -208,132 +218,134 @@ export default function AmplopDigitalPage() {
   const getBankOption = (gift: UndanganGift) =>
     gift.bank ?? findBankOption(gift.bankId, gift.bankName);
 
-  return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-1 border-b pb-4">
-        <h1 className="text-2xl font-bold">Amplop Digital</h1>
-        <p>
-          Dengan amplop digital, tamu undangan online dapat memberikan hadiah
-          berupa uang yang di transfer ke rekening atau mengirim kado ke
-          alamatmu.
-        </p>
-      </div>
+  const iconAction = `grid size-10 cursor-pointer place-items-center rounded-lg transition-colors ${cmsFocusRing} focus-visible:outline-offset-2`;
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Bank / eWallet section */}
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold">Bank / eWallet</h2>
-            <Button size="sm" onClick={openAdd}>
-              <Plus size={14} />
-              Tambah Rekening
-            </Button>
+  return (
+    <div className="flex flex-col gap-6 text-brand-ink">
+      <CmsPageHeader
+        title="Amplop digital"
+        description="Tamu bisa mengirim hadiah uang lewat transfer, atau mengirim kado ke alamat kalian."
+      />
+
+      <div className="grid items-start gap-6 xl:grid-cols-2">
+        <section className="rounded-2xl border border-brand-line bg-brand-cream p-4 sm:p-6" aria-labelledby="rekening-heading">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 id="rekening-heading" className="font-bold">Rekening & e-wallet</h2>
+              <p className="mt-1 text-sm text-brand-muted">Tamu bisa menyalin nomornya langsung dari undangan.</p>
+            </div>
+            <button type="button" onClick={openAdd} className={cmsPrimaryButton}>
+              <IconPlus size={18} aria-hidden="true" />
+              Tambah rekening
+            </button>
           </div>
 
           {gifts.length === 0 ? (
-            <div className="border border-dashed border-border rounded-xl p-6 text-center text-muted-foreground text-sm">
-              Belum ada rekening. Klik &ldquo;Tambah Rekening&rdquo; untuk menambahkan.
+            <div className="mt-5 flex flex-col items-center rounded-xl border border-dashed border-brand-line bg-white px-6 py-8 text-center">
+              <BrandCharacter character="gift" className="w-24" />
+              <p className="mt-3 font-bold">Belum ada rekening</p>
+              <p className="mt-1 max-w-xs text-sm text-brand-muted">
+                Tambahkan rekening bank atau e-wallet untuk menerima amplop.
+              </p>
             </div>
           ) : (
-            <div className="flex flex-col gap-3">
+            <ul className="mt-5 grid gap-3">
               {gifts.map((gift) => {
                 const bank = getBankOption(gift);
                 const palette = getBankPalette(bank?.color);
+                const bankLabel = bank?.name ?? gift.bankName;
                 return (
-                  <div
+                  <li
                     key={gift.id}
-                    className="flex items-center justify-between border rounded-xl p-4 gap-3"
+                    className="flex items-center justify-between gap-3 rounded-xl border p-3 sm:p-4"
                     style={{ backgroundColor: palette.tint, borderColor: palette.border }}
                   >
-                    <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex min-w-0 items-center gap-3">
                       {bank?.icon ? (
-                        <div className="relative w-10 h-10 rounded-lg border border-border bg-white overflow-hidden flex-shrink-0">
-                          <Image src={bank.icon} alt={bank.name} fill className="object-contain p-1" />
+                        <div className="relative size-11 shrink-0 overflow-hidden rounded-lg border border-brand-line bg-white">
+                          <Image src={bank.icon} alt="" fill className="object-contain p-1" />
                         </div>
                       ) : (
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                          bank ? "" : "bg-muted text-muted-foreground"
-                        }`} style={bank ? { backgroundColor: palette.soft, color: palette.text } : undefined}>
-                          {bank ? (
-                            bank.code.slice(0, 3).toUpperCase()
-                          ) : (
-                            gift.bankName?.slice(0, 3).toUpperCase() ?? "---"
-                          )}
+                        <div
+                          className={`grid size-11 shrink-0 place-items-center rounded-lg text-xs font-bold ${
+                            bank ? "" : "bg-white text-brand-muted"
+                          }`}
+                          style={bank ? { backgroundColor: palette.soft, color: palette.text } : undefined}
+                          aria-hidden="true"
+                        >
+                          {bank ? bank.code.slice(0, 3).toUpperCase() : gift.bankName?.slice(0, 3).toUpperCase() ?? "---"}
                         </div>
                       )}
                       <div className="min-w-0">
-                        <p className="font-semibold text-sm truncate">{bank?.name ?? gift.bankName}</p>
-                        <p className="text-sm text-muted-foreground font-mono">{gift.bankNumber}</p>
-                        <p className="text-xs text-muted-foreground">{gift.name}</p>
+                        <p className="truncate text-sm font-bold">{bankLabel}</p>
+                        <p className="text-base tabular-nums">{gift.bankNumber}</p>
+                        <p className="truncate text-xs text-brand-muted">a.n. {gift.name}</p>
                       </div>
                     </div>
-                    <div className="flex gap-1 flex-shrink-0">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
+                    <div className="flex shrink-0">
+                      <button
+                        type="button"
                         onClick={() => openEdit(gift)}
+                        aria-label={`Edit rekening ${bankLabel}`}
+                        className={`${iconAction} hover:bg-white`}
                       >
-                        <Pencil size={14} />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 hover:text-red-600 hover:bg-red-50"
+                        <IconEdit size={18} aria-hidden="true" />
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => { setSelectedGift(gift); setIsOpenDelete(true); }}
+                        aria-label={`Hapus rekening ${bankLabel}`}
+                        className={`${iconAction} text-brand-rose hover:bg-white`}
                       >
-                        <Trash2 size={14} />
-                      </Button>
+                        <IconTrash size={18} aria-hidden="true" />
+                      </button>
                     </div>
-                  </div>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           )}
-        </div>
+        </section>
 
-        {/* Penerima Kado section */}
-        <div className="flex flex-col gap-6">
-          <h2 className="text-xl font-bold">Penerima Kado</h2>
-          <div className="grid gap-2">
-            <Label htmlFor="name_address">Nama Penerima</Label>
+        <CmsSection title="Alamat penerima kado" description="Untuk tamu yang ingin mengirim kado fisik.">
+          <CmsField label="Nama penerima" htmlFor="name_address">
             <Input
               id="name_address"
               value={name_address}
               onChange={(e) => setNameAddress(e.target.value)}
-              placeholder="Masukkan nama penerima"
-              className="h-10"
+              autoComplete="name"
+              className={cmsInput}
             />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="phone">No. Telepon</Label>
+          </CmsField>
+          <CmsField label="Nomor telepon" htmlFor="phone">
             <Input
               id="phone"
+              type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="Masukkan nomor telepon"
-              className="h-10"
+              autoComplete="tel"
+              className={cmsInput}
             />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="address">Alamat Pengiriman Kado</Label>
+          </CmsField>
+          <CmsField label="Alamat lengkap" htmlFor="address" hint="Jalan, nomor rumah, kecamatan, kota, dan kode pos.">
             <Textarea
               id="address"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              placeholder="Masukkan alamat pengiriman kado"
+              autoComplete="street-address"
+              className={cmsTextarea}
             />
-          </div>
+          </CmsField>
           <div>
-            <Button onClick={handleSaveAddress} disabled={isSavingAddress}>
+            <button type="button" onClick={handleSaveAddress} disabled={isSavingAddress} className={cmsPrimaryButton}>
               {isSavingAddress ? (
-                <><Loader2 className="animate-spin w-4 h-4" /><span>Menyimpan...</span></>
+                <><IconLoader2 size={18} className="animate-spin" aria-hidden="true" />Menyimpan…</>
               ) : (
-                "Simpan Alamat"
+                "Simpan alamat"
               )}
-            </Button>
+            </button>
           </div>
-        </div>
+        </CmsSection>
       </div>
 
       {/* Dialog: Tambah / Edit Rekening */}
@@ -346,15 +358,14 @@ export default function AmplopDigitalPage() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{selectedGift ? "Edit Rekening" : "Tambah Rekening"}</DialogTitle>
+            <DialogTitle>{selectedGift ? "Edit rekening" : "Tambah rekening"}</DialogTitle>
             <DialogDescription>
-              {selectedGift ? "Ubah data rekening bank / eWallet." : "Tambah rekening bank / eWallet baru."}
+              {selectedGift ? "Ubah data rekening bank atau e-wallet." : "Tambahkan rekening bank atau e-wallet baru."}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex flex-col gap-4">
-            <div className="grid gap-2">
-              <Label>Bank / eWallet <span className="text-red-500">*</span></Label>
+          <div className="grid gap-5">
+            <CmsField label="Bank / e-wallet" htmlFor="bank">
               {banks.length > 0 ? (
                 <Select
                   value={form.bankId || findBankOption(form.bankId, form.bankName)?.id || ""}
@@ -363,19 +374,19 @@ export default function AmplopDigitalPage() {
                     setForm((f) => ({ ...f, bankId: val, bankName: bank?.name ?? f.bankName }));
                   }}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih bank / eWallet..." />
+                  <SelectTrigger id="bank" className="h-11! w-full rounded-xl border-brand-line bg-white text-brand-ink">
+                    <SelectValue placeholder="Pilih bank atau e-wallet" />
                   </SelectTrigger>
                   <SelectContent>
                     {banks.map((bank) => (
                       <SelectItem key={bank.id} value={bank.id}>
                         <div className="flex items-center gap-2">
                           {bank.icon ? (
-                            <div className="relative w-5 h-5 flex-shrink-0">
-                              <Image src={bank.icon} alt={bank.name} fill className="object-contain" />
+                            <div className="relative size-5 shrink-0">
+                              <Image src={bank.icon} alt="" fill className="object-contain" />
                             </div>
                           ) : (
-                            <div className={`w-5 h-5 rounded text-[10px] font-bold flex items-center justify-center flex-shrink-0 ${
+                            <div className={`grid size-5 shrink-0 place-items-center rounded text-[10px] font-bold ${
                               bank.color ? "" : "bg-muted text-muted-foreground"
                             }`} style={bank.color ? {
                               backgroundColor: getBankPalette(bank.color).soft,
@@ -392,46 +403,52 @@ export default function AmplopDigitalPage() {
                 </Select>
               ) : (
                 <Input
-                  placeholder="Nama bank / eWallet"
+                  id="bank"
+                  placeholder="Nama bank atau e-wallet"
                   value={form.bankName}
                   onChange={(e) => setForm((f) => ({ ...f, bankName: e.target.value }))}
+                  className={cmsInput}
                 />
               )}
-            </div>
+            </CmsField>
 
-            <div className="grid gap-2">
-              <Label>Nomor Rekening / eWallet <span className="text-red-500">*</span></Label>
+            <CmsField label="Nomor rekening / e-wallet" htmlFor="bank-number">
               <Input
-                placeholder="Contoh: 0812345678"
+                id="bank-number"
+                inputMode="numeric"
+                placeholder="0812345678"
                 value={form.bankNumber}
                 onChange={(e) => setForm((f) => ({ ...f, bankNumber: e.target.value }))}
+                className={cmsInput}
               />
-            </div>
+            </CmsField>
 
-            <div className="grid gap-2">
-              <Label>Nama Pemilik Rekening <span className="text-red-500">*</span></Label>
+            <CmsField label="Nama pemilik rekening" htmlFor="bank-owner" hint="Sesuai yang tertulis di rekening.">
               <Input
-                placeholder="Nama sesuai rekening"
+                id="bank-owner"
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                className={cmsInput}
               />
-            </div>
+            </CmsField>
           </div>
 
-          <div className="flex gap-2 justify-end pt-2">
-            <Button variant="outline" onClick={() => setIsOpenForm(false)}>
+          <div className="flex flex-wrap justify-end gap-2 pt-2">
+            <button type="button" className={cmsSecondaryButton} onClick={() => setIsOpenForm(false)}>
               Batal
-            </Button>
-            <Button
+            </button>
+            <button
+              type="button"
+              className={cmsPrimaryButton}
               onClick={handleSubmit}
               disabled={isBusy || (!form.bankId && !form.bankName) || !form.bankNumber || !form.name}
             >
               {isBusy ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /><span>Menyimpan...</span></>
+                <><IconLoader2 size={18} className="animate-spin" aria-hidden="true" />Menyimpan…</>
               ) : (
-                "Simpan"
+                "Simpan rekening"
               )}
-            </Button>
+            </button>
           </div>
         </DialogContent>
       </Dialog>
@@ -453,7 +470,7 @@ export default function AmplopDigitalPage() {
             <AlertDialogAction
               onClick={() => selectedGift && deleteGift(selectedGift.id)}
               disabled={isDeleting}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-brand-rose hover:bg-brand-rose/90"
             >
               {isDeleting ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /><span>Menghapus...</span></>

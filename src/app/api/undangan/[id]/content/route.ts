@@ -6,6 +6,7 @@ import { resolveMediaUrl } from '@/lib/helpers'
 import { isActiveCollaborator } from '@/lib/undangan-access'
 import { revalidateUndanganById } from '@/lib/queries/revalidate-undangan'
 import { expiryWithWedding, maxWeddingDate } from '@/lib/undangan-expiry'
+import { WHATSAPP_MESSAGE_MAX_LENGTH } from '@/lib/whatsapp-message'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -97,6 +98,14 @@ export async function PUT(request: NextRequest, { params }: Params) {
         return badRequest('Tanggal pernikahan maksimal 1 tahun sejak undangan dibuat')
       }
       data.dateWedding = dateWedding
+    }
+    if ('whatsappMessage' in body) {
+      const message = typeof body.whatsappMessage === 'string' ? body.whatsappMessage.trim() : ''
+      if (message.length > WHATSAPP_MESSAGE_MAX_LENGTH) {
+        return badRequest(`Pesan WhatsApp maksimal ${WHATSAPP_MESSAGE_MAX_LENGTH} karakter`)
+      }
+      // Empty → null so the invitation falls back to the default template
+      data.whatsappMessage = message || null
     }
     if ('isCovid' in body) {
       data.isCovid = body.isCovid !== undefined ? Number(body.isCovid) : null
